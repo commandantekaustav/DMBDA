@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Plan: Data Mining & Big Data Analytics - Overview</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chosen Palette: "Warm Neutral Harmony" - A calming palette with warm grays, soft beige, and subtle slate blue and terracotta accents for a professional and focused learning environment. -->
+    <!-- Application Structure Plan: This index.html serves as a comprehensive overview. It includes: 1) Key stats & visual summaries. 2) A "Detailed Course Modules" section with accordions to view full session details directly on this page. 3) A separate "Course Modules Index & Navigation" card with links to individual module pages (e.g., /module1/module-1-index.html) for focused viewing/export. This hybrid approach offers both immediate detail and structured navigation. -->
+    <!-- Visualization & Content Choices: 
+        - index.html: 
+            - Key Metrics (Goal: Inform): Static display. Justification: Quick overview.
+            - Course Hours Breakdown (Goal: Inform, Compare): Doughnut & Bar charts (Chart.js). Interaction: Hover. Justification: Quantitative understanding.
+            - Detailed Course Modules (Goal: Organize, Inform): Accordion sections (HTML/JS) showing full session tables. Interaction: Click to expand/collapse. Justification: Provides all details on the main page for users who prefer it, keeps layout manageable.
+            - Course Modules Index (Goal: Organize, Navigate): Links to individual module pages. Justification: Clear navigation for users who want to go to dedicated module pages.
+        - Module Pages (User to create): Session tables.
+        - PDF Export (Goal: Utility): Print-to-PDF.
+        - Icons (Goal: Inform): Unicode characters.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .faceprep-logo {
+            font-weight: bold;
+            color: #4A5568; /* Tailwind gray-700 */
+            font-size: 1.25rem;
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border: 2px solid #4A5568;
+            border-radius: 0.25rem;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .accordion-button.active + .accordion-content {
+            max-height: 2000px; /* Adjust as needed */
+        }
+        .accordion-button .accordion-icon {
+            transition: transform 0.3s ease;
+        }
+        .accordion-button.active .accordion-icon {
+            transform: rotate(180deg);
+        }
+        @media print {
+            body {
+                font-size: 10pt; /* Adjusted for better fit */
+                line-height: 1.3;
+            }
+            .no-print {
+                display: none !important;
+            }
+            header, footer {
+                text-align: center;
+            }
+            section {
+                page-break-inside: avoid;
+                margin-bottom: 15px; /* Reduced margin for print */
+            }
+            .chart-container canvas {
+                max-width: 100% !important;
+                height: auto !important;
+                /* display: none; /* Optionally hide charts for print if too complex */
+            }
+            .bg-white {
+                box-shadow: none !important;
+                border: 1px solid #ccc;
+                padding: 0.5rem !important; /* Reduced padding for cards */
+            }
+            a {
+                text-decoration: none;
+                color: black;
+            }
+            .module-link-card, .accordion-button {
+                border: 1px solid #ddd;
+                padding: 0.5rem !important;
+                margin-bottom: 0.5rem;
+            }
+            table { width: 100%; border-collapse: collapse; margin-top:10px; }
+            th, td { border: 1px solid #eee; padding: 4px; text-align: left; font-size: 9pt;}
+            th { background-color: #f0f0f0; }
+            .accordion-content {max-height: none !important; overflow: visible !important;} /* Ensure accordion content is visible for print */
+        }
+    </style>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-10">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900">Data Mining & Big Data Analytics</h1>
+            <p class="text-lg text-gray-600 mt-2">Course Plan (E1CAB701) - Overview</p>
+        </header>
+
+        <div class="text-center mb-8 no-print">
+            <button onclick="window.print()" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-lg shadow transition duration-150 ease-in-out">
+                Export Overview to PDF
+            </button>
+        </div>
+
+        <section id="key-metrics" class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 text-center mb-12">
+            <div class="bg-white p-4 rounded-lg shadow-sm">
+                <h3 class="text-sm md:text-base font-semibold text-gray-500">Total Hours</h3>
+                <p class="text-2xl md:text-3xl font-bold text-slate-800">90</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-sm">
+                <h3 class="text-sm md:text-base font-semibold text-gray-500">Total Modules</h3>
+                <p class="text-2xl md:text-3xl font-bold text-slate-800">5</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-sm">
+                <h3 class="text-sm md:text-base font-semibold text-gray-500">Theory Hours</h3>
+                <p class="text-2xl md:text-3xl font-bold text-slate-800">18 (20%)</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-sm">
+                <h3 class="text-sm md:text-base font-semibold text-gray-500">Practical Hours</h3>
+                <p class="text-2xl md:text-3xl font-bold text-slate-800">72 (80%)</p>
+            </div>
+        </section>
+        
+        <section id="visualizations" class="mb-12">
+            <h2 class="text-2xl font-bold text-center text-gray-800 mb-8">Course Structure at a Glance</h2>
+            <div class="bg-white p-12 rounded-lg shadow-md">
+                 <p class="text-gray-600 text-center mb-8">
+                    This section provides a visual breakdown of the course's time allocation. The doughnut chart highlights the course's strong emphasis on practical, hands-on learning, while the bar chart details how your time will be distributed across different learning activities. Hover over any segment on the charts to see the precise number of hours.
+                </p>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                    <div class="chart-container">
+                        <canvas id="hoursSplitChart"></canvas>
+                        <p class="text-center text-sm text-gray-500 mt-2">Theory vs. Practical Hours</p>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="activityTypeChart"></canvas>
+                         <p class="text-center text-sm text-gray-500 mt-2">Hours by Activity Type</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="detailed-modules" class="mb-12">
+            <h2 class="text-2xl font-bold text-center text-gray-800 mb-8">Detailed Course Modules</h2>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                 <p class="text-gray-600 text-center mb-8">
+                   Explore the entire 90-hour course, broken down by module. Click on any module title to expand it and view a detailed, session-by-session plan, including topics, session types, durations, and textbook references.
+                </p>
+                <div id="accordion-modules-container" class="space-y-4">
+                    <!-- Detailed accordion modules will be dynamically inserted here -->
+                </div>
+            </div>
+        </section>
+
+        <section id="modules-navigation-index" class="mb-12">
+            <h2 class="text-2xl font-bold text-center text-gray-800 mb-8">Course Modules Index & Navigation</h2>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                 <p class="text-gray-600 text-center mb-8">
+                   Quickly navigate to a dedicated page for each module. These pages are optimized for focused viewing and individual PDF export.
+                </p>
+                <div id="modules-links-container" class="space-y-4">
+                    <!-- Module links for navigation will be dynamically inserted here -->
+                </div>
+            </div>
+        </section>
+
+         <footer class="text-center mt-12 py-6 border-t border-gray-300">
+            <div class="mb-4">
+                 <span class="faceprep-logo">FACE Prep</span>
+            </div>
+            <p class="text-gray-600 text-sm">&copy; <span id="currentYear"></span> FACE Prep Campus (www.faceprep.in). All rights reserved.</p>
+            <p class="text-gray-500 text-xs mt-1"> click on the <a href="https://forms.gle/xxzn62PcQeZAd6heA">support</a> link for any queries.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Data for Accordion Modules (Detailed View)
+        const detailedCourseData = {
+            modules: [
+                {
+                    title: "Module I: Overview and Foundations",
+                    totalHours: 14,
+                    focus: "Understanding core concepts of data mining, big data, its applications, lifecycle, and introduction to big data technologies.",
+                    sessions: [
+                        { num: 1, topic: "Overview of data mining and big data", type: "Theory 📖", dur: 1, ref: "Han et al.: Ch. 1; Zikopoulos & Eaton: Ch. 1, 2" },
+                        { num: 2, topic: "Key concepts, importance, and applications in business", type: "Theory 📖", dur: 1, ref: "Han et al.: Ch. 1.3; Zikopoulos & Eaton: Ch. 1" },
+                        { num: 3, topic: "Lab 1: Exploring Big Data Landscapes & Use Cases", type: "Guided Practical 💻", dur: 2, ref: "Conceptual basis from Ch. 1-2" },
+                        { num: 4, topic: "Introduction to big data technologies (Hadoop, Spark)", type: "Theory 📖", dur: 1, ref: "Zikopoulos & Eaton: Ch. 3, 5, 6" },
+                        { num: 5, topic: "Architecture of Hadoop and Spark", type: "Theory 📖", dur: 1, ref: "Zikopoulos & Eaton: Ch. 5, 6; White: Part II, III" },
+                        { num: 6, topic: "Data mining lifecycle", type: "Theory 📖", dur: 1, ref: "Han et al.: Ch. 1.2, 2.1; Zikopoulos & Eaton: Ch. 2" },
+                        { num: 7, topic: "Lab 2: Data Mining Lifecycle in Practice & Mini-Project Brainstorming", type: "Guided Practical 💻", dur: 2, ref: "Conceptual basis from Ch. 1-2" },
+                        { num: 8, topic: "Mini Project: Phase 1 - Introduction & Ideation", type: "Mini Project 🔬", dur: 2, ref: "Primary: Project Work" },
+                        { num: 9, topic: "Blended Learning: Introduction to Hadoop & Ecosystem (Coursera)", type: "Blended Learning 🌐", dur: 3, ref: "Coursera Material" }
+                    ]
+                },
+                {
+                    title: "Module II: Data Preprocessing and Core Mining Techniques",
+                    totalHours: 19,
+                    focus: "Data preparation, handling different data types, and applying fundamental data mining algorithms like clustering, classification, and association rule mining.",
+                    sessions: [
+                        { num: 10, topic: "Data preprocessing: cleaning, transformation", type: "Theory 📖", dur: 1, ref: "Han et al.: Ch. 3" },
+                        { num: 11, topic: "Lab 3: Data Preprocessing with Python", type: "Guided Practical 💻", dur: 2, ref: "Concepts from Han et al. Ch. 3" },
+                        { num: 12, topic: "Lab 4: Introduction to Unstructured Data Handling", type: "Guided Practical 💻", dur: 1, ref: "Conceptual link to Han et al. Ch. 3.1.5" },
+                        { num: 13, topic: "Overview of clustering algorithms (e.g., K-Means)", type: "Theory 📖", dur: 1, ref: "Han et al.: Ch. 10" },
+                        { num: 14, topic: "Lab 5: Clustering with Python", type: "Guided Practical 💻", dur: 2, ref: "Concepts from Han et al. Ch. 10" },
+                        { num: 15, topic: "Classification algorithms overview (Decision trees, k-NN, Naive Bayes)", type: "Theory 📖", dur: 1, ref: "Han et al.: Ch. 8" },
+                        { num: 16, topic: "Lab 6: Classification with Python", type: "Guided Practical 💻", dur: 2, ref: "Concepts from Han et al. Ch. 8" },
+                        { num: 17, topic: "Association rule mining (Apriori and FP-Growth concepts)", type: "Theory 📖", dur: 1, ref: "Han et al.: Ch. 6" },
+                        { num: 18, topic: "Lab 7: Association Rule Mining with Python", type: "Guided Practical 💻", dur: 2, ref: "Concepts from Han et al. Ch. 6" },
+                        { num: 19, topic: "Mini Project: Phase 2 - Data Understanding and Preprocessing Plan", type: "Mini Project 🔬", dur: 2, ref: "Concepts from Han et al. Ch. 3" },
+                        { num: 20, topic: "Blended Learning: HDFS and MapReduce Fundamentals (Coursera)", type: "Blended Learning 🌐", dur: 5, ref: "Coursera Material" }
+                    ]
+                },
+                 {
+                    title: "Module III: Big Data Platforms - Hadoop and Spark",
+                    totalHours: 21,
+                    focus: "Understanding and using Hadoop ecosystem components (HDFS, MapReduce) and Apache Spark for large-scale data processing, including real-time data.",
+                    sessions: [
+                        { num: 21, topic: "Hadoop ecosystem (HDFS, MapReduce concepts)", type: "Theory 📖", dur: 1, ref: "Zikopoulos & Eaton: Ch. 5; White: Ch. 2, 3, 6-8" },
+                        { num: 22, topic: "Lab 8: Working with HDFS & MapReduce Concepts", type: "Guided Practical 💻", dur: 2, ref: "Concepts from Zikopoulos & Eaton Ch. 5, White Ch. 3, 6-8" },
+                        { num: 23, topic: "Apache Spark introduction", type: "Theory 📖", dur: 1, ref: "Zikopoulos & Eaton: Ch. 6" },
+                        { num: 24, topic: "Lab 9: Introduction to Apache Spark (Core, SQL)", type: "Guided Practical 💻", dur: 2, ref: "Zikopoulos & Eaton Ch. 6; Spark docs" },
+                        { num: 25, topic: "Real-time data processing: Spark Streaming Concepts", type: "Theory 📖", dur: 1, ref: "Zikopoulos & Eaton: Ch. 7" },
+                        { num: 26, topic: "Lab 10: Spark Streaming Basics Demo/Lab", type: "Guided Practical 💻", dur: 1, ref: "Zikopoulos & Eaton Ch. 7; Spark Streaming docs" },
+                        { num: 27, topic: "Lab 11: Big Data Case Studies Analysis (Business & Scientific)", type: "Guided Practical 💻", dur: 2, ref: "Zikopoulos & Eaton Ch. 9-11" },
+                        { num: 28, topic: "Mini Project: Phase 3 - Platform Selection & Initial Implementation", type: "Mini Project 🔬", dur: 4, ref: "Primary: Project Work" },
+                        { num: 29, topic: "Blended Learning: Advanced Hadoop/MapReduce & Spark Intro (Coursera)", type: "Blended Learning 🌐", dur: 7, ref: "Coursera Material" }
+                    ]
+                },
+                {
+                    title: "Module IV: Machine Learning for Big Data with Spark",
+                    totalHours: 18,
+                    focus: "Applying supervised and unsupervised machine learning techniques on large datasets using Spark MLlib, including model evaluation and tuning.",
+                    sessions: [
+                        { num: 30, topic: "Supervised learning concepts for big data", type: "Theory 📖", dur: 1, ref: "Han et al.: Ch. 8, 9; Zikopoulos & Eaton: Ch. 7" },
+                        { num: 31, topic: "Lab 12: Supervised Learning with Spark MLlib (Classification)", type: "Guided Practical 💻", dur: 2, ref: "Zikopoulos & Eaton Ch. 7; Spark MLlib docs" },
+                        { num: 32, topic: "Unsupervised learning concepts for big data", type: "Theory 📖", dur: 1, ref: "Han et al.: Ch. 10, 11; Zikopoulos & Eaton: Ch. 7" },
+                        { num: 33, topic: "Lab 13: Unsupervised Learning & Regression with Spark MLlib", type: "Guided Practical 💻", dur: 2, ref: "Zikopoulos & Eaton Ch. 7; Spark MLlib docs" },
+                        { num: 34, topic: "Lab 14: Model Evaluation and Tuning in Spark", type: "Guided Practical 💻", dur: 2, ref: "Han et al. Ch. 8.6; Spark MLlib docs" },
+                        { num: 35, topic: "Mini Project: Phase 4 - ML Implementation & Evaluation", type: "Mini Project 🔬", dur: 5, ref: "Primary: Project Work" },
+                        { num: 36, topic: "Blended Learning: Spark MLlib and Advanced Topics (Coursera)", type: "Blended Learning 🌐", dur: 5, ref: "Coursera Material / Spark MLlib docs" }
+                    ]
+                },
+                {
+                    title: "Module V: Advanced Topics, Ethics, and Project Conclusion",
+                    totalHours: 18,
+                    focus: "Exploring trends in big data analytics (AI, IoT, Cloud), ethical considerations, data privacy, and completing the big data mini-project.",
+                     sessions: [
+                        { num: 37, topic: "Trends in big data analytics: AI integration", type: "Theory 📖", dur: 1, ref: "Han et al.: Ch. 13; Zikopoulos & Eaton: Ch. 8, 12" },
+                        { num: 38, topic: "Trends: IoT and cloud integration in Big Data", type: "Theory 📖", dur: 1, ref: "Zikopoulos & Eaton: Ch. 8, 12" },
+                        { num: 39, topic: "Ethics in big data and Data privacy laws/regulations", type: "Theory 📖", dur: 1, ref: "Han et al.: Ch. 13.3; General reading" },
+                        { num: 40, topic: "Lab 15: Advanced Case Studies & Ethical Dilemmas", type: "Guided Practical 💻", dur: 2, ref: "Zikopoulos & Eaton Ch. 9-11; External sources" },
+                        { num: 41, topic: "Lab 16: Emerging Tech Exploration & Project Refinement", type: "Guided Practical 💻", dur: 1, ref: "Self-directed research" },
+                        { num: 42, topic: "Mini Project: Phase 5 - Finalization, Report Writing & Review", type: "Mini Project 🔬", dur: 7, ref: "Primary: Project Work" },
+                        { num: 43, topic: "Mini Project: Phase 6 - Presentations & Evaluation", type: "Mini Project 🔬", dur: 2, ref: "Primary: Project Work" },
+                        { num: 44, topic: "Blended Learning: Capstone Review / Advanced Case Studies (Coursera)", type: "Blended Learning 🌐", dur: 3, ref: "Coursera Material" }
+                    ]
+                }
+            ]
+        };
+
+        // Data for Module Navigation Links
+        const courseNavigationData = {
+            modules: [
+                { id: "module1", title: "Module I: Overview and Foundations", filePath: "module1/module-1-index.html", focus: "Core concepts, lifecycle, intro to Hadoop/Spark." },
+                { id: "module2", title: "Module II: Data Preprocessing and Core Mining Techniques", filePath: "module2/module-2-index.html", focus: "Data cleaning, transformation, clustering, classification." },
+                { id: "module3", title: "Module III: Big Data Platforms - Hadoop and Spark", filePath: "module3/module-3-index.html", focus: "HDFS, MapReduce, Spark Core, SQL, Streaming." },
+                { id: "module4", title: "Module IV: Machine Learning for Big Data with Spark", filePath: "module4/module-4-index.html", focus: "Supervised/unsupervised learning with Spark MLlib." },
+                { id: "module5", title: "Module V: Advanced Topics, Ethics, and Project Conclusion", filePath: "module5/module-5-index.html", focus: "AI, IoT, Cloud trends, ethics, capstone project." }
+            ]
+        };
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+            // Chart 1: Theory vs Practical
+            const hoursSplitCtx = document.getElementById('hoursSplitChart').getContext('2d');
+            new Chart(hoursSplitCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Theory Hours', 'Practical Hours'],
+                    datasets: [{
+                        label: 'Course Hours',
+                        data: [18, 72],
+                        backgroundColor: ['#64748b', '#f1f5f9'], 
+                        borderColor: ['#475569', '#cbd5e1'], 
+                        borderWidth: 1,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) { label += ': '; }
+                                    if (context.parsed !== null) { label += context.parsed + ' hours'; }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Chart 2: Hours by Activity Type
+            const activityTypeCtx = document.getElementById('activityTypeChart').getContext('2d');
+            new Chart(activityTypeCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Theory', 'Guided Labs', 'Mini Project', 'Blended Learning'],
+                    datasets: [{
+                        label: 'Hours per Activity',
+                        data: [18, 27, 20, 25],
+                        backgroundColor: ['#64748b', '#94a3b8', '#cbd5e1', '#e2e8f0'],
+                        borderColor: '#475569',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) { label += ': '; }
+                                    if (context.parsed.x !== null) { label += context.parsed.x + ' hours'; }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: { x: { beginAtZero: true } }
+                }
+            });
+
+            // Populate Accordion Modules
+            const accordionModulesContainer = document.getElementById('accordion-modules-container');
+            detailedCourseData.modules.forEach(module => {
+                const moduleEl = document.createElement('div');
+                moduleEl.className = 'border border-gray-200 rounded-lg';
+                
+                const tableRows = module.sessions.map(session => `
+                    <tr class="border-b border-gray-200 hover:bg-gray-50">
+                        <td class="py-2 px-3 text-center text-xs text-gray-600">${session.num}</td>
+                        <td class="py-2 px-3 text-xs font-medium text-gray-800">${session.topic}</td>
+                        <td class="py-2 px-3 text-xs text-gray-600">${session.type}</td>
+                        <td class="py-2 px-3 text-center text-xs text-gray-600">${session.dur}</td>
+                        <td class="py-2 px-3 text-xs text-gray-500 hidden md:table-cell">${session.ref}</td>
+                    </tr>
+                `).join('');
+
+                moduleEl.innerHTML = `
+                    <button class="accordion-button w-full text-left p-4 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-slate-400 rounded-t-lg flex justify-between items-center">
+                        <div>
+                            <h3 class="font-bold text-lg text-slate-800">${module.title}</h3>
+                            <p class="text-sm text-gray-600">${module.focus}</p>
+                        </div>
+                         <div class="accordion-icon text-slate-600 text-2xl font-thin transform">
+                            &#8964;
+                        </div>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="p-4 overflow-x-auto">
+                            <table class="w-full table-auto">
+                                <thead>
+                                    <tr class="bg-gray-50 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                        <th class="py-2 px-3 w-10 text-center">#</th>
+                                        <th class="py-2 px-3">Topic</th>
+                                        <th class="py-2 px-3">Type</th>
+                                        <th class="py-2 px-3 w-14 text-center">Hours</th>
+                                        <th class="py-2 px-3 hidden md:table-cell">Textbook Chapters/Sections</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${tableRows}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+                accordionModulesContainer.appendChild(moduleEl);
+            });
+
+            // Accordion Logic
+            document.querySelectorAll('.accordion-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    const currentlyActive = document.querySelector('.accordion-button.active');
+                    if(currentlyActive && currentlyActive !== button){
+                        currentlyActive.classList.remove('active');
+                    }
+                    button.classList.toggle('active');
+                });
+            });
+
+            // Populate Module Navigation Links
+            const modulesLinksContainer = document.getElementById('modules-links-container');
+            courseNavigationData.modules.forEach(module => {
+                const moduleLinkEl = document.createElement('a');
+                moduleLinkEl.href = module.filePath;
+                moduleLinkEl.className = 'module-link-card block bg-gray-100 hover:bg-gray-200 p-4 rounded-lg shadow-sm transition duration-150 ease-in-out';
+                
+                moduleLinkEl.innerHTML = `
+                    <h3 class="font-bold text-lg text-slate-800">${module.title}</h3>
+                    <p class="text-sm text-gray-600 mt-1">${module.focus}</p>
+                    <p class="text-sm text-slate-600 hover:text-slate-800 font-semibold mt-2">View Dedicated Module Page &rarr;</p>
+                `;
+                modulesLinksContainer.appendChild(moduleLinkEl);
+            });
+        });
+    </script>
+</body>
+</html>
