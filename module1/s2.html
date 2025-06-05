@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 2: Key Concepts, Importance & Applications - Module I</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: "Warm Neutral Harmony" -->
+    <!-- Application Structure Plan: This is a single session detail page. Structure: 1) Header with logo, module & session title, breadcrumbs. 2) Export button. 3) Session details. 4) Learning Objectives. 5) Extensive content sections with interactive elements (e.g., application explorer, case study highlights). 6) Key Takeaways. 7) Footer. Goal: Deep, focused learning. -->
+    <!-- Visualization & Content Choices: 
+        - Recap of Data Mining/Big Data.
+        - Discussion on importance (decision-making, innovation).
+        - Interactive "Application Explorer" for business sectors (tabs/accordions).
+        - Mini Case Study Spotlights (text-based, perhaps with a simple visual cue).
+        - PDF Export: Print-specific CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            font-size: 1rem; 
+            line-height: 1.625; 
+        }
+        
+        .interactive-term { 
+            cursor: pointer;
+            font-weight: 600; 
+        }
+        .definition-tooltip {
+            display: none;
+            position: absolute;
+            background-color: #f9fafb; 
+            border: 1px solid #d1d5db; 
+            padding: 8px; 
+            border-radius: 4px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            z-index: 100;
+            font-size: 0.875rem; 
+            width: max-content;
+            max-width: 300px; 
+        }
+
+        h1.page-title { font-size: 2.25rem; line-height: 2.5rem; } 
+        h2.section-title { font-size: 1.5rem; line-height: 2rem; margin-bottom: 0.75rem;} 
+        h3.subsection-title { font-size: 1.25rem; line-height: 1.75rem; margin-bottom: 0.5rem;}    
+        h4.detail-title { font-size: 1.125rem; line-height: 1.75rem; margin-bottom: 0.375rem;} 
+
+        .app-tab {
+            cursor: pointer;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .app-tab.active {
+            background-color: #3b82f6; /* Tailwind blue-500 */
+            color: white;
+            border-bottom-color: transparent;
+        }
+        .app-content {
+            display: none;
+        }
+        .app-content.active {
+            display: block;
+        }
+
+        @media print {
+            body { font-size: 10pt; line-height: 1.4; } 
+            .no-print { display: none !important; }
+            header { display: flex; flex-direction: column; align-items: center; text-align: center; }
+            .header-logo-print { max-width: 150px; max-height: 50px; margin-bottom: 10px; } 
+            .footer-logo-print { max-width: 100px; max-height: 30px; margin-top: 10px; } 
+            footer { text-align: center; }
+            section, .content-section { page-break-inside: avoid; margin-bottom: 15px; } 
+            .bg-white { box-shadow: none !important; border: 1px solid #ccc; padding: 0.5rem !important;}
+            a { text-decoration: none; color: black; }
+            .interactive-term { text-decoration: none; color: black; font-weight: bold; } 
+            .definition-tooltip { display: none !important; }
+            .print-only-definition { display: block !important; position: static !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin-top: 2px; font-style: italic; font-size: 0.9em;} 
+            .app-tab-container-web {display: none !important;}
+            .app-content {display: block !important; border-top: 1px solid #eee; padding-top: 5px; margin-top: 5px;}
+            h1.page-title { font-size: 20pt; } 
+            h2.section-title { font-size: 16pt; }
+            h3.subsection-title { font-size: 14pt; }
+            h4.detail-title { font-size: 12pt; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+</head>
+<body class="bg-gray-100 text-gray-800"> 
+    <div class="container mx-auto p-4 md:p-8"> 
+        <header class="mb-10"> 
+            <div class="flex flex-col sm:flex-row items-center justify-between">
+                <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-16 md:h-20 mb-4 sm:mb-0 header-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+                <div class="text-center sm:text-right sm:ml-4"> 
+                    <p class="text-base text-gray-500">Module I: Overview and Foundations</p> 
+                    <h1 class="page-title text-3xl md:text-4xl font-bold text-gray-900 mt-1">Session 2: Key Concepts, Importance & Applications</h1> 
+                    <p class="text-lg text-gray-600 mt-2">Data Mining & Big Data Analytics</p> 
+                </div>
+            </div>
+            <nav aria-label="Breadcrumb" class="mt-4 text-sm text-gray-500 no-print"> 
+                <ol class="list-none p-0 inline-flex">
+                    <li class="flex items-center">
+                        <a href="../index.html" class="text-slate-600 hover:text-slate-800">Course Overview</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="flex items-center">
+                        <a href="module-1-index.html" class="text-slate-600 hover:text-slate-800">Module I</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="text-gray-700 font-semibold" aria-current="page">Session 2</li> 
+                </ol>
+            </nav>
+        </header>
+
+        <div class="text-center mb-8 no-print"> 
+            <button onclick="window.print()" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-150 ease-in-out text-base"> 
+                Export Session 2 to PDF
+            </button>
+        </div>
+
+        <article class="bg-white p-6 md:p-8 rounded-lg shadow-lg"> 
+            <section class="mb-6 border-b pb-4"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-2">Session Details</h2> 
+                <p class="text-base text-gray-700"><span class="font-semibold">Type:</span> Theory 📖</p>
+                <p class="text-base text-gray-700"><span class="font-semibold">Duration:</span> 1 Hour</p>
+                <p class="text-base text-gray-700"><span class="font-semibold">Textbook References:</span> Han et al.: Ch. 1.3; Zikopoulos & Eaton: Ch. 1.</p>
+            </section>
+
+            <section class="mb-8 content-section"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Learning Objectives</h2> 
+                <p class="text-base text-gray-700 mb-3">By the end of this session, you will be able to:</p>
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1"> 
+                    <li>Explain the critical importance of Data Mining and Big Data in modern contexts.</li>
+                    <li>Identify and describe diverse applications of Data Mining and Big Data in various business sectors.</li>
+                    <li>Illustrate the impact of these technologies using real-world case examples.</li>
+                    <li>Recognize how data-driven insights can lead to innovation and competitive advantage.</li>
+                </ul>
+            </section>
+
+            <div class="definition-tooltip"></div>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Recap: Data Mining & Big Data</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    In our previous session, we defined 
+                    <span class="interactive-term" data-definition="The process of discovering patterns, correlations, anomalies, and other useful information from large datasets.">Data Mining</span> as the process of extracting valuable, hidden knowledge from data, and 
+                    <span class="interactive-term" data-definition="Extremely large datasets characterized by Volume, Velocity, Variety, Veracity, and Value, requiring advanced tools for analysis.">Big Data</span> by its defining characteristics (the 5 V's). Today, we build upon this by exploring why these concepts are so crucial and where they are making a significant impact, particularly in the business world.
+                </p>
+                <div class="print-only-definition">
+                    <p><strong>Data Mining:</strong> The process of discovering patterns and useful information from large datasets.</p>
+                    <p><strong>Big Data:</strong> Extremely large datasets characterized by Volume, Velocity, Variety, Veracity, and Value.</p>
+                </div>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">The Importance of Data Mining & Big Data</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    The convergence of Data Mining techniques and the availability of Big Data has created a paradigm shift in how organizations operate and innovate. Understanding and leveraging data is no longer a niche activity but a core strategic imperative.
+                </p>
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-2 leading-relaxed">
+                    <li>
+                        <strong>Enhanced Decision-Making:</strong> By analyzing historical data and identifying trends, organizations can move from intuition-based decisions to evidence-based strategies, leading to more accurate and effective outcomes.
+                    </li>
+                    <li>
+                        <strong>Improved Operational Efficiency:</strong> Insights from data can help streamline processes, reduce waste, optimize resource allocation, and identify bottlenecks. For example, predictive maintenance in manufacturing can prevent costly equipment failures.
+                    </li>
+                    <li>
+                        <strong>Deeper Customer Understanding:</strong> Businesses can gain unprecedented insights into customer behavior, preferences, and needs. This allows for personalized marketing, improved customer service, and the development of products and services that better meet customer demands.
+                    </li>
+                    <li>
+                        <strong>Innovation and New Opportunities:</strong> Analyzing Big Data can reveal unmet needs or emerging trends, sparking innovation and the creation of entirely new business models, products, or services.
+                    </li>
+                    <li>
+                        <strong>Competitive Advantage:</strong> Organizations that effectively utilize data mining and big data analytics can gain a significant edge over competitors by making smarter decisions, responding more quickly to market changes, and offering superior value to customers.
+                    </li>
+                    <li>
+                        <strong>Risk Management:</strong> Advanced analytics can help in identifying, quantifying, and mitigating various risks, from financial fraud to cybersecurity threats and supply chain disruptions.
+                    </li>
+                </ul>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Applications in Business Domains</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-4">
+                    Data Mining and Big Data find applications across virtually every business sector. Below are some prominent examples. Click on an industry tab to explore specific use cases:
+                </p>
+                <div class="app-tab-container-web no-print">
+                    <div class="flex flex-wrap border-b border-gray-300 mb-4">
+                        <button class="app-tab active py-2 px-4 text-sm font-medium text-gray-600 hover:bg-gray-200 rounded-t-md" data-app="retail">Retail & E-commerce</button>
+                        <button class="app-tab py-2 px-4 text-sm font-medium text-gray-600 hover:bg-gray-200 rounded-t-md" data-app="finance">Finance & Banking</button>
+                        <button class="app-tab py-2 px-4 text-sm font-medium text-gray-600 hover:bg-gray-200 rounded-t-md" data-app="healthcare">Healthcare</button>
+                        <button class="app-tab py-2 px-4 text-sm font-medium text-gray-600 hover:bg-gray-200 rounded-t-md" data-app="telecom">Telecommunications</button>
+                        <button class="app-tab py-2 px-4 text-sm font-medium text-gray-600 hover:bg-gray-200 rounded-t-md" data-app="manufacturing">Manufacturing</button>
+                    </div>
+
+                    <div id="retail-app-content" class="app-content active p-2">
+                        <h3 class="subsection-title text-lg font-medium text-gray-700">Retail & E-commerce</h3>
+                        <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1">
+                            <li><strong>Market Basket Analysis:</strong> Identifying products frequently purchased together (e.g., "beer and diapers") to optimize store layouts, product bundling, and cross-selling promotions.</li>
+                            <li><strong>Recommendation Engines:</strong> Powering "Customers who bought this also bought..." features by analyzing purchase histories and user behavior. (Think Amazon, Netflix).</li>
+                            <li><strong>Customer Segmentation & Targeting:</strong> Grouping customers based on demographics, purchase patterns, and online behavior for personalized marketing campaigns and offers.</li>
+                            <li><strong>Demand Forecasting & Inventory Management:</strong> Predicting product demand to optimize stock levels, reduce waste, and prevent stockouts.</li>
+                            <li><strong>Price Optimization:</strong> Dynamically adjusting prices based on demand, competitor pricing, and customer willingness to pay.</li>
+                            <li><strong>Fraud Detection:</strong> Identifying fraudulent transactions or account takeovers.</li>
+                        </ul>
+                    </div>
+                    <div id="finance-app-content" class="app-content p-2">
+                        <h3 class="subsection-title text-lg font-medium text-gray-700">Finance & Banking</h3>
+                        <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1">
+                            <li><strong>Credit Scoring & Risk Assessment:</strong> Evaluating loan applications and determining creditworthiness by analyzing financial history, transaction data, and alternative data sources.</li>
+                            <li><strong>Fraud Detection:</strong> Identifying suspicious activities in credit card transactions, insurance claims, and banking operations using anomaly detection techniques.</li>
+                            <li><strong>Algorithmic Trading:</strong> Utilizing complex models to analyze market data in real-time and execute trades at high speeds.</li>
+                            <li><strong>Customer Relationship Management (CRM):</strong> Understanding customer lifetime value, predicting churn, and personalizing financial product offerings.</li>
+                            <li><strong>Anti-Money Laundering (AML) Compliance:</strong> Monitoring transactions to detect patterns indicative of money laundering activities.</li>
+                        </ul>
+                    </div>
+                    <div id="healthcare-app-content" class="app-content p-2">
+                        <h3 class="subsection-title text-lg font-medium text-gray-700">Healthcare</h3>
+                        <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1">
+                            <li><strong>Disease Prediction & Diagnosis:</strong> Analyzing patient records (EHRs), medical images, and genomic data to predict disease risk and assist in early diagnosis.</li>
+                            <li><strong>Personalized Medicine & Treatment Optimization:</strong> Tailoring medical treatments based on individual patient characteristics, genetic makeup, and response to therapies.</li>
+                            <li><strong>Drug Discovery & Development:</strong> Accelerating the research process by analyzing vast amounts of biological and chemical data to identify potential drug candidates.</li>
+                            <li><strong>Healthcare Fraud Detection:</strong> Identifying fraudulent insurance claims and abuse of medical services.</li>
+                            <li><strong>Hospital Operations Management:</strong> Optimizing patient flow, resource allocation, and staffing based on predictive analytics.</li>
+                        </ul>
+                    </div>
+                    <div id="telecom-app-content" class="app-content p-2">
+                        <h3 class="subsection-title text-lg font-medium text-gray-700">Telecommunications</h3>
+                        <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1">
+                            <li><strong>Customer Churn Prediction:</strong> Identifying customers at high risk of switching to a competitor and implementing retention strategies.</li>
+                            <li><strong>Network Optimization & Predictive Maintenance:</strong> Analyzing network traffic and equipment performance data to optimize capacity, predict failures, and schedule maintenance.</li>
+                            <li><strong>Fraudulent Call Detection:</strong> Identifying patterns of fraudulent use of telecom services.</li>
+                            <li><strong>Personalized Service Offerings:</strong> Recommending relevant plans and services based on customer usage patterns.</li>
+                            <li><strong>Customer Sentiment Analysis:</strong> Analyzing customer feedback from calls, social media, and surveys to improve service quality.</li>
+                        </ul>
+                    </div>
+                    <div id="manufacturing-app-content" class="app-content p-2">
+                        <h3 class="subsection-title text-lg font-medium text-gray-700">Manufacturing</h3>
+                        <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1">
+                            <li><strong>Predictive Maintenance:</strong> Using sensor data from machinery to predict potential equipment failures and schedule maintenance proactively, reducing downtime.</li>
+                            <li><strong>Quality Control & Defect Detection:</strong> Analyzing production data and images to identify defects in products early in the manufacturing process.</li>
+                            <li><strong>Supply Chain Optimization:</strong> Improving inventory management, demand forecasting, and logistics by analyzing data across the supply chain.</li>
+                            <li><strong>Process Optimization:</strong> Identifying inefficiencies in production processes and areas for improvement to increase yield and reduce costs.</li>
+                            <li><strong>Energy Consumption Management:</strong> Analyzing energy usage patterns to optimize consumption and reduce operational costs.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="print-only-explanation" style="display:none;"> 
+                    <p><strong>Retail & E-commerce:</strong> Market basket analysis, recommendation engines, customer segmentation, demand forecasting, price optimization, fraud detection.</p>
+                    <p><strong>Finance & Banking:</strong> Credit scoring, fraud detection, algorithmic trading, CRM, AML compliance.</p>
+                    <p><strong>Healthcare:</strong> Disease prediction/diagnosis, personalized medicine, drug discovery, healthcare fraud detection, hospital operations management.</p>
+                    <p><strong>Telecommunications:</strong> Customer churn prediction, network optimization, fraudulent call detection, personalized service offerings, sentiment analysis.</p>
+                    <p><strong>Manufacturing:</strong> Predictive maintenance, quality control, supply chain optimization, process optimization, energy management.</p>
+                </div>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Illustrating Importance with Case Examples</h2>
+                <div class="space-y-6">
+                    <div class="p-4 border border-gray-200 rounded-lg bg-slate-50">
+                        <h3 class="subsection-title text-lg font-medium text-blue-700">Case Spotlight 1: Netflix - Personalized Recommendations</h3>
+                        <p class="text-base text-gray-700 leading-relaxed mt-1">
+                            <strong>Problem:</strong> How to keep subscribers engaged and reduce churn in a highly competitive streaming market.
+                        </p>
+                        <p class="text-base text-gray-700 leading-relaxed mt-1">
+                            <strong>Data Used:</strong> Massive amounts of data on user viewing history, ratings, searches, time of day viewing, device used, browsing behavior, and even how often users pause or rewind content.
+                        </p>
+                        <p class="text-base text-gray-700 leading-relaxed mt-1">
+                            <strong>Approach (Data Mining/Big Data):</strong> Netflix employs sophisticated collaborative filtering and content-based filtering algorithms, along with machine learning models, to analyze this data. Big Data technologies are used to process and manage the continuous inflow of user interaction data.
+                        </p>
+                        <p class="text-base text-gray-700 leading-relaxed mt-1">
+                            <strong>Outcome/Impact:</strong> Highly personalized recommendations that significantly influence what users watch (reportedly over 80% of streamed content is discovered through recommendations). This increases user engagement, satisfaction, and retention, directly contributing to Netflix's business success. They also use data to inform content acquisition and original production decisions.
+                        </p>
+                    </div>
+                    <div class="p-4 border border-gray-200 rounded-lg bg-slate-50">
+                        <h3 class="subsection-title text-lg font-medium text-green-700">Case Spotlight 2: UPS - Optimizing Delivery Routes (ORION)</h3>
+                        <p class="text-base text-gray-700 leading-relaxed mt-1">
+                            <strong>Problem:</strong> Reducing mileage, fuel consumption, and vehicle maintenance costs while improving delivery efficiency for millions of packages daily.
+                        </p>
+                        <p class="text-base text-gray-700 leading-relaxed mt-1">
+                            <strong>Data Used:</strong> Detailed package data, GPS data from delivery vehicles, map data, driver work rules, customer preferences, historical traffic patterns, and real-time updates.
+                        </p>
+                        <p class="text-base text-gray-700 leading-relaxed mt-1">
+                            <strong>Approach (Data Mining/Big Data):</strong> UPS developed ORION (On-Road Integrated Optimization and Navigation), a system that uses advanced algorithms (including vehicle routing problem solvers, a type of optimization) and telematics data. It processes vast amounts of data to calculate the most efficient delivery route for each driver.
+                        </p>
+                        <p class="text-base text-gray-700 leading-relaxed mt-1">
+                            <strong>Outcome/Impact:</strong> ORION reportedly saves UPS hundreds of millions of miles and tens of millions of gallons of fuel annually, significantly reducing operational costs and carbon emissions. It also improves on-time delivery rates and driver efficiency.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Key Takeaways for Session 2</h2>
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1 leading-relaxed">
+                    <li>Data Mining and Big Data are indispensable for modern organizations, driving better decisions, operational efficiencies, and customer understanding.</li>
+                    <li>Applications are widespread, transforming industries from retail and finance to healthcare and manufacturing by leveraging data insights.</li>
+                    <li>Real-world case examples like Netflix and UPS demonstrate the tangible, significant impact of applying these technologies to solve complex business challenges.</li>
+                    <li>The ability to extract value from data is a key differentiator and a source of competitive advantage and innovation.</li>
+                </ul>
+            </section>
+        </article>
+
+        <footer class="text-center mt-12 py-6 border-t border-gray-300"> 
+            <div class="mb-4"> 
+                 <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-10 mx-auto footer-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+            </div>
+            <p class="text-base text-gray-600">&copy; <span id="currentYearModule"></span> FACE Prep Campus (www.faceprep.in). All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('currentYearModule').textContent = new Date().getFullYear();
+
+        const interactiveTerms = document.querySelectorAll('.interactive-term');
+        const tooltip = document.querySelector('.definition-tooltip');
+
+        if (tooltip) {
+            interactiveTerms.forEach(term => {
+                const showTooltip = (e) => {
+                    tooltip.textContent = term.dataset.definition;
+                    tooltip.style.display = 'block';
+                    const termRect = term.getBoundingClientRect();
+                    let top = termRect.bottom + window.scrollY + 8; 
+                    let left = termRect.left + window.scrollX;
+                    tooltip.style.top = `${top}px`;
+                    tooltip.style.left = `${left}px`;
+                    const tooltipRect = tooltip.getBoundingClientRect();
+                    if (tooltipRect.right > (window.innerWidth - 15)) { 
+                        tooltip.style.left = `${window.innerWidth - tooltipRect.width - 15}px`;
+                    }
+                    if (tooltipRect.left < 15) { 
+                        tooltip.style.left = `15px`;
+                    }
+                };
+                term.addEventListener('mouseenter', showTooltip);
+                term.addEventListener('focus', showTooltip); 
+                term.addEventListener('click', showTooltip); 
+                const hideTooltip = () => {
+                    tooltip.style.display = 'none';
+                };
+                term.addEventListener('mouseleave', hideTooltip);
+                term.addEventListener('blur', hideTooltip); 
+            });
+            document.addEventListener('click', function(event) {
+                let isClickInsideTerm = false;
+                interactiveTerms.forEach(term => {
+                    if (term.contains(event.target)) {
+                        isClickInsideTerm = true;
+                    }
+                });
+                if (!isClickInsideTerm && !tooltip.contains(event.target)) {
+                    tooltip.style.display = 'none';
+                }
+            });
+        }
+
+        // Application Explorer Tabs Logic
+        const appTabs = document.querySelectorAll('.app-tab');
+        const appContents = document.querySelectorAll('.app-content');
+        
+        appTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                appTabs.forEach(t => t.classList.remove('active', 'bg-blue-500', 'text-white'));
+                tab.classList.add('active', 'bg-blue-500', 'text-white');
+                const appTarget = tab.dataset.app;
+                appContents.forEach(content => {
+                    if (content.id === `${appTarget}-app-content`) {
+                        content.classList.add('active');
+                    } else {
+                        content.classList.remove('active');
+                    }
+                });
+            });
+        });
+
+    </script>
+</body>
+</html>

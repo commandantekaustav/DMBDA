@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 3: Lab 1 - Exploring Big Data Landscapes & Use Cases - Module I</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: "Warm Neutral Harmony" -->
+    <!-- Application Structure Plan: This is a single session detail page for a lab. Structure: 1) Header with logo, module & session title, breadcrumbs. 2) Export button. 3) Session details. 4) Lab Objectives. 5) Detailed sections for Lab Activities, including: Introduction, Task Breakdown (Researching Applications, Identifying Datasets, Analyzing Case Studies), Guiding Questions, and an interactive "Use Case Explorer" as a starting point. 6) Deliverables/Discussion Points. 7) Key Takeaways. 8) Footer. Goal: Provide clear guidance for the practical lab session. -->
+    <!-- Visualization & Content Choices: 
+        - Interactive "Use Case Explorer" (tabs/accordions) to provide initial examples across industries.
+        - Structured lists for lab tasks and guiding questions.
+        - Emphasis on practical application and research.
+        - PDF Export: Print-specific CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            font-size: 1rem; 
+            line-height: 1.625; 
+        }
+        
+        .interactive-term { 
+            cursor: pointer;
+            font-weight: 600; 
+        }
+        .definition-tooltip {
+            display: none;
+            position: absolute;
+            background-color: #f9fafb; 
+            border: 1px solid #d1d5db; 
+            padding: 8px; 
+            border-radius: 4px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            z-index: 100;
+            font-size: 0.875rem; 
+            width: max-content;
+            max-width: 300px; 
+        }
+
+        h1.page-title { font-size: 2.25rem; line-height: 2.5rem; } 
+        h2.section-title { font-size: 1.5rem; line-height: 2rem; margin-bottom: 0.75rem;} 
+        h3.subsection-title { font-size: 1.25rem; line-height: 1.75rem; margin-bottom: 0.5rem;}    
+        h4.detail-title { font-size: 1.125rem; line-height: 1.75rem; margin-bottom: 0.375rem;} 
+
+        .use-case-tab {
+            cursor: pointer;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .use-case-tab.active {
+            background-color: #3b82f6; /* Tailwind blue-500 */
+            color: white;
+            border-bottom-color: transparent;
+        }
+        .use-case-content {
+            display: none;
+        }
+        .use-case-content.active {
+            display: block;
+        }
+
+        @media print {
+            body { font-size: 10pt; line-height: 1.4; } 
+            .no-print { display: none !important; }
+            header { display: flex; flex-direction: column; align-items: center; text-align: center; }
+            .header-logo-print { max-width: 150px; max-height: 50px; margin-bottom: 10px; } 
+            .footer-logo-print { max-width: 100px; max-height: 30px; margin-top: 10px; } 
+            footer { text-align: center; }
+            section, .content-section { page-break-inside: avoid; margin-bottom: 15px; } 
+            .bg-white { box-shadow: none !important; border: 1px solid #ccc; padding: 0.5rem !important;}
+            a { text-decoration: none; color: black; }
+            .interactive-term { text-decoration: none; color: black; font-weight: bold; } 
+            .definition-tooltip { display: none !important; }
+            .print-only-explanation { display: block !important; position: static !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin-top: 2px; font-style: italic; font-size: 0.9em;} 
+            .use-case-explorer-web {display: none !important;}
+            .use-case-content {display: block !important; border-top: 1px solid #eee; padding-top: 5px; margin-top: 5px;}
+            h1.page-title { font-size: 20pt; } 
+            h2.section-title { font-size: 16pt; }
+            h3.subsection-title { font-size: 14pt; }
+            h4.detail-title { font-size: 12pt; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+</head>
+<body class="bg-gray-100 text-gray-800"> 
+    <div class="container mx-auto p-4 md:p-8"> 
+        <header class="mb-10"> 
+            <div class="flex flex-col sm:flex-row items-center justify-between">
+                <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-16 md:h-20 mb-4 sm:mb-0 header-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+                <div class="text-center sm:text-right sm:ml-4"> 
+                    <p class="text-base text-gray-500">Module I: Overview and Foundations</p> 
+                    <h1 class="page-title text-3xl md:text-4xl font-bold text-gray-900 mt-1">Session 3: Lab 1 - Exploring Big Data Landscapes & Use Cases</h1> 
+                    <p class="text-lg text-gray-600 mt-2">Data Mining & Big Data Analytics</p> 
+                </div>
+            </div>
+            <nav aria-label="Breadcrumb" class="mt-4 text-sm text-gray-500 no-print"> 
+                <ol class="list-none p-0 inline-flex">
+                    <li class="flex items-center">
+                        <a href="../index.html" class="text-slate-600 hover:text-slate-800">Course Overview</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="flex items-center">
+                        <a href="module-1-index.html" class="text-slate-600 hover:text-slate-800">Module I</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="text-gray-700 font-semibold" aria-current="page">Session 3</li> 
+                </ol>
+            </nav>
+        </header>
+
+        <div class="text-center mb-8 no-print"> 
+            <button onclick="window.print()" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-150 ease-in-out text-base"> 
+                Export Session 3 to PDF
+            </button>
+        </div>
+
+        <article class="bg-white p-6 md:p-8 rounded-lg shadow-lg"> 
+            <section class="mb-6 border-b pb-4"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-2">Session Details</h2> 
+                <p class="text-base text-gray-700"><span class="font-semibold">Type:</span> Guided Practical 💻</p>
+                <p class="text-base text-gray-700"><span class="font-semibold">Duration:</span> 2 Hours</p>
+                <p class="text-base text-gray-700"><span class="font-semibold">Textbook References:</span> Conceptual basis from Han et al.: Ch. 1-2; Zikopoulos & Eaton: Ch. 1-2.</p>
+            </section>
+
+            <section class="mb-8 content-section"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Lab Objectives</h2> 
+                <p class="text-base text-gray-700 mb-3">Upon completion of this lab session, you will be able to:</p>
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1"> 
+                    <li>Identify and describe real-world applications of Big Data and Data Mining across various industries.</li>
+                    <li>Research and identify potential datasets that could be used for specific data mining tasks.</li>
+                    <li>Analyze case studies to understand the problem, data used, approach, and impact of Big Data projects.</li>
+                    <li>Critically evaluate the challenges and benefits associated with these real-world applications.</li>
+                </ul>
+            </section>
+
+            <div class="definition-tooltip"></div>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Lab Introduction</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    This first lab session is designed to bridge the gap between the theoretical concepts of Data Mining and Big Data discussed in Sessions 1 and 2, and their practical, real-world implications. The goal is to actively explore how organizations are leveraging vast amounts of data to innovate, solve complex problems, and gain competitive advantages. This exploration will also help you start thinking critically about data sources and the kinds of questions data can help answer, which is essential for your upcoming mini-project.
+                </p>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Lab Activities & Task Breakdown</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-4">
+                    This lab will involve research, analysis, and discussion. You may work individually or in small groups as directed by your instructor.
+                </p>
+
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="subsection-title text-lg font-medium text-gray-700">Activity 1: Researching Real-World Applications (Approx. 45 mins)</h3>
+                        <p class="text-base text-gray-700 leading-relaxed mb-2">
+                            Your task is to identify at least 3-4 distinct real-world applications of Big Data and Data Mining. Aim for variety in industries (e.g., don't pick all from retail).
+                        </p>
+                        <h4 class="detail-title text-base font-semibold text-gray-600 mt-3 mb-1">Starting Points & Resources:</h4>
+                        <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1 mb-3">
+                            <li>News articles (e.g., from tech journals, business publications).</li>
+                            <li>Company case studies (many tech companies publish these).</li>
+                            <li>Academic papers or conference proceedings (search on Google Scholar, IEEE Xplore, ACM Digital Library).</li>
+                            <li>Industry reports from analyst firms (e.g., Gartner, Forrester).</li>
+                            <li>Use the "Use Case Explorer" below for initial ideas.</li>
+                        </ul>
+                        <div class="use-case-explorer-web no-print mt-4 p-4 border border-blue-200 rounded-lg bg-blue-50">
+                            <h4 class="detail-title text-base font-semibold text-blue-700 mb-2">Interactive Use Case Explorer (Examples)</h4>
+                            <p class="text-sm text-blue-600 mb-3">Click on an industry to get some initial ideas for applications and the types of data involved. Use these as a springboard for your deeper research.</p>
+                            <div class="flex flex-wrap gap-2 mb-3">
+                                <button class="use-case-tab bg-blue-500 hover:bg-blue-600 text-white text-xs sm:text-sm py-1 px-2 sm:px-3 rounded" data-industry="retail-lab">Retail</button>
+                                <button class="use-case-tab bg-green-500 hover:bg-green-600 text-white text-xs sm:text-sm py-1 px-2 sm:px-3 rounded" data-industry="healthcare-lab">Healthcare</button>
+                                <button class="use-case-tab bg-yellow-500 hover:bg-yellow-600 text-white text-xs sm:text-sm py-1 px-2 sm:px-3 rounded" data-industry="finance-lab">Finance</button>
+                                <button class="use-case-tab bg-purple-500 hover:bg-purple-600 text-white text-xs sm:text-sm py-1 px-2 sm:px-3 rounded" data-industry="transport-lab">Transportation</button>
+                                <button class="use-case-tab bg-red-500 hover:bg-red-600 text-white text-xs sm:text-sm py-1 px-2 sm:px-3 rounded" data-industry="media-lab">Media & Entertainment</button>
+                            </div>
+                            <div id="use-case-details" class="text-sm p-3 border border-gray-300 rounded bg-white min-h-[60px]">
+                                Select an industry to see example applications and typical data sources.
+                            </div>
+                        </div>
+                         <div class="print-only-explanation mt-4" style="display:none;">
+                            <h4 class="font-semibold">Example Use Cases (Refer to these for research inspiration):</h4>
+                            <p><strong>Retail:</strong> Personalized marketing, supply chain optimization using sales data, customer transaction logs, loyalty program data.</p>
+                            <p><strong>Healthcare:</strong> Epidemic prediction using public health records & social media data, patient outcome analysis using EHRs, genomic data.</p>
+                            <p><strong>Finance:</strong> Algorithmic trading using real-time market feeds, fraud detection using transaction patterns, customer credit risk assessment.</p>
+                            <p><strong>Transportation:</strong> Route optimization for logistics using GPS data & traffic patterns, predictive maintenance for vehicles using sensor data.</p>
+                            <p><strong>Media & Entertainment:</strong> Content recommendation systems using viewing history & user ratings, targeted advertising based on user demographics & preferences.</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="subsection-title text-lg font-medium text-gray-700">Activity 2: Identifying Potential Datasets (Approx. 30 mins)</h3>
+                        <p class="text-base text-gray-700 leading-relaxed mb-2">
+                            For each application you researched in Activity 1, try to identify:
+                        </p>
+                        <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1">
+                            <li>What kind of data is being used (e.g., customer demographics, transaction records, sensor readings, social media posts, weblogs, medical images)?</li>
+                            <li>Is the data structured, unstructured, or semi-structured?</li>
+                            <li>What are the potential sources of this data (e.g., company databases, public APIs, government portals, third-party data providers)?</li>
+                            <li>Are there any publicly available datasets that are similar or could be used for a related analysis? (Search on Kaggle, UCI Machine Learning Repository, data.gov, etc.)</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 class="subsection-title text-lg font-medium text-gray-700">Activity 3: Analyzing Case Studies (Approx. 30 mins)</h3>
+                        <p class="text-base text-gray-700 leading-relaxed mb-2">
+                            Select one or two of the applications you researched and try to find a more detailed case study or report on it. For each case study, analyze:
+                        </p>
+                        <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1">
+                            <li><strong>Problem Statement:</strong> What specific problem was the organization trying to solve?</li>
+                            <li><strong>Data Used:</strong> What specific data sources and types were crucial?</li>
+                            <li><strong>Approach/Techniques:</strong> What data mining or big data techniques were employed (even if described at a high level)?</li>
+                            <li><strong>Outcome/Impact:</strong> What were the results? (e.g., cost savings, revenue increase, improved efficiency, new insights).</li>
+                            <li><strong>Challenges:</strong> What challenges were faced during the project (e.g., data quality, scalability, privacy concerns)?</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Guiding Questions for Research & Discussion</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-2">
+                    As you conduct your research, consider the following:
+                </p>
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1">
+                    <li>How does the use of Big Data in this application go beyond what could be done with smaller, traditional datasets?</li>
+                    <li>What are the ethical implications or privacy concerns related to the data being used in these applications?</li>
+                    <li>What kind of skills (technical and non-technical) would be needed for a team working on such a project?</li>
+                    <li>How might the 5 V's (Volume, Velocity, Variety, Veracity, Value) manifest in the applications you are exploring?</li>
+                    <li>Could similar approaches be applied in other industries or to solve different problems?</li>
+                </ul>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Deliverables / Discussion Points</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-2">
+                    Be prepared to discuss your findings. Depending on your instructor's directions, this might involve:
+                </p>
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1">
+                    <li>A brief presentation or summary of one interesting application you researched.</li>
+                    <li>A written report or notes detailing your findings for Activity 1, 2, and 3.</li>
+                    <li>Contribution to a class discussion about the most impactful or surprising applications found.</li>
+                </ul>
+            </section>
+
+            <section class="content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Key Takeaways for Session 3</h2>
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1 leading-relaxed">
+                    <li>Big Data and Data Mining are not just theoretical concepts but are actively creating value and driving innovation across numerous industries.</li>
+                    <li>Identifying relevant data sources and understanding the characteristics of that data is a critical first step in any data-driven project.</li>
+                    <li>Analyzing real-world case studies helps to appreciate the complexities, challenges, and enormous potential of Big Data analytics.</li>
+                    <li>This exploratory work lays the foundation for understanding how to approach your own data mining projects.</li>
+                </ul>
+            </section>
+        </article>
+
+        <footer class="text-center mt-12 py-6 border-t border-gray-300"> 
+            <div class="mb-4"> 
+                 <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-10 mx-auto footer-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+            </div>
+            <p class="text-base text-gray-600">&copy; <span id="currentYearModule"></span> FACE Prep Campus (www.faceprep.in). All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('currentYearModule').textContent = new Date().getFullYear();
+
+        // Tooltip for any .interactive-term (though none are used in this session's main text)
+        const interactiveTerms = document.querySelectorAll('.interactive-term');
+        const tooltip = document.querySelector('.definition-tooltip');
+
+        if (tooltip) {
+            interactiveTerms.forEach(term => {
+                const showTooltip = (e) => {
+                    tooltip.textContent = term.dataset.definition;
+                    tooltip.style.display = 'block';
+                    const termRect = term.getBoundingClientRect();
+                    let top = termRect.bottom + window.scrollY + 8; 
+                    let left = termRect.left + window.scrollX;
+                    tooltip.style.top = `${top}px`;
+                    tooltip.style.left = `${left}px`;
+                    const tooltipRect = tooltip.getBoundingClientRect();
+                    if (tooltipRect.right > (window.innerWidth - 15)) { 
+                        tooltip.style.left = `${window.innerWidth - tooltipRect.width - 15}px`;
+                    }
+                    if (tooltipRect.left < 15) { 
+                        tooltip.style.left = `15px`;
+                    }
+                };
+                term.addEventListener('mouseenter', showTooltip);
+                term.addEventListener('focus', showTooltip); 
+                term.addEventListener('click', showTooltip); 
+                const hideTooltip = () => {
+                    tooltip.style.display = 'none';
+                };
+                term.addEventListener('mouseleave', hideTooltip);
+                term.addEventListener('blur', hideTooltip); 
+            });
+            document.addEventListener('click', function(event) {
+                let isClickInsideTerm = false;
+                interactiveTerms.forEach(term => {
+                    if (term.contains(event.target)) {
+                        isClickInsideTerm = true;
+                    }
+                });
+                if (!isClickInsideTerm && !tooltip.contains(event.target)) {
+                    tooltip.style.display = 'none';
+                }
+            });
+        }
+
+        // Use Case Explorer Logic (Lab Session 3)
+        const useCaseTabs = document.querySelectorAll('.use-case-tab');
+        const useCaseDetailsDiv = document.getElementById('use-case-details');
+        const labUseCases = {
+            "retail-lab": {
+                title: "Retail & E-commerce Applications",
+                points: [
+                    "<strong>Personalized Marketing Campaigns:</strong> Using customer purchase history and browsing data to send targeted offers. (Data: Transaction logs, web analytics, CRM data)",
+                    "<strong>Supply Chain Optimization:</strong> Predicting demand fluctuations to manage inventory and logistics effectively. (Data: Sales data, warehouse stock levels, supplier lead times, weather forecasts)",
+                    "<strong>Dynamic Pricing Strategies:</strong> Adjusting prices in real-time based on competitor pricing, demand, and customer behavior. (Data: Competitor prices, sales velocity, customer profiles)"
+                ]
+            },
+            "healthcare-lab": {
+                title: "Healthcare Applications",
+                points: [
+                    "<strong>Epidemic Outbreak Prediction:</strong> Analyzing public health records, social media trends, and travel data to predict disease spread. (Data: EHRs, news feeds, social media APIs, flight data)",
+                    "<strong>Patient Readmission Risk Analysis:</strong> Identifying patients at high risk of hospital readmission to provide proactive care. (Data: Patient demographics, medical history, previous admission records, social determinants of health)",
+                    "<strong>Optimizing Clinical Trial Recruitment:</strong> Using patient data to identify suitable candidates for clinical trials more efficiently. (Data: EHRs, genomic data, trial inclusion/exclusion criteria)"
+                ]
+            },
+            "finance-lab": {
+                title: "Finance & Banking Applications",
+                points: [
+                    "<strong>Algorithmic Trading & High-Frequency Trading:</strong> Using models to analyze market data and execute trades automatically. (Data: Real-time stock market feeds, news sentiment, economic indicators)",
+                    "<strong>Customer Lifetime Value (CLV) Prediction:</strong> Estimating the total revenue a business can expect from a single customer account. (Data: Customer transaction history, engagement metrics, demographic data)",
+                    "<strong>Regulatory Compliance Reporting (e.g., MiFID II):</strong> Using data analytics to ensure adherence to complex financial regulations. (Data: Trade records, communication logs, transaction data)"
+                ]
+            },
+            "transport-lab": {
+                title: "Transportation & Logistics Applications",
+                points: [
+                    "<strong>Real-time Route Optimization:</strong> Adjusting delivery routes dynamically based on traffic, weather, and new pickups/drop-offs. (Data: GPS data, traffic APIs, weather APIs, order management systems)",
+                    "<strong>Predictive Maintenance for Fleets:</strong> Analyzing sensor data from vehicles (trucks, trains, planes) to predict maintenance needs and avoid breakdowns. (Data: IoT sensor data, maintenance logs, operational history)",
+                    "<strong>Public Transportation Planning:</strong> Optimizing routes and schedules based on passenger demand patterns. (Data: Ticketing data, passenger count sensors, GPS data from buses/trains)"
+                ]
+            },
+            "media-lab": {
+                title: "Media & Entertainment Applications",
+                points: [
+                    "<strong>Hyper-Personalized Content Curation:</strong> Beyond simple recommendations, creating unique content feeds or playlists for individual users. (Data: Viewing/listening history, user ratings, content metadata, social sharing)",
+                    "<strong>Audience Engagement Analytics:</strong> Understanding how users interact with content (e.g., drop-off points in videos, popular articles) to improve content strategy. (Data: Web/app analytics, video player analytics, A/B testing results)",
+                    "<strong>Targeted Advertising & Ad Revenue Optimization:</strong> Using detailed user profiles and contextual data to serve more relevant ads and maximize ad revenue. (Data: User demographics, browsing history, app usage, ad performance data)"
+                ]
+            }
+        };
+
+        if(useCaseDetailsDiv && useCaseTabs.length > 0) {
+            useCaseTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    useCaseTabs.forEach(t => t.classList.remove('active', 'bg-opacity-100')); // Manage active state visually
+                    tab.classList.add('active', 'bg-opacity-100');
+
+                    const industry = tab.dataset.industry;
+                    const data = labUseCases[industry];
+                    if (data) {
+                        useCaseDetailsDiv.innerHTML = `<h5 class="font-semibold text-gray-700 mb-2">${data.title}</h5><ul class="space-y-1">${data.points.map(item => `<li class='text-xs text-gray-600 list-disc list-inside ml-2'>${item}</li>`).join('')}</ul>`;
+                    } else {
+                         useCaseDetailsDiv.innerHTML = "Select an industry to see example applications and typical data sources.";
+                    }
+                });
+            });
+            // Optionally, trigger the first tab on load
+            // if (useCaseTabs.length > 0) useCaseTabs[0].click(); 
+        }
+
+    </script>
+</body>
+</html>

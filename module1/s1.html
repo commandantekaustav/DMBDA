@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 1: Overview of Data Mining & Big Data - Module I</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: "Warm Neutral Harmony" -->
+    <!-- Application Structure Plan: This is a single session detail page. Structure: 1) Header with logo, module & session title, breadcrumbs. 2) Export button. 3) Session details (type, duration, refs). 4) Learning Objectives. 5) Extensive content sections for the session's topics with interactive elements. 6) Key Takeaways. 7) Footer. Goal: Deep, focused learning for this specific session with standard readability. -->
+    <!-- Visualization & Content Choices: 
+        - Key terms (Data Mining, Big Data) via interactive definitions (bold, pointer cursor, no underline).
+        - 5 V's of Big Data visual cards. Detailed explanations provided.
+        - Textual elaboration on goals of data mining, types of patterns, importance of Big Data, and the relationship between the two.
+        - PDF Export: Print-specific CSS for readability, static fallbacks for interactive elements.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            font-size: 1rem; /* Standard base font size */
+            line-height: 1.625; /* Standard line height */
+        }
+        
+        .interactive-term { 
+            cursor: pointer;
+            font-weight: 600; 
+            /* text-decoration: underline; REMOVED */
+            /* text-decoration-style: dotted; REMOVED */
+            /* color: #2563eb; REMOVED - will inherit parent color */
+        }
+        .definition-tooltip {
+            display: none;
+            position: absolute;
+            background-color: #f9fafb; /* Tailwind gray-50 */
+            border: 1px solid #d1d5db; /* Tailwind gray-300 */
+            padding: 8px; 
+            border-radius: 4px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            z-index: 100;
+            font-size: 0.875rem; /* Standard tooltip font size */
+            width: max-content;
+            max-width: 300px; 
+        }
+
+        /* Standard heading sizes using Tailwind classes where possible, or CSS for consistency */
+        h1.page-title { font-size: 2.25rem; line-height: 2.5rem; } /* text-4xl */
+        h2.section-title { font-size: 1.5rem; line-height: 2rem; margin-bottom: 0.75rem;} /* text-2xl */
+        h3.subsection-title { font-size: 1.25rem; line-height: 1.75rem; margin-bottom: 0.5rem;}    /* text-xl */
+        h4.detail-title { font-size: 1.125rem; line-height: 1.75rem; margin-bottom: 0.375rem;} /* text-lg */
+
+
+        @media print {
+            body { font-size: 10pt; line-height: 1.4; } 
+            .no-print { display: none !important; }
+            header { display: flex; flex-direction: column; align-items: center; text-align: center; }
+            .header-logo-print { max-width: 150px; max-height: 50px; margin-bottom: 10px; } 
+            .footer-logo-print { max-width: 100px; max-height: 30px; margin-top: 10px; } 
+            footer { text-align: center; }
+            section, .content-section { page-break-inside: avoid; margin-bottom: 15px; } 
+            .bg-white { box-shadow: none !important; border: 1px solid #ccc; padding: 0.5rem !important;}
+            a { text-decoration: none; color: black; }
+            .interactive-term { text-decoration: none; color: black; font-weight: bold; } 
+            .definition-tooltip { display: none !important; }
+            .print-only-definition, .five-v-item-print .print-only-description { display: block !important; position: static !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin-top: 2px; font-style: italic; font-size: 0.9em;} 
+            .five-v-item-print { border: 1px solid #eee; padding: 3px; margin-bottom: 3px;}
+            .five-v-item-print .text-3xl { display: none; } 
+            h1.page-title { font-size: 20pt; } 
+            h2.section-title { font-size: 16pt; }
+            h3.subsection-title { font-size: 14pt; }
+            h4.detail-title { font-size: 12pt; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+</head>
+<body class="bg-gray-100 text-gray-800"> 
+    <div class="container mx-auto p-4 md:p-8"> 
+        <header class="mb-10"> 
+            <div class="flex flex-col sm:flex-row items-center justify-between">
+                <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-16 md:h-20 mb-4 sm:mb-0 header-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+                <div class="text-center sm:text-right sm:ml-4"> 
+                    <p class="text-base text-gray-500">Module I: Overview and Foundations</p> 
+                    <h1 class="page-title text-3xl md:text-4xl font-bold text-gray-900 mt-1">Session 1: Overview of Data Mining & Big Data</h1> 
+                    <p class="text-lg text-gray-600 mt-2">Data Mining & Big Data Analytics</p> 
+                </div>
+            </div>
+            <nav aria-label="Breadcrumb" class="mt-4 text-sm text-gray-500 no-print"> 
+                <ol class="list-none p-0 inline-flex">
+                    <li class="flex items-center">
+                        <a href="../index.html" class="text-slate-600 hover:text-slate-800">Course Overview</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="flex items-center">
+                        <a href="module-1-index.html" class="text-slate-600 hover:text-slate-800">Module I</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="text-gray-700 font-semibold" aria-current="page">Session 1</li> 
+                </ol>
+            </nav>
+        </header>
+
+        <div class="text-center mb-8 no-print"> 
+            <button onclick="window.print()" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-150 ease-in-out text-base"> 
+                Export Session 1 to PDF
+            </button>
+        </div>
+
+        <article class="bg-white p-6 md:p-8 rounded-lg shadow-lg"> 
+            <section class="mb-6 border-b pb-4"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-2">Session Details</h2> 
+                <p class="text-base text-gray-700"><span class="font-semibold">Type:</span> Theory 📖</p>
+                <p class="text-base text-gray-700"><span class="font-semibold">Duration:</span> 1 Hour</p>
+                <p class="text-base text-gray-700"><span class="font-semibold">Textbook References:</span> Han et al.: Ch. 1; Zikopoulos & Eaton: Ch. 1, 2.</p>
+            </section>
+
+            <section class="mb-8 content-section"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Learning Objectives</h2> 
+                <p class="text-base text-gray-700 mb-3">By the end of this session, you will be able to:</p>
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1"> 
+                    <li>Define Data Mining and understand its primary goals.</li>
+                    <li>Define Big Data and articulate its significance in the modern world.</li>
+                    <li>Describe the key characteristics of Big Data, commonly known as the 5 V's.</li>
+                    <li>Understand the fundamental relationship between Data Mining and Big Data.</li>
+                </ul>
+            </section>
+
+            <div class="definition-tooltip"></div>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">What is Data Mining?</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    <span class="interactive-term" data-definition="Data Mining is the non-trivial process of identifying valid, novel, potentially useful, and ultimately understandable patterns in data.">Data Mining</span>
+                    is essentially about discovering valuable knowledge from large volumes of data. It's an interdisciplinary field that combines techniques from statistics, machine learning, artificial intelligence, database technology, and pattern recognition. The aim is to go beyond simple data retrieval and to extract hidden insights that can lead to better decision-making.
+                </p>
+                <div class="print-only-definition">
+                    <p><strong>Data Mining:</strong> The non-trivial process of identifying valid, novel, potentially useful, and ultimately understandable patterns in data. It aims to extract hidden insights for better decision-making.</p>
+                </div>
+                <h3 class="subsection-title text-lg font-medium text-gray-700 mt-4 mb-2">Primary Goals of Data Mining:</h3> 
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1 leading-relaxed">
+                    <li><strong>Prediction:</strong> Utilizing historical data and statistical modeling to forecast future events, behaviors, or values. Examples include predicting which customers are likely to stop using a service (churn), forecasting product sales for the next quarter, or estimating the probability of a loan default.</li>
+                    <li><strong>Description (or Discovery):</strong> Identifying and summarizing inherent patterns, anomalies, and relationships within the data in a human-understandable form. This helps in understanding past behaviors and current situations, such as identifying distinct customer segments based on purchasing habits or discovering unusual network traffic patterns that might indicate an intrusion.</li>
+                </ul>
+                <h3 class="subsection-title text-lg font-medium text-gray-700 mt-4 mb-2">Types of Patterns Discovered:</h3>
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1 leading-relaxed">
+                    <li><strong>Associations (or Co-occurrence):</strong> Finding relationships between items that frequently appear together in a dataset. A classic example is market basket analysis, which might reveal that customers who buy diapers also often buy beer.</li>
+                    <li><strong>Sequences (or Temporal Patterns):</strong> Discovering patterns where events occur in a specific order over time. For instance, identifying that a customer who purchases a new smartphone is likely to buy accessories like a case and screen protector within the next week.</li>
+                    <li><strong>Classifications:</strong> Building models to assign data instances to predefined categories or classes. This involves learning from a labeled dataset where class assignments are known, e.g., classifying emails as 'spam' or 'not spam', or categorizing loan applications as 'high-risk' or 'low-risk'.</li>
+                    <li><strong>Clustering:</strong> Grouping similar data instances together into clusters based on their characteristics, without prior knowledge of the group labels. This is useful for customer segmentation, document categorization, or identifying natural groupings in biological data.</li>
+                    <li><strong>Anomaly Detection (or Outlier Detection):</strong> Identifying data points or events that deviate significantly from the expected or normal behavior. This is crucial for fraud detection, network intrusion detection, or identifying defective products in manufacturing.</li>
+                </ul>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">What is Big Data?</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    <span class="interactive-term" data-definition="Big Data refers to datasets that are too large or complex for traditional data-processing application software to adequately deal with. It's not just about volume, but also about other characteristics.">Big Data</span>
+                    describes the explosive growth and widespread availability of diverse information – structured, semi-structured, and unstructured. The term has gained prominence as the data generated daily by individuals, organizations, sensors, and digital interactions has reached unprecedented scales, presenting both enormous opportunities for insight and considerable challenges for management and analysis.
+                </p>
+                 <div class="print-only-definition">
+                    <p><strong>Big Data:</strong> Datasets too large or complex for traditional data-processing applications, characterized by the 5 V's. It represents opportunities and challenges due to its scale and diversity.</p>
+                </div>
+                <h3 class="subsection-title text-lg font-medium text-gray-700 mt-4 mb-2">The 5 V's of Big Data:</h3>
+                <p class="text-base text-gray-700 leading-relaxed mb-4">
+                    These five characteristics are fundamental to understanding the nature of Big Data and the specific challenges they pose.
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 text-center"> 
+                    <div class="p-4 bg-slate-100 rounded-lg shadow-md five-v-item-print">
+                        <span class="text-3xl no-print mb-1 block">🌊</span><p class="font-semibold text-lg mt-1">Volume</p>
+                        <p class="text-sm text-gray-600 mt-1 hidden md:block no-print">The immense quantity of data generated.</p>
+                        <p class="print-only-description text-xs mt-1">The sheer scale of data being generated (terabytes, petabytes, exabytes).</p>
+                    </div>
+                    <div class="p-4 bg-slate-100 rounded-lg shadow-md five-v-item-print">
+                        <span class="text-3xl no-print mb-1 block">⚡️</span><p class="font-semibold text-lg mt-1">Velocity</p>
+                        <p class="text-sm text-gray-600 mt-1 hidden md:block no-print">The high speed of data generation.</p>
+                        <p class="print-only-description text-xs mt-1">The speed at which new data is generated and needs to be processed (real-time streams).</p>
+                    </div>
+                    <div class="p-4 bg-slate-100 rounded-lg shadow-md five-v-item-print">
+                        <span class="text-3xl no-print mb-1 block">🧩</span><p class="font-semibold text-lg mt-1">Variety</p>
+                        <p class="text-sm text-gray-600 mt-1 hidden md:block no-print">The diverse types and formats of data.</p>
+                         <p class="print-only-description text-xs mt-1">The different forms of data (structured, semi-structured, unstructured).</p>
+                    </div>
+                    <div class="p-4 bg-slate-100 rounded-lg shadow-md five-v-item-print">
+                        <span class="text-3xl no-print mb-1 block">✅</span><p class="font-semibold text-lg mt-1">Veracity</p>
+                        <p class="text-sm text-gray-600 mt-1 hidden md:block no-print">The uncertainty and reliability of data.</p>
+                        <p class="print-only-description text-xs mt-1">The trustworthiness and quality of the data (accuracy, reliability).</p>
+                    </div>
+                    <div class="p-4 bg-slate-100 rounded-lg shadow-md five-v-item-print">
+                        <span class="text-3xl no-print mb-1 block">💎</span><p class="font-semibold text-lg mt-1">Value</p>
+                        <p class="text-sm text-gray-600 mt-1 hidden md:block no-print">The potential to extract meaningful insights.</p>
+                        <p class="print-only-description text-xs mt-1">The usefulness and insights derived to create business value or achieve objectives.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Relationship between Data Mining and Big Data</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    Data Mining and Big Data are intrinsically linked and mutually reinforcing. Big Data provides the expansive and diverse datasets – the "raw material" – while Data Mining offers the methodologies, algorithms, and tools to process this raw material and transform it into valuable knowledge, actionable insights, and predictive models.
+                </p>
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-2 leading-relaxed">
+                    <li>
+                        <strong>Fuel for Discovery:</strong> Big Data serves as the fuel for data mining. The sheer volume and variety of data allow data mining algorithms to uncover more subtle, complex, and statistically significant patterns that might be invisible in smaller datasets.
+                    </li>
+                    <li>
+                        <strong>Enabling Technologies:</strong> To effectively mine Big Data, specialized technologies and platforms (such as Apache Hadoop for distributed storage and batch processing, and Apache Spark for fast, in-memory processing and real-time analytics) are often indispensable. These technologies handle the challenges of storing, managing, and pre-processing massive datasets to make them amenable to data mining techniques.
+                    </li>
+                    <li>
+                        <strong>Scalable Algorithms:</strong> Traditional data mining algorithms may struggle with the scale of Big Data. Consequently, there's a continuous drive to develop and adapt algorithms to be more scalable, efficient, and capable of running in distributed computing environments.
+                    </li>
+                    <li>
+                        <strong>Driving Value:</strong> The ultimate goal of combining Big Data with Data Mining is to extract actionable value. This could manifest as improved business strategies, enhanced customer experiences, breakthroughs in scientific research, more efficient operations, or the development of innovative products and services.
+                    </li>
+                </ul>
+            </section>
+
+            <section class="content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Key Takeaways for Session 1</h2>
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1 leading-relaxed">
+                    <li>Data Mining is a sophisticated process focused on discovering valuable, non-obvious patterns and knowledge from data.</li>
+                    <li>Big Data is characterized by its massive Volume, high Velocity, diverse Variety, uncertain Veracity, and the potential to deliver significant Value.</li>
+                    <li>The 5 V's articulate the primary challenges and opportunities inherent in managing and analyzing Big Data.</li>
+                    <li>Data Mining provides the analytical power to unlock the insights and value concealed within the vastness of Big Data, often requiring specialized technologies and scalable algorithms.</li>
+                </ul>
+            </section>
+        </article>
+
+        <footer class="text-center mt-12 py-6 border-t border-gray-300"> 
+            <div class="mb-4"> 
+                 <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-10 mx-auto footer-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+            </div>
+            <p class="text-base text-gray-600">&copy; <span id="currentYearModule"></span> FACE Prep Campus (www.faceprep.in). All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('currentYearModule').textContent = new Date().getFullYear();
+
+        const interactiveTerms = document.querySelectorAll('.interactive-term');
+        const tooltip = document.querySelector('.definition-tooltip');
+
+        if (tooltip) {
+            interactiveTerms.forEach(term => {
+                const showTooltip = (e) => {
+                    tooltip.textContent = term.dataset.definition;
+                    tooltip.style.display = 'block';
+                    
+                    const termRect = term.getBoundingClientRect();
+                    
+                    let top = termRect.bottom + window.scrollY + 8; 
+                    let left = termRect.left + window.scrollX;
+
+                    tooltip.style.top = `${top}px`;
+                    tooltip.style.left = `${left}px`;
+                    
+                    const tooltipRect = tooltip.getBoundingClientRect();
+                    if (tooltipRect.right > (window.innerWidth - 15)) { 
+                        tooltip.style.left = `${window.innerWidth - tooltipRect.width - 15}px`;
+                    }
+                    if (tooltipRect.left < 15) { 
+                        tooltip.style.left = `15px`;
+                    }
+                };
+
+                term.addEventListener('mouseenter', showTooltip);
+                term.addEventListener('focus', showTooltip); 
+                term.addEventListener('click', showTooltip); 
+
+                const hideTooltip = () => {
+                    tooltip.style.display = 'none';
+                };
+                term.addEventListener('mouseleave', hideTooltip);
+                term.addEventListener('blur', hideTooltip); 
+            });
+
+            document.addEventListener('click', function(event) {
+                let isClickInsideTerm = false;
+                interactiveTerms.forEach(term => {
+                    if (term.contains(event.target)) {
+                        isClickInsideTerm = true;
+                    }
+                });
+                if (!isClickInsideTerm && !tooltip.contains(event.target)) {
+                    tooltip.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

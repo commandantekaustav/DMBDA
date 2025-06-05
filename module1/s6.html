@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 6: Data Mining Lifecycle - Module I</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: "Warm Neutral Harmony" -->
+    <!-- Application Structure Plan: Single session detail page. Structure: Header, Export, Session Details, Objectives, Extensive Content (Intro to lifecycle, detailed breakdown of CRISP-DM phases with an interactive diagram and expanded details per phase), Iterative Nature, Key Takeaways, Footer. Goal: Comprehensive and in-depth understanding of the data mining process. -->
+    <!-- Visualization & Content Choices: 
+        - Detailed textual explanation of each phase of CRISP-DM, including objectives, tasks, outputs, and challenges.
+        - Interactive HTML/CSS/JS diagram for CRISP-DM lifecycle: clicking a stage reveals the expanded, detailed description. Unicode icons for stages.
+        - Interactive tooltips for key terms.
+        - Emphasis on the iterative nature of the process with more examples.
+        - PDF Export: Print-specific CSS, ensuring expanded content is readable.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            font-size: 1rem; 
+            line-height: 1.625; 
+        }
+        
+        .interactive-term { 
+            cursor: pointer;
+            font-weight: 600; 
+        }
+        .definition-tooltip {
+            display: none;
+            position: absolute;
+            background-color: #f9fafb; 
+            border: 1px solid #d1d5db; 
+            padding: 8px; 
+            border-radius: 4px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            z-index: 100;
+            font-size: 0.875rem; 
+            width: max-content;
+            max-width: 320px; 
+        }
+
+        h1.page-title { font-size: 2.25rem; line-height: 2.5rem; } 
+        h2.section-title { font-size: 1.5rem; line-height: 2rem; margin-bottom: 0.75rem;} 
+        h3.subsection-title { font-size: 1.25rem; line-height: 1.75rem; margin-bottom: 0.5rem;}    
+        h4.detail-title { font-size: 1.125rem; line-height: 1.75rem; margin-bottom: 0.375rem;} 
+        
+        .lifecycle-stage-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); /* Slightly wider for text */
+            gap: 1rem;
+        }
+        .lifecycle-stage {
+            cursor: pointer;
+            border: 2px solid #d1d5db; /* gray-300 */
+            background-color: #f9fafb; /* gray-50 */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out;
+        }
+        .lifecycle-stage:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+            border-color: #60a5fa; /* blue-400 */
+        }
+        .lifecycle-stage.active {
+            border-color: #2563eb; /* blue-600 */
+            background-color: #eff6ff; /* blue-50 */
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4); 
+            transform: translateY(-2px);
+        }
+        .lifecycle-stage-icon {
+            font-size: 1.75rem; /* text-3xl */
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        .lifecycle-description-box {
+            background-color: #f3f4f6; /* gray-100 */
+            border: 1px solid #e5e7eb; /* gray-200 */
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            min-height: 150px; /* Increased min-height for more text */
+        }
+        .lifecycle-description-box strong { color: #1e3a8a; /* Tailwind blue-800 for emphasis */ }
+        .lifecycle-description-box ul { margin-top: 0.5rem; margin-left: 1rem; }
+
+
+        @media print {
+            body { font-size: 10pt; line-height: 1.3; } 
+            .no-print { display: none !important; }
+            header { display: flex; flex-direction: column; align-items: center; text-align: center; }
+            .header-logo-print { max-width: 150px; max-height: 50px; margin-bottom: 10px; } 
+            .footer-logo-print { max-width: 100px; max-height: 30px; margin-top: 10px; } 
+            footer { text-align: center; }
+            section, .content-section { page-break-inside: avoid; margin-bottom: 15px; } 
+            .bg-white { box-shadow: none !important; border: 1px solid #ccc; padding: 0.5rem !important;}
+            a { text-decoration: none; color: black; }
+            .interactive-term { text-decoration: none; color: black; font-weight: bold; } 
+            .definition-tooltip { display: none !important; }
+            .print-only-definition, .lifecycle-details-print { display: block !important; position: static !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin-top: 2px; font-style: normal !important; font-size: 0.9em;} 
+            .lifecycle-details-print h5 { font-weight: bold; margin-top: 5px; font-size: 1.05em;}
+            .lifecycle-details-print ul { margin-left: 15px; }
+            .lifecycle-stage-container-web, .lifecycle-description-box-web { display: none !important; }
+            .lifecycle-stage-print { border: 1px solid #eee; padding: 5px; margin-bottom: 5px; }
+            .lifecycle-stage-print .lifecycle-stage-icon { display: none; }
+            h1.page-title { font-size: 20pt; } 
+            h2.section-title { font-size: 16pt; }
+            h3.subsection-title { font-size: 14pt; }
+            h4.detail-title { font-size: 12pt; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+</head>
+<body class="bg-gray-100 text-gray-800"> 
+    <div class="container mx-auto p-4 md:p-8"> 
+        <header class="mb-10"> 
+            <div class="flex flex-col sm:flex-row items-center justify-between">
+                <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-16 md:h-20 mb-4 sm:mb-0 header-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+                <div class="text-center sm:text-right sm:ml-4"> 
+                    <p class="text-base text-gray-500">Module I: Overview and Foundations</p> 
+                    <h1 class="page-title text-3xl md:text-4xl font-bold text-gray-900 mt-1">Session 6: Data Mining Lifecycle</h1> 
+                    <p class="text-lg text-gray-600 mt-2">Data Mining & Big Data Analytics</p> 
+                </div>
+            </div>
+            <nav aria-label="Breadcrumb" class="mt-4 text-sm text-gray-500 no-print"> 
+                <ol class="list-none p-0 inline-flex">
+                    <li class="flex items-center">
+                        <a href="../index.html" class="text-slate-600 hover:text-slate-800">Course Overview</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="flex items-center">
+                        <a href="module-1-index.html" class="text-slate-600 hover:text-slate-800">Module I</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="text-gray-700 font-semibold" aria-current="page">Session 6</li> 
+                </ol>
+            </nav>
+        </header>
+
+        <div class="text-center mb-8 no-print"> 
+            <button onclick="window.print()" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-150 ease-in-out text-base"> 
+                Export Session 6 to PDF
+            </button>
+        </div>
+
+        <article class="bg-white p-6 md:p-8 rounded-lg shadow-lg"> 
+            <section class="mb-6 border-b pb-4"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-2">Session Details</h2> 
+                <p class="text-base text-gray-700"><span class="font-semibold">Type:</span> Theory 📖</p>
+                <p class="text-base text-gray-700"><span class="font-semibold">Duration:</span> 1 Hour</p>
+                <p class="text-base text-gray-700"><span class="font-semibold">Textbook References:</span> Han et al.: Ch. 1.2, 2.1; Zikopoulos & Eaton: Ch. 2.</p>
+            </section>
+
+            <section class="mb-8 content-section"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Learning Objectives</h2> 
+                <p class="text-base text-gray-700 mb-3">By the end of this session, you will be able to:</p>
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1"> 
+                    <li>Articulate the critical importance of employing a structured process model for data mining endeavors.</li>
+                    <li>Identify, describe, and differentiate the key phases of a standard data mining lifecycle, with a focus on the CRISP-DM methodology.</li>
+                    <li>Comprehend the specific objectives, common tasks, typical inputs, and expected outputs associated with each phase of the lifecycle.</li>
+                    <li>Recognize and explain the inherently iterative nature of the data mining process and why flexibility is paramount.</li>
+                </ul>
+            </section>
+
+            <div class="definition-tooltip"></div>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Introduction to the Data Mining Lifecycle</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    Embarking on a data mining project without a clear plan is akin to navigating uncharted waters without a map or compass. To effectively extract valuable insights and build robust predictive models, a systematic and structured approach is indispensable. This structured approach is commonly referred to as the <span class="interactive-term" data-definition="A data mining lifecycle or process model outlines the standard phases and tasks involved in a data mining project, providing a framework for planning, execution, and evaluation.">Data Mining Lifecycle</span> or Process Model.
+                </p>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    Adhering to a standard lifecycle provides numerous benefits: it ensures comprehensive planning, mitigates risks by addressing critical steps, promotes consistency across projects, facilitates communication among team members and stakeholders, and ultimately increases the likelihood of delivering outcomes that align with business or research objectives. While several process models exist (e.g., KDD Process, SEMMA), the <span class="interactive-term" data-definition="CRISP-DM (Cross-Industry Standard Process for Data Mining) is a widely adopted, open-standard process model that breaks down the data mining lifecycle into six flexible and iterative phases.">CRISP-DM</span> (Cross-Industry Standard Process for Data Mining) methodology has gained widespread adoption due to its industry-agnostic nature and practical framework. This session will primarily use CRISP-DM to illustrate the typical phases of a data mining project.
+                </p>
+                <div class="print-only-definition">
+                    <p><strong>Data Mining Lifecycle:</strong> A structured, phased approach for conducting data mining projects, ensuring thoroughness and alignment with objectives.</p>
+                    <p><strong>CRISP-DM:</strong> Cross-Industry Standard Process for Data Mining; a popular, six-phase iterative model for data mining projects.</p>
+                </div>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Phases of the CRISP-DM Lifecycle</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-4">
+                    CRISP-DM organizes the data mining process into six major phases. It's important to remember that these phases are not strictly sequential; the process is highly iterative, with frequent feedback loops and a need to revisit earlier phases as new understanding is gained. Click on each stage below to explore its detailed objectives, tasks, outputs, and common challenges.
+                </p>
+
+                <div class="lifecycle-stage-container-web no-print">
+                    <div class="lifecycle-stage-container mb-6">
+                        <div class="lifecycle-stage" data-stage="bu">
+                            <span class="lifecycle-stage-icon">🎯</span>
+                            <span class="font-medium">1. Business Understanding</span>
+                        </div>
+                        <div class="lifecycle-stage" data-stage="du">
+                            <span class="lifecycle-stage-icon">📊</span>
+                            <span class="font-medium">2. Data Understanding</span>
+                        </div>
+                        <div class="lifecycle-stage" data-stage="dp">
+                            <span class="lifecycle-stage-icon">🛠️</span>
+                            <span class="font-medium">3. Data Preparation</span>
+                        </div>
+                        <div class="lifecycle-stage" data-stage="mo">
+                            <span class="lifecycle-stage-icon">🧠</span>
+                            <span class="font-medium">4. Modeling</span>
+                        </div>
+                        <div class="lifecycle-stage" data-stage="ev">
+                            <span class="lifecycle-stage-icon">📈</span>
+                            <span class="font-medium">5. Evaluation</span>
+                        </div>
+                        <div class="lifecycle-stage" data-stage="de">
+                            <span class="lifecycle-stage-icon">🚀</span>
+                            <span class="font-medium">6. Deployment</span>
+                        </div>
+                    </div>
+                    <div id="lifecycle-description-box" class="lifecycle-description-box-web lifecycle-description-box text-sm leading-relaxed">
+                        Select a lifecycle stage above to view its detailed description.
+                    </div>
+                </div>
+
+                <div class="lifecycle-details-print print-only-explanation" style="display:none;">
+                    <!-- Content for print will be generated by JS based on lifecycleDescriptions -->
+                </div>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">The Iterative Nature of Data Mining</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    One of the most critical aspects to grasp about the data mining lifecycle, particularly CRISP-DM, is its profoundly iterative nature. The arrows in the CRISP-DM diagram are not just one-way; they signify that the process involves frequent backward steps and loops. This is not a sign of failure but an inherent part of discovery and refinement.
+                </p>
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-2 leading-relaxed">
+                    <li><strong>New Insights Drive Re-evaluation:</strong> For example, during Data Understanding, you might uncover an unexpected data quality issue or a new variable that seems highly relevant. This could necessitate revisiting the Business Understanding phase to refine the problem definition or project scope.</li>
+                    <li><strong>Modeling Challenges:</strong> If initial models perform poorly (Modeling phase), it's common to loop back to Data Preparation to try different feature engineering techniques, handle missing data differently, or even collect more/different data (Data Understanding). Sometimes, poor model performance might even indicate that the business problem itself was not well-defined or that the available data is insufficient to solve it, prompting a return to Business Understanding.</li>
+                    <li><strong>Evaluation Feedback:</strong> The Evaluation phase is a critical checkpoint. If a technically sound model doesn't meet the business success criteria (e.g., it's not accurate enough for practical use, or it's too complex to deploy), the project must loop back. This might involve trying different modeling techniques, further data preparation, or even a re-assessment of the business objectives if they prove unrealistic with the current data and resources.</li>
+                    <li><strong>Deployment Learning:</strong> Even after deployment, monitoring the model's performance might reveal degradation over time (concept drift), requiring a new iteration of the entire lifecycle to retrain or rebuild the model.</li>
+                </ul>
+                <p class="text-base text-gray-700 leading-relaxed mt-3">
+                    Therefore, successful data mining projects embrace this iterative characteristic. They involve continuous learning, adaptation, and refinement, rather than a rigid, linear progression through steps. Flexibility, critical thinking, and effective communication within the project team are paramount.
+                </p>
+            </section>
+
+            <section class="content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Key Takeaways for Session 6</h2>
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1 leading-relaxed">
+                    <li>A structured data mining lifecycle, such as CRISP-DM, provides an essential roadmap for project success, ensuring thoroughness and alignment with goals.</li>
+                    <li>CRISP-DM consists of six interconnected phases: Business Understanding, Data Understanding, Data Preparation, Modeling, Evaluation, and Deployment.</li>
+                    <li>Each phase has distinct objectives, involves specific tasks (e.g., defining problems, exploring data, cleaning data, building models, assessing results, deploying solutions), and produces key deliverables.</li>
+                    <li>Data Preparation is typically the most resource-intensive phase, often highlighting the 'garbage in, garbage out' principle.</li>
+                    <li>The data mining process is fundamentally iterative; insights and challenges discovered in later phases often necessitate revisiting and refining work done in earlier stages.</li>
+                </ul>
+            </section>
+        </article>
+
+        <footer class="text-center mt-12 py-6 border-t border-gray-300"> 
+            <div class="mb-4"> 
+                 <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-10 mx-auto footer-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+            </div>
+            <p class="text-base text-gray-600">&copy; <span id="currentYearModule"></span> FACE Prep Campus (www.faceprep.in). All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('currentYearModule').textContent = new Date().getFullYear();
+
+        const interactiveTerms = document.querySelectorAll('.interactive-term');
+        const tooltip = document.querySelector('.definition-tooltip');
+
+        if (tooltip) {
+            interactiveTerms.forEach(term => {
+                const showTooltip = (e) => {
+                    tooltip.textContent = term.dataset.definition;
+                    tooltip.style.display = 'block';
+                    const termRect = term.getBoundingClientRect();
+                    let top = termRect.bottom + window.scrollY + 8; 
+                    let left = termRect.left + window.scrollX;
+                    tooltip.style.top = `${top}px`;
+                    tooltip.style.left = `${left}px`;
+                    const tooltipRect = tooltip.getBoundingClientRect();
+                    if (tooltipRect.right > (window.innerWidth - 15)) { 
+                        tooltip.style.left = `${window.innerWidth - tooltipRect.width - 15}px`;
+                    }
+                    if (tooltipRect.left < 15) { 
+                        tooltip.style.left = `15px`;
+                    }
+                };
+                term.addEventListener('mouseenter', showTooltip);
+                term.addEventListener('focus', showTooltip); 
+                term.addEventListener('click', showTooltip); 
+                const hideTooltip = () => {
+                    tooltip.style.display = 'none';
+                };
+                term.addEventListener('mouseleave', hideTooltip);
+                term.addEventListener('blur', hideTooltip); 
+            });
+            document.addEventListener('click', function(event) {
+                let isClickInsideTerm = false;
+                interactiveTerms.forEach(term => {
+                    if (term.contains(event.target)) {
+                        isClickInsideTerm = true;
+                    }
+                });
+                if (!isClickInsideTerm && !tooltip.contains(event.target)) {
+                    tooltip.style.display = 'none';
+                }
+            });
+        }
+
+        // Data Mining Lifecycle Logic with EXPANDED descriptions
+        const lifecycleStages = document.querySelectorAll('.lifecycle-stage');
+        const lifecycleDescBox = document.getElementById('lifecycle-description-box');
+        const lifecyclePrintContainer = document.querySelector('.lifecycle-details-print');
+
+        const lifecycleDescriptions = {
+            bu: `
+                <h4 class="detail-title font-semibold text-gray-700 mb-2">1. Business Understanding</h4>
+                <p><strong>Objective:</strong> To thoroughly understand the project's objectives and requirements from a business or research perspective. This involves clearly defining the problem the data mining project aims to solve and establishing the criteria for a successful outcome.</p>
+                <h5>Key Tasks:</h5>
+                <ul>
+                    <li><strong>Determine Business Objectives:</strong> Work closely with stakeholders to uncover crucial factors, articulate project goals, and understand success metrics from their point of view. E.g., "Reduce customer churn by 15%," or "Identify factors leading to equipment failure."</li>
+                    <li><strong>Assess Situation:</strong> Inventory resources (personnel, data, computing power), constraints (budget, time, legal/ethical limits), assumptions, and risks. Perform a cost-benefit analysis.</li>
+                    <li><strong>Determine Data Mining Goals:</strong> Translate business objectives into specific data mining goals. E.g., For "reduce customer churn," a data mining goal might be "build a model to predict which customers are likely to churn."</li>
+                    <li><strong>Produce Project Plan:</strong> Outline the stages of the project, timelines, required resources, evaluation strategies, and potential challenges. This plan is preliminary and will be refined.</li>
+                </ul>
+                <h5>Key Outputs/Deliverables:</h5>
+                <ul><li>Project Charter / Problem Definition Document</li><li>Initial Project Plan</li><li>List of Business Success Criteria</li></ul>
+                <h5>Common Challenges & Considerations:</h5>
+                <ul><li>Vague or misaligned business objectives.</li><li>Lack of stakeholder buy-in or understanding of data mining capabilities.</li><li>Unrealistic expectations regarding outcomes or timelines.</li><li>Insufficient consideration of project constraints.</li></ul>
+            `,
+            du: `
+                <h4 class="detail-title font-semibold text-gray-700 mb-2">2. Data Understanding</h4>
+                <p><strong>Objective:</strong> To collect, explore, and become familiar with the available data, identify potential data quality issues, and gain initial insights that might inform subsequent phases.</p>
+                <h5>Key Tasks:</h5>
+                <ul>
+                    <li><strong>Collect Initial Data:</strong> Gather all potentially relevant data from various sources identified. This might involve accessing databases, APIs, log files, or external datasets.</li>
+                    <li><strong>Describe Data:</strong> Document the datasets, including their format, number of records and attributes (columns), attribute types (numeric, categorical, text), and any known meanings or constraints for each attribute.</li>
+                    <li><strong>Explore Data:</strong> Use basic statistical measures (mean, median, mode, standard deviation), create visualizations (histograms, scatter plots, box plots), and perform simple queries to understand data distributions, identify relationships between variables, and spot obvious patterns or anomalies.</li>
+                    <li><strong>Verify Data Quality:</strong> Assess the data for completeness (missing values), correctness (errors, outliers), consistency (contradictory values), and currency. Document any identified issues.</li>
+                </ul>
+                <h5>Key Outputs/Deliverables:</h5>
+                <ul><li>Initial Data Collection Report</li><li>Data Description Report</li><li>Data Exploration Report (including visualizations)</li><li>Data Quality Report</li></ul>
+                <h5>Common Challenges & Considerations:</h5>
+                <ul><li>Data access issues or delays.</li><li>Poorly documented data sources.</li><li>Significant data quality problems (missing data, errors, biases).</li><li>Underestimating the time required for thorough data exploration.</li><li>Making premature assumptions based on initial findings.</li></ul>
+            `,
+            dp: `
+                <h4 class="detail-title font-semibold text-gray-700 mb-2">3. Data Preparation (Preprocessing)</h4>
+                <p><strong>Objective:</strong> To transform the raw, initial data into a final dataset that is suitable for input into modeling tools. This is often the most time-consuming and critical phase, as the quality of the prepared data directly impacts model performance.</p>
+                <h5>Key Tasks:</h5>
+                <ul>
+                    <li><strong>Select Data:</strong> Decide which datasets, records (rows), and attributes (columns) are relevant for the analysis, based on data mining goals and data understanding. Justify selections.</li>
+                    <li><strong>Clean Data:</strong> Address data quality issues identified earlier. This includes handling missing values (e.g., imputation, deletion), correcting errors, smoothing noisy data, and identifying/handling outliers.</li>
+                    <li><strong>Construct Data (Feature Engineering):</strong> Derive new attributes (features) from existing ones that might be more informative for modeling (e.g., calculating age from date of birth, creating interaction terms, aggregating data). Discretize continuous variables or create dummy variables from categorical ones if needed.</li>
+                    <li><strong>Integrate Data:</strong> Combine data from multiple sources (e.g., merging tables based on common keys). Resolve any inconsistencies or conflicts that arise during integration.</li>
+                    <li><strong>Format Data:</strong> Transform data into the specific format required by the chosen modeling tools (e.g., rearranging columns, converting data types, normalizing/scaling numerical values).</li>
+                </ul>
+                <h5>Key Outputs/Deliverables:</h5>
+                <ul><li>Final Prepared Dataset(s) (often called the analytical base table)</li><li>Data Preparation Documentation (detailing all transformations and decisions)</li></ul>
+                <h5>Common Challenges & Considerations:</h5>
+                <ul><li>The sheer volume of tasks; this phase can be iterative and complex.</li><li>Choosing appropriate methods for handling missing data or outliers.</li><li>The "art" of feature engineering – creating meaningful new attributes.</li><li>Ensuring data transformations are applied consistently if the model is to be deployed on new data.</li><li>Maintaining clear documentation of all preparation steps for reproducibility.</li></ul>
+            `,
+            mo: `
+                <h4 class="detail-title font-semibold text-gray-700 mb-2">4. Modeling</h4>
+                <p><strong>Objective:</strong> To select, apply, and fine-tune various modeling techniques to address the data mining goals defined earlier, aiming to create models that capture meaningful patterns in the data.</p>
+                <h5>Key Tasks:</h5>
+                <ul>
+                    <li><strong>Select Modeling Technique(s):</strong> Choose appropriate algorithms based on the data mining task (e.g., classification, regression, clustering), data characteristics, and business objectives. Often, multiple techniques are explored.</li>
+                    <li><strong>Generate Test Design:</strong> Define a strategy for evaluating the model's performance and its ability to generalize to unseen data (e.g., splitting data into training, validation, and test sets; cross-validation).</li>
+                    <li><strong>Build Model(s):</strong> Apply the selected algorithm(s) to the prepared training data. This often involves setting initial parameters for the algorithm.</li>
+                    <li><strong>Assess Model(s) (Technically):</strong> Evaluate the performance of the built model(s) using appropriate technical metrics (e.g., accuracy, precision, recall for classification; RMSE, R-squared for regression; silhouette score for clustering). Iteratively tune model parameters (hyperparameter optimization) to improve performance. Compare different models.</li>
+                </ul>
+                <h5>Key Outputs/Deliverables:</h5>
+                <ul><li>One or more trained Model(s)</li><li>Model Descriptions (how they were built, parameters used)</li><li>Technical Model Assessment Report (performance metrics)</li></ul>
+                <h5>Common Challenges & Considerations:</h5>
+                <ul><li>Selecting the most appropriate algorithm(s) for the problem and data.</li><li>Overfitting (model performs well on training data but poorly on new data) or underfitting.</li><li>Understanding and interpreting complex models.</li><li>Computational expense of training some models, especially with large datasets.</li><li>Choosing the right evaluation metrics for the specific problem.</li></ul>
+            `,
+            ev: `
+                <h4 class="detail-title font-semibold text-gray-700 mb-2">5. Evaluation</h4>
+                <p><strong>Objective:</strong> To thoroughly assess the model(s) from the previous phase to ensure they meet the business objectives and are suitable for deployment. This phase goes beyond technical metrics and considers the practical utility and implications of the model.</p>
+                <h5>Key Tasks:</h5>
+                <ul>
+                    <li><strong>Evaluate Results:</strong> Assess the degree to which the model(s) meet the business success criteria defined in the Business Understanding phase. Interpret the model's findings in a business context.</li>
+                    <li><strong>Review Process:</strong> Conduct a comprehensive review of the entire data mining project, checking for any overlooked issues, errors, or constraints. Ensure all steps were executed soundly.</li>
+                    <li><strong>Determine Next Steps:</strong> Based on the evaluation, decide whether the model is ready for deployment, requires further iteration (e.g., more modeling, data preparation), or if the project should be concluded (e.g., if objectives cannot be met).</li>
+                </ul>
+                <h5>Key Outputs/Deliverables:</h5>
+                <ul><li>Model Evaluation Report (including business success assessment)</li><li>List of Approved Model(s) for deployment</li><li>Decision on project continuation/conclusion</li></ul>
+                <h5>Common Challenges & Considerations:</h5>
+                <ul><li>Ensuring the model is not just technically accurate but also practically useful and interpretable by business users.</li><li>Validating that the model generalizes well to real-world scenarios beyond the test data.</li><li>Assessing potential biases in the model and their ethical implications.</li><li>Communicating complex model results effectively to non-technical stakeholders.</li></ul>
+            `,
+            de: `
+                <h4 class="detail-title font-semibold text-gray-700 mb-2">6. Deployment</h4>
+                <p><strong>Objective:</strong> To make the developed model(s) available for use by the end-users or integrate them into business processes to realize the anticipated benefits.</p>
+                <h5>Key Tasks:</h5>
+                <ul>
+                    <li><strong>Plan Deployment:</strong> Develop a strategy for deploying the model. This includes considering how the model will be integrated into existing systems, who will use it, and how its outputs will be consumed.</li>
+                    <li><strong>Plan Monitoring and Maintenance:</strong> Create a plan for continuously monitoring the deployed model's performance and for maintaining it over time (e.g., retraining with new data, addressing concept drift).</li>
+                    <li><strong>Produce Final Report:</strong> Document the entire project, including all phases, findings, model details, and deployment plans. This report is typically for stakeholders.</li>
+                    <li><strong>Review Project (Post-mortem):</strong> Conduct a final review of the project to identify lessons learned, best practices, and areas for improvement in future data mining endeavors. This might involve documenting the entire process from start to finish, including successes and failures.</li>
+                </ul>
+                <h5>Key Outputs/Deliverables:</h5>
+                <ul><li>Deployed Model(s) / Integrated Solution</li><li>Deployment Plan</li><li>Monitoring and Maintenance Plan</li><li>Final Project Report and Presentation</li><li>Project Review Document / Lessons Learned</li></ul>
+                <h5>Common Challenges & Considerations:</h5>
+                <ul><li>Technical hurdles in integrating the model with existing IT infrastructure.</li><li>User adoption and training.</li><li>Ensuring the model remains accurate and relevant over time as data patterns change (concept drift).</li><li>Setting up effective monitoring systems.</li><li>Scaling the deployed solution if usage grows.</li></ul>
+            `
+        };
+
+        function populatePrintDetails() {
+            if(lifecyclePrintContainer) {
+                let printHTML = '';
+                for (const stageKey in lifecycleDescriptions) {
+                    const stageData = lifecycleStages[0].parentNode.querySelector(`.lifecycle-stage[data-stage="${stageKey}"]`);
+                    const stageName = stageData ? stageData.querySelector('.font-medium').textContent : `Stage ${stageKey.toUpperCase()}`;
+                    
+                    // Create a temporary div to parse the HTML string and extract text for print
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = lifecycleDescriptions[stageKey];
+                    
+                    printHTML += `<div class="lifecycle-stage-print">`;
+                    printHTML += `<h4 class="detail-title font-semibold">${tempDiv.querySelector('h4') ? tempDiv.querySelector('h4').textContent : stageName}</h4>`;
+                    
+                    // Objective
+                    const objectiveP = tempDiv.querySelector('p');
+                    if (objectiveP) printHTML += `<p><strong>Objective:</strong> ${objectiveP.nextElementSibling && objectiveP.nextElementSibling.tagName === 'P' ? objectiveP.nextElementSibling.textContent : objectiveP.textContent}</p>`;
+                    
+                    // Key Tasks
+                    const tasksH5 = Array.from(tempDiv.querySelectorAll('h5')).find(h => h.textContent.includes('Key Tasks'));
+                    if (tasksH5) {
+                        printHTML += `<h5>Key Tasks:</h5>`;
+                        const tasksUl = tasksH5.nextElementSibling;
+                        if (tasksUl && tasksUl.tagName === 'UL') {
+                            printHTML += `<ul>${Array.from(tasksUl.children).map(li => `<li>${li.textContent}</li>`).join('')}</ul>`;
+                        }
+                    }
+                    
+                    // Key Outputs
+                    const outputsH5 = Array.from(tempDiv.querySelectorAll('h5')).find(h => h.textContent.includes('Key Outputs'));
+                    if (outputsH5) {
+                        printHTML += `<h5>Key Outputs/Deliverables:</h5>`;
+                        const outputsUl = outputsH5.nextElementSibling;
+                        if (outputsUl && outputsUl.tagName === 'UL') {
+                           printHTML += `<ul>${Array.from(outputsUl.children).map(li => `<li>${li.textContent}</li>`).join('')}</ul>`;
+                        }
+                    }
+
+                    // Challenges
+                    const challengesH5 = Array.from(tempDiv.querySelectorAll('h5')).find(h => h.textContent.includes('Common Challenges'));
+                     if (challengesH5) {
+                        printHTML += `<h5>Common Challenges & Considerations:</h5>`;
+                        const challengesUl = challengesH5.nextElementSibling;
+                        if (challengesUl && challengesUl.tagName === 'UL') {
+                           printHTML += `<ul>${Array.from(challengesUl.children).map(li => `<li>${li.textContent}</li>`).join('')}</ul>`;
+                        }
+                    }
+                    printHTML += `</div>`;
+                }
+                lifecyclePrintContainer.innerHTML = printHTML;
+            }
+        }
+
+
+        if(lifecycleDescBox && lifecycleStages.length > 0){
+            lifecycleStages.forEach(stage => {
+                stage.addEventListener('click', () => {
+                    lifecycleStages.forEach(s => s.classList.remove('active'));
+                    stage.classList.add('active');
+                    const stageKey = stage.dataset.stage;
+                    lifecycleDescBox.innerHTML = lifecycleDescriptions[stageKey] || "Select a stage to see its description.";
+                });
+            });
+            populatePrintDetails(); // Populate print details on load
+            // lifecycleStages[0].click(); // Optionally activate the first stage
+        }
+
+        // Tooltip logic (unchanged from previous versions)
+        if (tooltip) {
+            interactiveTerms.forEach(term => {
+                const showTooltip = (e) => {
+                    tooltip.textContent = term.dataset.definition;
+                    tooltip.style.display = 'block';
+                    const termRect = term.getBoundingClientRect();
+                    let top = termRect.bottom + window.scrollY + 8; 
+                    let left = termRect.left + window.scrollX;
+                    tooltip.style.top = `${top}px`;
+                    tooltip.style.left = `${left}px`;
+                    const tooltipRect = tooltip.getBoundingClientRect();
+                    if (tooltipRect.right > (window.innerWidth - 15)) { 
+                        tooltip.style.left = `${window.innerWidth - tooltipRect.width - 15}px`;
+                    }
+                    if (tooltipRect.left < 15) { 
+                        tooltip.style.left = `15px`;
+                    }
+                };
+                term.addEventListener('mouseenter', showTooltip);
+                term.addEventListener('focus', showTooltip); 
+                term.addEventListener('click', showTooltip); 
+                const hideTooltip = () => {
+                    tooltip.style.display = 'none';
+                };
+                term.addEventListener('mouseleave', hideTooltip);
+                term.addEventListener('blur', hideTooltip); 
+            });
+            document.addEventListener('click', function(event) {
+                let isClickInsideTerm = false;
+                interactiveTerms.forEach(term => {
+                    if (term.contains(event.target)) {
+                        isClickInsideTerm = true;
+                    }
+                });
+                if (!isClickInsideTerm && !tooltip.contains(event.target)) {
+                    tooltip.style.display = 'none';
+                }
+            });
+        }
+
+    </script>
+</body>
+</html>

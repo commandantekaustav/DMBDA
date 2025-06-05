@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 8: Mini Project - Phase 1: Introduction & Ideation - Module I</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: "Warm Neutral Harmony" -->
+    <!-- Application Structure Plan: Single session detail page for a project phase. Structure: Header, Export, Session Details, Phase Objectives, Introduction, Detailed Key Tasks for Phase 1, Guidance on Documentation, Tips, Deliverables, Key Takeaways, Footer. Goal: Clear, actionable guidance for starting the mini-project. -->
+    <!-- Visualization & Content Choices: 
+        - Textual guidance for each key task of the project's first phase.
+        - Structured lists for objectives, tasks, deliverables, and tips.
+        - Emphasis on clear problem definition, data source identification, and initial planning.
+        - Interactive tooltips for terms like "SMART objectives" or "Data Provenance."
+        - PDF Export: Print-specific CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            font-size: 1rem; 
+            line-height: 1.625; 
+        }
+        
+        .interactive-term { 
+            cursor: pointer;
+            font-weight: 600; 
+        }
+        .definition-tooltip {
+            display: none;
+            position: absolute;
+            background-color: #f9fafb; 
+            border: 1px solid #d1d5db; 
+            padding: 8px; 
+            border-radius: 4px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            z-index: 100;
+            font-size: 0.875rem; 
+            width: max-content;
+            max-width: 320px; 
+        }
+
+        h1.page-title { font-size: 2.25rem; line-height: 2.5rem; } 
+        h2.section-title { font-size: 1.5rem; line-height: 2rem; margin-bottom: 0.75rem;} 
+        h3.subsection-title { font-size: 1.25rem; line-height: 1.75rem; margin-bottom: 0.5rem;}    
+        h4.detail-title { font-size: 1.125rem; line-height: 1.75rem; margin-bottom: 0.375rem;} 
+        
+        .task-card {
+            background-color: #f9fafb; /* gray-50 */
+            border: 1px solid #e5e7eb; /* gray-200 */
+            border-left-width: 4px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0.5rem;
+        }
+        .task-card-project { border-left-color: #f59e0b; /* amber-500 */ }
+
+
+        @media print {
+            body { font-size: 10pt; line-height: 1.3; } 
+            .no-print { display: none !important; }
+            header { display: flex; flex-direction: column; align-items: center; text-align: center; }
+            .header-logo-print { max-width: 150px; max-height: 50px; margin-bottom: 10px; } 
+            .footer-logo-print { max-width: 100px; max-height: 30px; margin-top: 10px; } 
+            footer { text-align: center; }
+            section, .content-section, .task-card { page-break-inside: avoid; margin-bottom: 15px; } 
+            .bg-white { box-shadow: none !important; border: 1px solid #ccc; padding: 0.5rem !important;}
+            a { text-decoration: none; color: black; }
+            .interactive-term { text-decoration: none; color: black; font-weight: bold; } 
+            .definition-tooltip { display: none !important; }
+            .print-only-definition { display: block !important; position: static !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin-top: 2px; font-style: italic; font-size: 0.9em;} 
+            .task-card { border: 1px solid #eee; padding: 10px; border-left-width: 2px !important; }
+            h1.page-title { font-size: 20pt; } 
+            h2.section-title { font-size: 16pt; }
+            h3.subsection-title { font-size: 14pt; }
+            h4.detail-title { font-size: 12pt; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+</head>
+<body class="bg-gray-100 text-gray-800"> 
+    <div class="container mx-auto p-4 md:p-8"> 
+        <header class="mb-10"> 
+            <div class="flex flex-col sm:flex-row items-center justify-between">
+                <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-16 md:h-20 mb-4 sm:mb-0 header-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+                <div class="text-center sm:text-right sm:ml-4"> 
+                    <p class="text-base text-gray-500">Module I: Overview and Foundations</p> 
+                    <h1 class="page-title text-3xl md:text-4xl font-bold text-gray-900 mt-1">Session 8: Mini Project - Phase 1: Introduction & Ideation</h1> 
+                    <p class="text-lg text-gray-600 mt-2">Data Mining & Big Data Analytics</p> 
+                </div>
+            </div>
+            <nav aria-label="Breadcrumb" class="mt-4 text-sm text-gray-500 no-print"> 
+                <ol class="list-none p-0 inline-flex">
+                    <li class="flex items-center">
+                        <a href="../index.html" class="text-slate-600 hover:text-slate-800">Course Overview</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="flex items-center">
+                        <a href="module-1-index.html" class="text-slate-600 hover:text-slate-800">Module I</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="text-gray-700 font-semibold" aria-current="page">Session 8</li> 
+                </ol>
+            </nav>
+        </header>
+
+        <div class="text-center mb-8 no-print"> 
+            <button onclick="window.print()" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-150 ease-in-out text-base"> 
+                Export Session 8 to PDF
+            </button>
+        </div>
+
+        <article class="bg-white p-6 md:p-8 rounded-lg shadow-lg"> 
+            <section class="mb-6 border-b pb-4"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-2">Session Details</h2> 
+                <p class="text-base text-gray-700"><span class="font-semibold">Type:</span> Mini Project 🔬</p>
+                <p class="text-base text-gray-700"><span class="font-semibold">Duration:</span> 2 Hours</p>
+                <p class="text-base text-gray-700"><span class="font-semibold">Reference:</span> Primary: Project Work guidelines provided by instructor.</p>
+            </section>
+
+            <section class="mb-8 content-section"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Phase 1 Objectives: Introduction & Ideation</h2> 
+                <p class="text-base text-gray-700 mb-3">By the end of this project phase (and dedicated session), you (and your team, if applicable) should aim to:</p>
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1"> 
+                    <li>Finalize a focused and feasible topic for your mini-project.</li>
+                    <li>Develop a clear problem statement that your project intends to address.</li>
+                    <li>Define specific, measurable, achievable, relevant, and time-bound (SMART) objectives for your project.</li>
+                    <li>Identify potential data sources and assess their accessibility and suitability.</li>
+                    <li>Outline the primary data mining tasks you anticipate performing.</li>
+                    <li>Draft an initial high-level project plan, including potential tools and a rough timeline for key lifecycle stages.</li>
+                    <li>If working in a team, establish roles and responsibilities.</li>
+                </ul>
+            </section>
+
+            <div class="definition-tooltip"></div>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Phase 1 Overview: Laying the Groundwork</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    This initial phase of your mini-project is critically important. It's where you translate broad ideas into a concrete and actionable plan. Think of this as the "Business Understanding" and initial "Data Understanding" stages of the CRISP-DM lifecycle, applied directly to your chosen project. A well-defined problem and clear objectives at this stage will significantly increase your chances of a successful project outcome.
+                </p>
+                <p class="text-base text-gray-700 leading-relaxed">
+                    During this session, dedicated time is provided to work on these foundational aspects. Utilize this time to discuss, research, refine, and document your project's core elements.
+                </p>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Key Tasks for Project Phase 1</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-4">
+                    Focus on completing the following tasks during this session and in your own time for this phase:
+                </p>
+
+                <div class="space-y-6">
+                    <div class="task-card task-card-project">
+                        <h3 class="subsection-title text-lg font-medium text-amber-700 mb-2">
+                            <span class="component-icon">🎯</span>1. Finalize Project Topic and Problem Statement
+                        </h3>
+                        <p class="text-base text-gray-700 leading-relaxed mb-2">
+                            Based on previous brainstorming (Sessions 3 & 7), select ONE project topic. Then, craft a clear and concise problem statement.
+                        </p>
+                        <h4 class="detail-title text-base font-semibold text-gray-600 mt-3 mb-1">Guiding Questions:</h4>
+                        <ul class="list-disc list-inside text-sm text-gray-600 ml-5 space-y-1">
+                            <li>What specific issue or question are you trying to address? (e.g., "Can we predict student dropout rates based on early academic performance and engagement?")</li>
+                            <li>Why is this problem important or interesting? What is its potential impact?</li>
+                            <li>Is the scope of the problem manageable for a mini-project? Avoid overly broad topics.</li>
+                        </ul>
+                    </div>
+
+                    <div class="task-card task-card-project">
+                        <h3 class="subsection-title text-lg font-medium text-amber-700 mb-2">
+                            <span class="component-icon">📈</span>2. Define Clear, Measurable Objectives
+                        </h3>
+                        <p class="text-base text-gray-700 leading-relaxed mb-2">
+                            Translate your problem statement into specific objectives. Aim for 
+                            <span class="interactive-term" data-definition="SMART objectives are: Specific (target a specific area for improvement), Measurable (quantify or at least suggest an indicator of progress), Achievable (realistic and attainable), Relevant (matter to your project/stakeholders), and Time-bound (specify when the results can be achieved).">SMART</span> 
+                            objectives if possible.
+                        </p>
+                        <div class="print-only-definition">
+                            <p><strong>SMART Objectives:</strong> Specific, Measurable, Achievable, Relevant, Time-bound.</p>
+                        </div>
+                        <h4 class="detail-title text-base font-semibold text-gray-600 mt-3 mb-1">Examples:</h4>
+                        <ul class="list-disc list-inside text-sm text-gray-600 ml-5 space-y-1">
+                            <li>"To develop a classification model that predicts customer churn with at least X% accuracy."</li>
+                            <li>"To identify the top 5 key factors associated with employee attrition through exploratory data analysis and feature importance ranking."</li>
+                            <li>"To segment customers into 3-5 distinct groups based on their purchasing behavior using clustering techniques."</li>
+                        </ul>
+                    </div>
+
+                    <div class="task-card task-card-project">
+                        <h3 class="subsection-title text-lg font-medium text-amber-700 mb-2">
+                            <span class="component-icon">💾</span>3. Identify and Assess Potential Data Sources
+                        </h3>
+                        <p class="text-base text-gray-700 leading-relaxed mb-2">
+                            Determine what data you will need to achieve your objectives and where you will obtain it.
+                        </p>
+                        <h4 class="detail-title text-base font-semibold text-gray-600 mt-3 mb-1">Considerations:</h4>
+                        <ul class="list-disc list-inside text-sm text-gray-600 ml-5 space-y-1">
+                            <li><strong>Availability & Accessibility:</strong> Is the data publicly available (e.g., Kaggle, UCI Repository, government portals)? If private, do you have permission and means to access it?</li>
+                            <li><strong>Relevance:</strong> Does the data contain the attributes (features) necessary to address your problem statement?</li>
+                            <li><strong>Quality (Initial Assessment):</strong> What is the likely quality of the data? Expect to perform cleaning, but is it fundamentally usable? (e.g., too many missing values, known inaccuracies).</li>
+                            <li><strong>Volume & Size:</strong> Is the dataset large enough to be meaningful but manageable for your project's scope and available computing resources?</li>
+                            <li><strong>Format:</strong> In what format is the data (CSV, JSON, database, API)?</li>
+                            <li><strong>Ethics & Privacy:</strong> If using data involving individuals, are there privacy concerns? Is the data anonymized? Do you need to consider ethical implications of your analysis? (This is crucial!)</li>
+                            <li><span class="interactive-term" data-definition="Data Provenance refers to the history or origin of the data. Knowing where your data comes from helps in assessing its reliability and understanding any inherent biases.">Data Provenance</span>: Where did the data originate? Is it reliable?</li>
+                        </ul>
+                         <div class="print-only-definition">
+                            <p><strong>Data Provenance:</strong> The history or origin of data, crucial for assessing reliability and bias.</p>
+                        </div>
+                    </div>
+
+                    <div class="task-card task-card-project">
+                        <h3 class="subsection-title text-lg font-medium text-amber-700 mb-2">
+                            <span class="component-icon">⚙️</span>4. Outline Anticipated Data Mining Tasks
+                        </h3>
+                        <p class="text-base text-gray-700 leading-relaxed mb-2">
+                            Based on your objectives, what primary data mining tasks do you think will be involved?
+                        </p>
+                        <h4 class="detail-title text-base font-semibold text-gray-600 mt-3 mb-1">Examples:</h4>
+                        <ul class="list-disc list-inside text-sm text-gray-600 ml-5 space-y-1">
+                            <li>If predicting categories: Classification.</li>
+                            <li>If finding natural groupings: Clustering.</li>
+                            <li>If predicting a continuous value: Regression.</li>
+                            <li>If finding co-occurring items: Association Rule Mining.</li>
+                            <li>If identifying unusual instances: Anomaly Detection.</li>
+                            <li>You will likely also perform Exploratory Data Analysis (EDA) as part of Data Understanding and Preparation.</li>
+                        </ul>
+                    </div>
+
+                    <div class="task-card task-card-project">
+                        <h3 class="subsection-title text-lg font-medium text-amber-700 mb-2">
+                            <span class="component-icon">📅</span>5. Draft an Initial Project Plan (High-Level)
+                        </h3>
+                        <p class="text-base text-gray-700 leading-relaxed mb-2">
+                            Sketch a rough timeline for the main phases of your mini-project (Data Understanding, Data Preparation, Modeling, Evaluation, Reporting/Presentation). Identify any potential tools or software you might use (e.g., Python with libraries like Pandas, Scikit-learn, Matplotlib/Seaborn; Weka; R).
+                        </p>
+                    </div>
+                    
+                    <div class="task-card task-card-project">
+                        <h3 class="subsection-title text-lg font-medium text-amber-700 mb-2">
+                            <span class="component-icon">🤝</span>6. Team Formation and Role Assignment (If Applicable)
+                        </h3>
+                        <p class="text-base text-gray-700 leading-relaxed">
+                            If this is a team project, formalize your team and discuss how tasks might be divided. Assign preliminary roles or areas of responsibility, even if they evolve later. Good communication and collaboration are key.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Guidance on Documenting Phase 1</h2>
+                 <p class="text-base text-gray-700 leading-relaxed mb-2">
+                    It's good practice to document your findings and decisions from this phase. This might take the form of a brief project proposal or an initial project charter. Key elements to include:
+                </p>
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1">
+                    <li>Project Title</li>
+                    <li>Team Members (if applicable)</li>
+                    <li>Problem Statement</li>
+                    <li>Project Objectives</li>
+                    <li>Proposed Data Source(s) and initial assessment</li>
+                    <li>Anticipated Data Mining Task(s)</li>
+                    <li>High-level Plan / Timeline Sketch</li>
+                    <li>Potential Challenges or Risks identified</li>
+                </ul>
+            </section>
+
+             <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Tips for Success in Phase 1</h2>
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1 leading-relaxed">
+                    <li><strong>Start Early, Iterate Often:</strong> Don't wait until the last minute. Discuss ideas, do preliminary research, and be prepared to refine your topic.</li>
+                    <li><strong>Be Realistic:</strong> Choose a project scope that is manageable within the timeframe and with the available resources/skills. It's better to do a smaller project well than a large one poorly.</li>
+                    <li><strong>Focus on Data Availability:</strong> A great idea is useless without accessible and appropriate data. Prioritize projects where you have a clear path to obtaining data.</li>
+                    <li><strong>Consult Your Instructor:</strong> If you're unsure about the feasibility of an idea or need guidance, don't hesitate to ask your instructor for feedback.</li>
+                    <li><strong>Document Your Thoughts:</strong> Even rough notes can be valuable as your project evolves.</li>
+                </ul>
+            </section>
+
+
+            <section class="content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Key Takeaways for Session 8</h2>
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1 leading-relaxed">
+                    <li>The Introduction & Ideation phase is fundamental to a successful mini-project, aligning with the Business and Data Understanding stages of CRISP-DM.</li>
+                    <li>Clearly defining the problem, objectives, and scope early on prevents significant issues later.</li>
+                    <li>Thorough consideration of data sources, including availability and quality, is paramount.</li>
+                    <li>A preliminary plan, even if high-level, provides direction and helps manage expectations.</li>
+                    <li>This phase sets the foundation upon which all subsequent project work will be built.</li>
+                </ul>
+            </section>
+        </article>
+
+        <footer class="text-center mt-12 py-6 border-t border-gray-300"> 
+            <div class="mb-4"> 
+                 <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-10 mx-auto footer-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+            </div>
+            <p class="text-base text-gray-600">&copy; <span id="currentYearModule"></span> FACE Prep Campus (www.faceprep.in). All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('currentYearModule').textContent = new Date().getFullYear();
+
+        const interactiveTerms = document.querySelectorAll('.interactive-term');
+        const tooltip = document.querySelector('.definition-tooltip');
+
+        if (tooltip) {
+            interactiveTerms.forEach(term => {
+                const showTooltip = (e) => {
+                    tooltip.textContent = term.dataset.definition;
+                    tooltip.style.display = 'block';
+                    const termRect = term.getBoundingClientRect();
+                    let top = termRect.bottom + window.scrollY + 8; 
+                    let left = termRect.left + window.scrollX;
+                    tooltip.style.top = `${top}px`;
+                    tooltip.style.left = `${left}px`;
+                    const tooltipRect = tooltip.getBoundingClientRect();
+                    if (tooltipRect.right > (window.innerWidth - 15)) { 
+                        tooltip.style.left = `${window.innerWidth - tooltipRect.width - 15}px`;
+                    }
+                    if (tooltipRect.left < 15) { 
+                        tooltip.style.left = `15px`;
+                    }
+                };
+                term.addEventListener('mouseenter', showTooltip);
+                term.addEventListener('focus', showTooltip); 
+                term.addEventListener('click', showTooltip); 
+                const hideTooltip = () => {
+                    tooltip.style.display = 'none';
+                };
+                term.addEventListener('mouseleave', hideTooltip);
+                term.addEventListener('blur', hideTooltip); 
+            });
+            document.addEventListener('click', function(event) {
+                let isClickInsideTerm = false;
+                interactiveTerms.forEach(term => {
+                    if (term.contains(event.target)) {
+                        isClickInsideTerm = true;
+                    }
+                });
+                if (!isClickInsideTerm && !tooltip.contains(event.target)) {
+                    tooltip.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

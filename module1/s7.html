@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 7: Lab 2 - DM Lifecycle & Project Brainstorming - Module I</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: "Warm Neutral Harmony" -->
+    <!-- Application Structure Plan: Single session detail page for a lab. Structure: Header, Export, Session Details, Objectives, Lab Introduction, Detailed Lab Activities (Case Study Analysis, Lifecycle Mapping, Mini-Project Brainstorming), Deliverables, Key Takeaways, Footer. Goal: Practical application of lifecycle and project development. -->
+    <!-- Visualization & Content Choices: 
+        - Textual guidance for each lab activity.
+        - Prompts and guiding questions for case study analysis and project brainstorming.
+        - Reference to the interactive lifecycle diagram from Session 6 (conceptually, as it's on a different page).
+        - Emphasis on discussion, critical thinking, and initial project planning.
+        - PDF Export: Print-specific CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            font-size: 1rem; 
+            line-height: 1.625; 
+        }
+        
+        .interactive-term { /* Retained for potential future use, though less emphasis in this lab content */
+            cursor: pointer;
+            font-weight: 600; 
+        }
+        .definition-tooltip {
+            display: none;
+            position: absolute;
+            background-color: #f9fafb; 
+            border: 1px solid #d1d5db; 
+            padding: 8px; 
+            border-radius: 4px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            z-index: 100;
+            font-size: 0.875rem; 
+            width: max-content;
+            max-width: 320px; 
+        }
+
+        h1.page-title { font-size: 2.25rem; line-height: 2.5rem; } 
+        h2.section-title { font-size: 1.5rem; line-height: 2rem; margin-bottom: 0.75rem;} 
+        h3.subsection-title { font-size: 1.25rem; line-height: 1.75rem; margin-bottom: 0.5rem;}    
+        h4.detail-title { font-size: 1.125rem; line-height: 1.75rem; margin-bottom: 0.375rem;} 
+        
+        .activity-card {
+            background-color: #f9fafb; /* gray-50 */
+            border: 1px solid #e5e7eb; /* gray-200 */
+            border-left-width: 4px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0.5rem;
+        }
+        .activity-card-lab { border-left-color: #10b981; /* emerald-500 */ }
+
+
+        @media print {
+            body { font-size: 10pt; line-height: 1.3; } 
+            .no-print { display: none !important; }
+            header { display: flex; flex-direction: column; align-items: center; text-align: center; }
+            .header-logo-print { max-width: 150px; max-height: 50px; margin-bottom: 10px; } 
+            .footer-logo-print { max-width: 100px; max-height: 30px; margin-top: 10px; } 
+            footer { text-align: center; }
+            section, .content-section, .activity-card { page-break-inside: avoid; margin-bottom: 15px; } 
+            .bg-white { box-shadow: none !important; border: 1px solid #ccc; padding: 0.5rem !important;}
+            a { text-decoration: none; color: black; }
+            .interactive-term { text-decoration: none; color: black; font-weight: bold; } 
+            .definition-tooltip { display: none !important; }
+            .print-only-definition { display: block !important; position: static !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin-top: 2px; font-style: italic; font-size: 0.9em;} 
+            .activity-card { border: 1px solid #eee; padding: 10px; border-left-width: 2px !important; }
+            h1.page-title { font-size: 20pt; } 
+            h2.section-title { font-size: 16pt; }
+            h3.subsection-title { font-size: 14pt; }
+            h4.detail-title { font-size: 12pt; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+</head>
+<body class="bg-gray-100 text-gray-800"> 
+    <div class="container mx-auto p-4 md:p-8"> 
+        <header class="mb-10"> 
+            <div class="flex flex-col sm:flex-row items-center justify-between">
+                <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-16 md:h-20 mb-4 sm:mb-0 header-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+                <div class="text-center sm:text-right sm:ml-4"> 
+                    <p class="text-base text-gray-500">Module I: Overview and Foundations</p> 
+                    <h1 class="page-title text-3xl md:text-4xl font-bold text-gray-900 mt-1">Session 7: Lab 2 - DM Lifecycle & Project Brainstorming</h1> 
+                    <p class="text-lg text-gray-600 mt-2">Data Mining & Big Data Analytics</p> 
+                </div>
+            </div>
+            <nav aria-label="Breadcrumb" class="mt-4 text-sm text-gray-500 no-print"> 
+                <ol class="list-none p-0 inline-flex">
+                    <li class="flex items-center">
+                        <a href="../index.html" class="text-slate-600 hover:text-slate-800">Course Overview</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="flex items-center">
+                        <a href="module-1-index.html" class="text-slate-600 hover:text-slate-800">Module I</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="text-gray-700 font-semibold" aria-current="page">Session 7</li> 
+                </ol>
+            </nav>
+        </header>
+
+        <div class="text-center mb-8 no-print"> 
+            <button onclick="window.print()" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-150 ease-in-out text-base"> 
+                Export Session 7 to PDF
+            </button>
+        </div>
+
+        <article class="bg-white p-6 md:p-8 rounded-lg shadow-lg"> 
+            <section class="mb-6 border-b pb-4"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-2">Session Details</h2> 
+                <p class="text-base text-gray-700"><span class="font-semibold">Type:</span> Guided Practical 💻</p>
+                <p class="text-base text-gray-700"><span class="font-semibold">Duration:</span> 2 Hours</p>
+                <p class="text-base text-gray-700"><span class="font-semibold">Textbook References:</span> Conceptual basis from Han et al.: Ch. 1-2; Zikopoulos & Eaton: Ch. 2. (Focus on applying concepts from Session 6).</p>
+            </section>
+
+            <section class="mb-8 content-section"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Lab Objectives</h2> 
+                <p class="text-base text-gray-700 mb-3">Upon completion of this lab session, you will be able to:</p>
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1"> 
+                    <li>Apply the phases of the Data Mining Lifecycle (e.g., CRISP-DM) to a given case study or problem scenario.</li>
+                    <li>Identify appropriate data mining tasks, potential tools, and techniques relevant to each lifecycle stage for a specific problem.</li>
+                    <li>Critically analyze a case study to understand its business objectives, data considerations, and data mining approach.</li>
+                    <li>Further develop and refine initial ideas for your mini-project, considering feasibility and the structured lifecycle.</li>
+                    <li>Collaborate with peers (if applicable) to brainstorm project components and potential challenges.</li>
+                </ul>
+            </section>
+
+            <div class="definition-tooltip"></div>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Lab Introduction</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    This lab session builds directly on your understanding of the Data Mining Lifecycle discussed in Session 6. The primary goal is to move from theory to practice by applying the lifecycle framework to concrete examples and your own developing mini-project ideas. You will analyze a case study to see how the lifecycle plays out in a real(istic) scenario and then use this understanding to refine your own project concepts.
+                </p>
+                <p class="text-base text-gray-700 leading-relaxed">
+                    Active participation, critical thinking, and discussion (if working in groups) are key to maximizing the learning from this lab.
+                </p>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Lab Activities & Task Breakdown</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-4">
+                    Your instructor will provide a specific case study for analysis. The following activities will guide you through the lab.
+                </p>
+
+                <div class="space-y-8">
+                    <div class="activity-card activity-card-lab">
+                        <h3 class="subsection-title text-lg font-medium text-emerald-700 mb-2">
+                            <span class="component-icon">🧐</span>Activity 1: Case Study Analysis & Lifecycle Mapping (Approx. 60 mins)
+                        </h3>
+                        <p class="text-base text-gray-700 leading-relaxed mb-3">
+                            Thoroughly read and analyze the provided case study. As you do, map the information presented in the case study to the six phases of the CRISP-DM lifecycle (or an alternative model if specified by your instructor).
+                        </p>
+                        <h4 class="detail-title text-base font-semibold text-gray-600 mt-3 mb-1">For each CRISP-DM phase, try to identify or infer from the case study:</h4>
+                        <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-2">
+                            <li>
+                                <strong>Business Understanding:</strong>
+                                <ul class="list-circle list-inside ml-5 text-sm space-y-0.5">
+                                    <li>What was the primary business problem or objective?</li>
+                                    <li>What were the success criteria?</li>
+                                </ul>
+                            </li>
+                            <li>
+                                <strong>Data Understanding:</strong>
+                                <ul class="list-circle list-inside ml-5 text-sm space-y-0.5">
+                                    <li>What data sources were used or mentioned?</li>
+                                    <li>What were some initial insights or challenges related to the data?</li>
+                                </ul>
+                            </li>
+                            <li>
+                                <strong>Data Preparation:</strong>
+                                <ul class="list-circle list-inside ml-5 text-sm space-y-0.5">
+                                    <li>What data cleaning, transformation, or feature engineering steps were likely performed (even if not explicitly detailed)?</li>
+                                </ul>
+                            </li>
+                            <li>
+                                <strong>Modeling:</strong>
+                                <ul class="list-circle list-inside ml-5 text-sm space-y-0.5">
+                                    <li>What type of data mining task was it (e.g., classification, clustering)?</li>
+                                    <li>Were specific algorithms mentioned or implied?</li>
+                                </ul>
+                            </li>
+                            <li>
+                                <strong>Evaluation:</strong>
+                                <ul class="list-circle list-inside ml-5 text-sm space-y-0.5">
+                                    <li>How was the model's performance likely assessed?</li>
+                                    <li>Did it meet the business objectives?</li>
+                                </ul>
+                            </li>
+                            <li>
+                                <strong>Deployment:</strong>
+                                <ul class="list-circle list-inside ml-5 text-sm space-y-0.5">
+                                    <li>How was the solution put into practice or what were the final recommendations?</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <p class="text-sm text-gray-600 leading-relaxed mt-3">
+                            <span class="interactive-term" data-definition="Refer to the detailed descriptions of each CRISP-DM phase from Session 6 to guide your analysis.">Tip:</span> Refer back to the detailed notes and interactive diagram from Session 6 regarding the CRISP-DM lifecycle to help structure your analysis.
+                        </p>
+                    </div>
+                     <div class="print-only-definition">
+                        <p><strong>Tip:</strong> Refer to detailed descriptions of each CRISP-DM phase from Session 6.</p>
+                    </div>
+
+
+                    <div class="activity-card activity-card-lab">
+                        <h3 class="subsection-title text-lg font-medium text-emerald-700 mb-2">
+                            <span class="component-icon">💡</span>Activity 2: Mini-Project Brainstorming & Initial Lifecycle Mapping (Approx. 45 mins)
+                        </h3>
+                        <p class="text-base text-gray-700 leading-relaxed mb-3">
+                            Now, apply the same lifecycle thinking to your own mini-project ideas that you started brainstorming in Lab 1 (Session 3) and further developed in Session 8.
+                        </p>
+                         <p class="text-base text-gray-700 leading-relaxed mb-3">
+                            Select one promising project idea (or work with your group on a shared idea) and try to sketch out an initial plan by considering each phase of the CRISP-DM lifecycle:
+                        </p>
+                        <h4 class="detail-title text-base font-semibold text-gray-600 mt-3 mb-1">For your chosen mini-project idea:</h4>
+                        <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-2">
+                            <li>
+                                <strong>Business Understanding:</strong>
+                                <ul class="list-circle list-inside ml-5 text-sm space-y-0.5">
+                                    <li>Clearly define the problem your project will address. What question are you trying to answer?</li>
+                                    <li>What would constitute a "successful" outcome for your project? (e.g., a predictive model with a certain accuracy, interesting discovered patterns, a clear report of findings).</li>
+                                </ul>
+                            </li>
+                            <li>
+                                <strong>Data Understanding:</strong>
+                                <ul class="list-circle list-inside ml-5 text-sm space-y-0.5">
+                                    <li>What data do you plan to use? Where will you get it? (Be specific: public datasets, APIs, self-collected).</li>
+                                    <li>What are the key attributes (columns) you anticipate working with?</li>
+                                    <li>What potential data quality issues do you foresee?</li>
+                                </ul>
+                            </li>
+                            <li>
+                                <strong>Data Preparation (High-Level):</strong>
+                                <ul class="list-circle list-inside ml-5 text-sm space-y-0.5">
+                                    <li>What general data cleaning or transformation steps might be necessary? (You don't need to be exhaustive yet).</li>
+                                </ul>
+                            </li>
+                            <li>
+                                <strong>Modeling (High-Level):</strong>
+                                <ul class="list-circle list-inside ml-5 text-sm space-y-0.5">
+                                    <li>What type of data mining task (classification, clustering, regression, association) seems most appropriate for your problem?</li>
+                                    <li>Can you think of one or two potential algorithms you might explore? (It's okay if this is very preliminary).</li>
+                                </ul>
+                            </li>
+                            <li>
+                                <strong>Evaluation (High-Level):</strong>
+                                <ul class="list-circle list-inside ml-5 text-sm space-y-0.5">
+                                    <li>How might you determine if your model or findings are good/useful?</li>
+                                </ul>
+                            </li>
+                            <li>
+                                <strong>Deployment (Conceptual):</strong>
+                                <ul class="list-circle list-inside ml-5 text-sm space-y-0.5">
+                                    <li>How would your project's results be presented or used? (e.g., a report, a presentation, a simple web visualization).</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <p class="text-sm text-gray-600 leading-relaxed mt-3">
+                            This is an initial sketch; details will evolve. The goal is to start thinking systematically.
+                        </p>
+                    </div>
+
+                    <div class="activity-card activity-card-lab">
+                        <h3 class="subsection-title text-lg font-medium text-emerald-700 mb-2">
+                            <span class="component-icon">💬</span>Activity 3: Discussion & Peer Feedback (Approx. 15 mins, if applicable)
+                        </h3>
+                        <p class="text-base text-gray-700 leading-relaxed">
+                            If working in groups or if directed by your instructor, share your case study analysis and your preliminary mini-project lifecycle map. Provide constructive feedback to your peers. Consider:
+                        </p>
+                        <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1">
+                            <li>Are the business objectives clear for the mini-project ideas?</li>
+                            <li>Are the data sources realistic and accessible?</li>
+                            <li>Have any critical steps in the lifecycle been overlooked?</li>
+                            <li>Are there any potential challenges that haven't been considered?</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Deliverables / Discussion Points for Lab 2</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-2">
+                    Depending on your instructor's requirements, you may need to:
+                </p>
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1">
+                    <li>Submit your written analysis of the provided case study, mapped to the CRISP-DM phases.</li>
+                    <li>Submit a preliminary lifecycle plan for your chosen mini-project idea.</li>
+                    <li>Actively participate in class or group discussions, sharing insights and feedback.</li>
+                </ul>
+                <p class="text-base text-gray-700 leading-relaxed mt-2">
+                    The primary goal is to demonstrate your ability to apply the data mining lifecycle framework thoughtfully.
+                </p>
+            </section>
+
+            <section class="content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Key Takeaways for Session 7</h2>
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1 leading-relaxed">
+                    <li>The Data Mining Lifecycle (e.g., CRISP-DM) provides a practical and robust framework for structuring real-world data mining projects.</li>
+                    <li>Applying the lifecycle to case studies helps solidify understanding of each phase's purpose and tasks.</li>
+                    <li>Thinking through the lifecycle for your own project ideas early on helps in identifying potential challenges, data needs, and scope.</li>
+                    <li>Data mining is an iterative process; initial plans will evolve as you gain more understanding of the data and the problem.</li>
+                </ul>
+            </section>
+        </article>
+
+        <footer class="text-center mt-12 py-6 border-t border-gray-300"> 
+            <div class="mb-4"> 
+                 <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-10 mx-auto footer-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+            </div>
+            <p class="text-base text-gray-600">&copy; <span id="currentYearModule"></span> FACE Prep Campus (www.faceprep.in). All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('currentYearModule').textContent = new Date().getFullYear();
+
+        const interactiveTerms = document.querySelectorAll('.interactive-term');
+        const tooltip = document.querySelector('.definition-tooltip');
+
+        if (tooltip) {
+            interactiveTerms.forEach(term => {
+                const showTooltip = (e) => {
+                    tooltip.textContent = term.dataset.definition;
+                    tooltip.style.display = 'block';
+                    const termRect = term.getBoundingClientRect();
+                    let top = termRect.bottom + window.scrollY + 8; 
+                    let left = termRect.left + window.scrollX;
+                    tooltip.style.top = `${top}px`;
+                    tooltip.style.left = `${left}px`;
+                    const tooltipRect = tooltip.getBoundingClientRect();
+                    if (tooltipRect.right > (window.innerWidth - 15)) { 
+                        tooltip.style.left = `${window.innerWidth - tooltipRect.width - 15}px`;
+                    }
+                    if (tooltipRect.left < 15) { 
+                        tooltip.style.left = `15px`;
+                    }
+                };
+                term.addEventListener('mouseenter', showTooltip);
+                term.addEventListener('focus', showTooltip); 
+                term.addEventListener('click', showTooltip); 
+                const hideTooltip = () => {
+                    tooltip.style.display = 'none';
+                };
+                term.addEventListener('mouseleave', hideTooltip);
+                term.addEventListener('blur', hideTooltip); 
+            });
+            document.addEventListener('click', function(event) {
+                let isClickInsideTerm = false;
+                interactiveTerms.forEach(term => {
+                    if (term.contains(event.target)) {
+                        isClickInsideTerm = true;
+                    }
+                });
+                if (!isClickInsideTerm && !tooltip.contains(event.target)) {
+                    tooltip.style.display = 'none';
+                }
+            });
+        }
+
+        // Use Case Explorer Logic (Lab Session 3 - for this page context)
+        const useCaseTabs = document.querySelectorAll('.use-case-tab');
+        const useCaseDetailsDiv = document.getElementById('use-case-details');
+        const labUseCases = {
+            "retail-lab": {
+                title: "Retail & E-commerce: Example Applications & Data",
+                points: [
+                    "<strong>Personalized Marketing:</strong> Using purchase history, browsing data (weblogs, clickstreams), demographics (CRM data).",
+                    "<strong>Supply Chain Optimization:</strong> Analyzing sales data, inventory levels, supplier info, external factors (weather, events).",
+                    "<strong>Customer Churn Prediction:</strong> Using subscription data, usage patterns, customer service interactions, social media sentiment."
+                ]
+            },
+            "healthcare-lab": {
+                title: "Healthcare: Example Applications & Data",
+                points: [
+                    "<strong>Disease Outbreak Prediction:</strong> Using public health records, news feeds, social media data, travel patterns.",
+                    "<strong>Patient Readmission Risk:</strong> Analyzing EHRs, demographics, past admissions, socio-economic factors.",
+                    "<strong>Drug Efficacy Analysis:</strong> Using clinical trial data, patient-reported outcomes, genomic data."
+                ]
+            },
+            "finance-lab": {
+                title: "Finance & Banking: Example Applications & Data",
+                points: [
+                    "<strong>Credit Card Fraud Detection:</strong> Analyzing transaction patterns, location data, merchant category codes, historical fraud cases.",
+                    "<strong>Loan Default Prediction:</strong> Using credit scores, income verification, loan application details, employment history.",
+                    "<strong>Stock Market Trend Analysis:</strong> Using historical stock prices, trading volumes, news sentiment, economic indicators."
+                ]
+            },
+            "transport-lab": {
+                title: "Transportation & Logistics: Example Applications & Data",
+                points: [
+                    "<strong>Route Optimization:</strong> Using GPS data from vehicles, real-time traffic information, weather conditions, delivery schedules.",
+                    "<strong>Predictive Maintenance:</strong> Analyzing IoT sensor data from engines/parts, maintenance logs, operational hours.",
+                    "<strong>Demand Forecasting for Public Transport:</strong> Using ticketing data, passenger counters, special event schedules, demographic shifts."
+                ]
+            },
+            "media-lab": {
+                title: "Media & Entertainment: Example Applications & Data",
+                points: [
+                    "<strong>Content Recommendation:</strong> Analyzing viewing/listening history, user ratings, content metadata, time of day, device type.",
+                    "<strong>Audience Segmentation for Advertising:</strong> Using demographic data, content consumption patterns, social media activity, psychographics.",
+                    "<strong>Sentiment Analysis of Show Reviews:</strong> Using text data from online reviews, social media comments, forums."
+                ]
+            }
+        };
+
+        if(useCaseDetailsDiv && useCaseTabs.length > 0) {
+            useCaseTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    useCaseTabs.forEach(t => {
+                        t.classList.remove('active');
+                        // Reset non-active tab styles if they were changed by 'active'
+                        t.style.backgroundColor = ''; // Reset to default Tailwind class or initial style
+                        t.style.color = ''; // Reset to default Tailwind class or initial style
+                    }); 
+                    tab.classList.add('active');
+                    // Manually set active styles if Tailwind classes are overridden by specificity
+                    // This ensures the active tab is visually distinct
+                    const activeBgColor = getComputedStyle(tab).getPropertyValue('background-color');
+                    if (activeBgColor.includes('rgb(59, 130, 246)')) { // Check if it's already blue
+                        // It's already styled by the active class via Tailwind, do nothing more for bg
+                    } else {
+                        // Fallback if needed, or adjust Tailwind classes.
+                        // For simplicity, ensure your .active class in <style> takes precedence or use JS to add specific colors.
+                    }
+
+
+                    const industry = tab.dataset.industry;
+                    const data = labUseCases[industry];
+                    if (data) {
+                        useCaseDetailsDiv.innerHTML = `<h5 class="font-semibold text-gray-700 mb-2">${data.title}</h5><ul class="space-y-1">${data.points.map(item => `<li class='text-xs text-gray-600 list-disc list-inside ml-2'>${item}</li>`).join('')}</ul>`;
+                    } else {
+                         useCaseDetailsDiv.innerHTML = "Select an industry to see example applications and typical data sources.";
+                    }
+                });
+            });
+        }
+
+    </script>
+</body>
+</html>

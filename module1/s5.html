@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 5: Architecture of Hadoop and Spark - Module I</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: "Warm Neutral Harmony" -->
+    <!-- Application Structure Plan: Single session detail page. Structure: Header, Export, Session Details, Objectives, Extensive Content (Hadoop Arch, Spark Arch with component breakdowns and icons), Key Takeaways, Footer. Goal: Detailed understanding of Hadoop/Spark architectures. -->
+    <!-- Visualization & Content Choices: 
+        - Textual descriptions of architectures with Unicode icons for components (e.g., HDFS 📁, MapReduce 🗺️➕, YARN ⚙️📦, Spark ✨🧠🚀).
+        - Interactive tooltips for technical terms.
+        - Structured lists and paragraphs to explain components like NameNode, DataNode, RDDs, Driver, Executors.
+        - Conceptual flow descriptions.
+        - PDF Export: Print-specific CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            font-size: 1rem; 
+            line-height: 1.625; 
+        }
+        
+        .interactive-term { 
+            cursor: pointer;
+            font-weight: 600; 
+        }
+        .definition-tooltip {
+            display: none;
+            position: absolute;
+            background-color: #f9fafb; 
+            border: 1px solid #d1d5db; 
+            padding: 8px; 
+            border-radius: 4px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            z-index: 100;
+            font-size: 0.875rem; 
+            width: max-content;
+            max-width: 320px; /* Slightly wider for arch terms */
+        }
+
+        h1.page-title { font-size: 2.25rem; line-height: 2.5rem; } 
+        h2.section-title { font-size: 1.5rem; line-height: 2rem; margin-bottom: 0.75rem;} 
+        h3.subsection-title { font-size: 1.25rem; line-height: 1.75rem; margin-bottom: 0.5rem;}    
+        h4.detail-title { font-size: 1.125rem; line-height: 1.75rem; margin-bottom: 0.375rem;} 
+        
+        .arch-component-card {
+            background-color: #f9fafb; /* gray-50 */
+            border: 1px solid #e5e7eb; /* gray-200 */
+            border-left-width: 4px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 0.375rem;
+        }
+        .hadoop-card { border-left-color: #2563eb; /* blue-600 */ }
+        .spark-card { border-left-color: #16a34a; /* green-600 */ }
+        .component-icon {
+            font-size: 1.5rem; /* text-2xl */
+            margin-right: 0.5rem;
+            vertical-align: middle;
+        }
+
+        @media print {
+            body { font-size: 10pt; line-height: 1.4; } 
+            .no-print { display: none !important; }
+            header { display: flex; flex-direction: column; align-items: center; text-align: center; }
+            .header-logo-print { max-width: 150px; max-height: 50px; margin-bottom: 10px; } 
+            .footer-logo-print { max-width: 100px; max-height: 30px; margin-top: 10px; } 
+            footer { text-align: center; }
+            section, .content-section { page-break-inside: avoid; margin-bottom: 15px; } 
+            .bg-white { box-shadow: none !important; border: 1px solid #ccc; padding: 0.5rem !important;}
+            a { text-decoration: none; color: black; }
+            .interactive-term { text-decoration: none; color: black; font-weight: bold; } 
+            .definition-tooltip { display: none !important; }
+            .print-only-definition { display: block !important; position: static !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin-top: 2px; font-style: italic; font-size: 0.9em;} 
+            .arch-component-card { border: 1px solid #eee; margin-bottom: 10px; padding: 10px; border-left-width: 2px !important; }
+            .component-icon { display: none; }
+            h1.page-title { font-size: 20pt; } 
+            h2.section-title { font-size: 16pt; }
+            h3.subsection-title { font-size: 14pt; }
+            h4.detail-title { font-size: 12pt; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+</head>
+<body class="bg-gray-100 text-gray-800"> 
+    <div class="container mx-auto p-4 md:p-8"> 
+        <header class="mb-10"> 
+            <div class="flex flex-col sm:flex-row items-center justify-between">
+                <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-16 md:h-20 mb-4 sm:mb-0 header-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+                <div class="text-center sm:text-right sm:ml-4"> 
+                    <p class="text-base text-gray-500">Module I: Overview and Foundations</p> 
+                    <h1 class="page-title text-3xl md:text-4xl font-bold text-gray-900 mt-1">Session 5: Architecture of Hadoop and Spark</h1> 
+                    <p class="text-lg text-gray-600 mt-2">Data Mining & Big Data Analytics</p> 
+                </div>
+            </div>
+            <nav aria-label="Breadcrumb" class="mt-4 text-sm text-gray-500 no-print"> 
+                <ol class="list-none p-0 inline-flex">
+                    <li class="flex items-center">
+                        <a href="../index.html" class="text-slate-600 hover:text-slate-800">Course Overview</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="flex items-center">
+                        <a href="module-1-index.html" class="text-slate-600 hover:text-slate-800">Module I</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="text-gray-700 font-semibold" aria-current="page">Session 5</li> 
+                </ol>
+            </nav>
+        </header>
+
+        <div class="text-center mb-8 no-print"> 
+            <button onclick="window.print()" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-150 ease-in-out text-base"> 
+                Export Session 5 to PDF
+            </button>
+        </div>
+
+        <article class="bg-white p-6 md:p-8 rounded-lg shadow-lg"> 
+            <section class="mb-6 border-b pb-4"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-2">Session Details</h2> 
+                <p class="text-base text-gray-700"><span class="font-semibold">Type:</span> Theory 📖</p>
+                <p class="text-base text-gray-700"><span class="font-semibold">Duration:</span> 1 Hour</p>
+                <p class="text-base text-gray-700"><span class="font-semibold">Textbook References:</span> Zikopoulos & Eaton: Ch. 5, 6; White: Part II (MapReduce), Part III (HDFS).</p>
+            </section>
+
+            <section class="mb-8 content-section"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Learning Objectives</h2> 
+                <p class="text-base text-gray-700 mb-3">By the end of this session, you will be able to:</p>
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1"> 
+                    <li>Describe the high-level architecture of Apache Hadoop, including HDFS, MapReduce (v1 concept), and YARN.</li>
+                    <li>Identify the roles of key components in Hadoop (NameNode, DataNode, ResourceManager, NodeManager).</li>
+                    <li>Describe the high-level architecture of Apache Spark, including Driver, Executors, and Cluster Manager.</li>
+                    <li>Explain the concept of Resilient Distributed Datasets (RDDs) in Spark.</li>
+                    <li>Compare and contrast the architectural approaches of Hadoop and Spark for Big Data processing.</li>
+                </ul>
+            </section>
+
+            <div class="definition-tooltip"></div>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Recap: The Need for Specialized Architectures</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    In Session 4, we established that traditional data processing systems face significant challenges with Big Data due to issues like scalability, storage constraints, processing speed, data variety, and fault tolerance. This led to the development of distributed computing frameworks like Apache Hadoop and Apache Spark. Today, we'll delve into the architectural details of these two pivotal technologies.
+                </p>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Apache Hadoop Architecture</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-4">
+                    Apache Hadoop is fundamentally designed for distributed storage and distributed processing. Its architecture can be understood through its core components:
+                </p>
+
+                <div class="arch-component-card hadoop-card">
+                    <h3 class="subsection-title text-lg font-medium text-blue-700 mb-2">
+                        <span class="component-icon">📁</span>Hadoop Distributed File System (HDFS)
+                    </h3>
+                    <p class="text-base text-gray-700 leading-relaxed mb-2">
+                        HDFS is the primary storage system of Hadoop. It's a distributed file system designed to run on commodity hardware and provide high-throughput access to application data.
+                    </p>
+                    <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1">
+                        <li>
+                            <strong>Master/Slave Architecture:</strong> HDFS follows a master/slave architecture.
+                            <ul class="list-circle list-inside ml-5 space-y-0.5 text-sm">
+                                <li><span class="interactive-term" data-definition="The NameNode is the centerpiece of HDFS. It manages the file system namespace (metadata like directory structure, file permissions, block locations) and regulates access to files by clients.">NameNode (Master)</span>: Manages the file system metadata, including the directory tree and the mapping of files to data blocks. It knows where each block of a file is stored across the DataNodes. There's typically one active NameNode in a cluster.</li>
+                                <li><span class="interactive-term" data-definition="DataNodes are the slave nodes in HDFS. They store the actual data blocks of the files. They report to the NameNode about the blocks they store and respond to read/write requests from clients or the NameNode.">DataNodes (Slaves)</span>: Store the actual data in blocks (typically 128MB or 256MB by default). There are many DataNodes in a Hadoop cluster.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Data Blocks & Replication:</strong> Files are split into large blocks. For fault tolerance, these blocks are replicated (usually 3 times by default) across different DataNodes in the cluster. If a DataNode fails, the data can still be accessed from its replicas on other nodes.</li>
+                        <li><strong>"Write Once, Read Many" Model:</strong> HDFS is optimized for large streaming reads of datasets, rather than frequent random writes to existing files.</li>
+                    </ul>
+                </div>
+                 <div class="print-only-definition">
+                    <p><strong>HDFS:</strong> Distributed file system. NameNode (master) manages metadata; DataNodes (slaves) store data blocks. Blocks are replicated for fault tolerance. Optimized for large reads.</p>
+                </div>
+
+
+                <div class="arch-component-card hadoop-card mt-6">
+                    <h3 class="subsection-title text-lg font-medium text-blue-700 mb-2">
+                         <span class="component-icon">🗺️➕</span>MapReduce (Processing Framework)
+                    </h3>
+                    <p class="text-base text-gray-700 leading-relaxed mb-2">
+                        MapReduce is a programming model and software framework for writing applications that rapidly process vast amounts of data in parallel on large clusters of commodity hardware. 
+                    </p>
+                     <p class="text-sm text-gray-600 leading-relaxed mb-2">
+                        (Note: While MapReduce was central to early Hadoop, YARN (discussed next) has largely taken over resource management, and other processing engines like Spark often run on Hadoop alongside or instead of MapReduce for many tasks today. However, understanding the MapReduce concept is still valuable.)
+                    </p>
+                    <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1">
+                        <li><strong>Map Phase:</strong> Input data is split and processed by multiple "Map" tasks running in parallel. Each Mapper takes a key/value pair as input and produces intermediate key/value pairs. Its role is to filter and transform data.</li>
+                        <li><strong>Shuffle and Sort Phase:</strong> Intermediate results from the Map phase are grouped by key and sorted.</li>
+                        <li><strong>Reduce Phase:</strong> "Reduce" tasks process the grouped intermediate data, performing aggregation or summarization operations to produce the final output.</li>
+                    </ul>
+                </div>
+                 <div class="print-only-definition">
+                    <p><strong>MapReduce:</strong> Programming model for parallel data processing. Map phase filters/transforms data; Reduce phase aggregates/summarizes results.</p>
+                </div>
+
+                <div class="arch-component-card hadoop-card mt-6">
+                    <h3 class="subsection-title text-lg font-medium text-blue-700 mb-2">
+                        <span class="component-icon">⚙️📦</span>Yet Another Resource Negotiator (YARN)
+                    </h3>
+                    <p class="text-base text-gray-700 leading-relaxed mb-2">
+                        Introduced in Hadoop 2, YARN is the cluster resource management layer of Hadoop. It decouples resource management from job scheduling/monitoring, allowing Hadoop to support various processing engines beyond MapReduce (like Spark, Flink, etc.).
+                    </p>
+                    <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1">
+                        <li><span class="interactive-term" data-definition="The ResourceManager (RM) is the master daemon for YARN. It manages the global allocation of compute resources (CPU, memory) to applications running on the cluster.">ResourceManager (RM)</span>: A global master that manages resources across all applications in the cluster. It has two main components: Scheduler (allocates resources based on application demands and policies) and ApplicationManager (manages running ApplicationMasters).</li>
+                        <li><span class="interactive-term" data-definition="The NodeManager (NM) runs on each slave node in the cluster. It is responsible for managing resources on that specific node, monitoring resource usage (CPU, memory, disk, network), and reporting to the ResourceManager.">NodeManager (NM)</span>: Runs on each slave node and is responsible for managing resources (CPU, memory) on that node, launching containers, and reporting to the ResourceManager.</li>
+                        <li><span class="interactive-term" data-definition="The ApplicationMaster (AM) is a per-application framework-specific entity. It negotiates resources from the ResourceManager and works with the NodeManagers to execute and monitor the tasks of the application.">ApplicationMaster (AM)</span>: An application-specific process that negotiates resources from the ResourceManager and works with NodeManagers to execute and monitor tasks.</li>
+                        <li><span class="interactive-term" data-definition="A Container in YARN represents an allocation of resources (CPU, memory) on a specific NodeManager where an application task can run.">Containers</span>: Represent an allocation of resources (CPU, memory) on a specific node where an application task can run.</li>
+                    </ul>
+                </div>
+                 <div class="print-only-definition">
+                    <p><strong>YARN:</strong> Cluster resource management. ResourceManager (master) allocates resources; NodeManagers (slaves) manage resources on nodes; ApplicationMaster manages per-application tasks within allocated Containers.</p>
+                </div>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Apache Spark Architecture</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-4">
+                    Apache Spark provides a fast and general-purpose cluster computing system. Its architecture is designed for speed, ease of use, and supporting a wide range of workloads.
+                </p>
+
+                <div class="arch-component-card spark-card">
+                    <h3 class="subsection-title text-lg font-medium text-green-700 mb-2">
+                        <span class="component-icon">✨</span>Core Spark Components
+                    </h3>
+                    <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-2">
+                        <li>
+                            <span class="interactive-term" data-definition="The Driver Program is the process running the main() function of a Spark application and creating the SparkContext. It's responsible for converting user code into tasks executed on the cluster.">Driver Program</span>: This is the process that runs the `main()` function of your application and creates the <span class="interactive-term" data-definition="The SparkContext is the main entry point for Spark functionality. It represents the connection to a Spark cluster and can be used to create RDDs, accumulators, and broadcast variables on that cluster.">SparkContext</span>. The SparkContext coordinates the execution of jobs on the cluster. The driver is responsible for:
+                            <ul class="list-circle list-inside ml-5 space-y-0.5 text-sm">
+                                <li>Connecting to a Cluster Manager.</li>
+                                <li>Requesting resources (CPU, memory) for executors.</li>
+                                <li>Transforming user code into a directed acyclic graph (DAG) of tasks.</li>
+                                <li>Scheduling tasks on executors.</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <span class="interactive-term" data-definition="Executors are processes that run on worker nodes in the Spark cluster. They are launched at the beginning of a Spark application and run for the entire lifetime of the application. Executors execute the tasks assigned by the driver and return results back to the driver. They also provide in-memory storage for RDDs that are cached.">Executors</span>: These are worker processes launched on cluster nodes that execute the tasks assigned by the driver. Each executor has a certain number of "cores" (threads) to run tasks in parallel. Executors also cache data in memory (or on disk if memory is insufficient).
+                        </li>
+                         <li>
+                            <span class="interactive-term" data-definition="A Cluster Manager is an external service responsible for acquiring cluster resources for Spark applications. Spark supports several cluster managers: Standalone, Apache Mesos, and Hadoop YARN.">Cluster Manager</span>: An external service responsible for acquiring resources on the cluster for Spark to run. Spark supports several cluster managers:
+                            <ul class="list-circle list-inside ml-5 space-y-0.5 text-sm">
+                                <li><strong>Standalone Cluster Manager:</strong> A simple cluster manager included with Spark.</li>
+                                <li><strong>Apache Mesos:</strong> A general-purpose cluster manager.</li>
+                                <li><strong>Hadoop YARN:</strong> As discussed, YARN can also manage Spark applications.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div class="print-only-definition">
+                    <p><strong>Spark Driver Program:</strong> Runs main() and SparkContext, coordinates tasks.</p>
+                    <p><strong>Spark Executors:</strong> Processes on worker nodes executing tasks and caching data.</p>
+                    <p><strong>Spark Cluster Manager:</strong> Acquires cluster resources (e.g., Standalone, YARN, Mesos).</p>
+                </div>
+
+                <div class="arch-component-card spark-card mt-6">
+                    <h3 class="subsection-title text-lg font-medium text-green-700 mb-2">
+                         <span class="component-icon">🧠</span>Resilient Distributed Datasets (RDDs)
+                    </h3>
+                    <p class="text-base text-gray-700 leading-relaxed mb-2">
+                        RDDs are the fundamental data abstraction in Spark. An RDD is an immutable, partitioned collection of records that can be operated on in parallel.
+                    </p>
+                    <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1">
+                        <li><strong>Immutable:</strong> Once an RDD is created, it cannot be changed. Transformations on RDDs create new RDDs.</li>
+                        <li><strong>Distributed:</strong> Data in an RDD is partitioned and distributed across multiple nodes in the cluster.</li>
+                        <li><strong>Lazily Evaluated:</strong> Transformations on RDDs are not computed immediately. Spark builds up a DAG of transformations, and execution only happens when an "action" (e.g., count, collect, save) is called.</li>
+                        <li><strong>Fault-Tolerant:</strong> Spark can recompute lost partitions of an RDD from its lineage (the sequence of transformations used to create it).</li>
+                    </ul>
+                    <p class="text-sm text-gray-600 leading-relaxed mt-2">
+                        While RDDs are foundational, higher-level APIs like <span class="interactive-term" data-definition="DataFrames in Spark are a distributed collection of data organized into named columns, similar to a table in a relational database or a data frame in R/Python. They provide richer optimizations and a more structured API than RDDs.">DataFrames</span> and <span class="interactive-term" data-definition="Datasets in Spark are an extension of DataFrames that provide type safety and object-oriented programming interface. They combine the benefits of RDDs (strong typing, lambda functions) with Spark SQL's optimized execution engine.">Datasets</span> are now more commonly used for most tasks, offering more optimizations and a richer API.
+                    </p>
+                </div>
+                <div class="print-only-definition">
+                   <p><strong>RDDs:</strong> Spark's fundamental data abstraction: immutable, distributed, lazily evaluated, fault-tolerant collection of records. DataFrames/Datasets are higher-level APIs built on RDDs.</p>
+                </div>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Conceptual Architectural Comparison</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-slate-100">
+                                <th class="border border-gray-300 p-2 font-semibold">Aspect</th>
+                                <th class="border border-gray-300 p-2 font-semibold">Apache Hadoop (MapReduce Focus)</th>
+                                <th class="border border-gray-300 p-2 font-semibold">Apache Spark</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="border border-gray-300 p-2">Primary Processing Model</td>
+                                <td class="border border-gray-300 p-2">Disk-based batch processing (MapReduce)</td>
+                                <td class="border border-gray-300 p-2">In-memory processing for speed; supports batch, streaming, interactive</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-gray-300 p-2">Data Storage</td>
+                                <td class="border border-gray-300 p-2">Primarily HDFS (tightly coupled with MapReduce in early versions)</td>
+                                <td class="border border-gray-300 p-2">Can use HDFS, S3, Cassandra, HBase, local file systems, etc. (more decoupled)</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-gray-300 p-2">Resource Management</td>
+                                <td class="border border-gray-300 p-2">YARN (or classic JobTracker/TaskTracker in MRv1)</td>
+                                <td class="border border-gray-300 p-2">Standalone, YARN, Mesos</td>
+                            </tr>
+                             <tr>
+                                <td class="border border-gray-300 p-2">Fault Tolerance</td>
+                                <td class="border border-gray-300 p-2">HDFS replication; MapReduce re-executes failed tasks</td>
+                                <td class="border border-gray-300 p-2">RDD lineage allows re-computation of lost partitions</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-gray-300 p-2">Versatility</td>
+                                <td class="border border-gray-300 p-2">Strong for batch ETL; ecosystem tools for SQL (Hive), scripting (Pig)</td>
+                                <td class="border border-gray-300 p-2">Unified engine for SQL, Streaming, ML, Graph processing</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Key Takeaways for Session 5</h2>
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1 leading-relaxed">
+                    <li>Hadoop's architecture revolves around HDFS for distributed storage (NameNode/DataNodes) and YARN for cluster resource management, enabling processing engines like MapReduce.</li>
+                    <li>Spark's architecture features a Driver program coordinating tasks on Executors across a cluster, managed by a Cluster Manager, with RDDs as its core fault-tolerant data abstraction.</li>
+                    <li>HDFS ensures data durability through replication of data blocks across DataNodes.</li>
+                    <li>YARN allows multiple data processing frameworks (including Spark) to run on a Hadoop cluster by managing resources effectively.</li>
+                    <li>Spark leverages in-memory processing and RDDs for faster and more versatile data analytics compared to Hadoop's traditional disk-based MapReduce.</li>
+                    <li>While conceptually different, Hadoop and Spark can be used together, with HDFS often providing persistent storage for Spark applications.</li>
+                </ul>
+            </section>
+        </article>
+
+        <footer class="text-center mt-12 py-6 border-t border-gray-300"> 
+            <div class="mb-4"> 
+                 <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-10 mx-auto footer-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+            </div>
+            <p class="text-base text-gray-600">&copy; <span id="currentYearModule"></span> FACE Prep Campus (www.faceprep.in). All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('currentYearModule').textContent = new Date().getFullYear();
+
+        const interactiveTerms = document.querySelectorAll('.interactive-term');
+        const tooltip = document.querySelector('.definition-tooltip');
+
+        if (tooltip) {
+            interactiveTerms.forEach(term => {
+                const showTooltip = (e) => {
+                    tooltip.textContent = term.dataset.definition;
+                    tooltip.style.display = 'block';
+                    const termRect = term.getBoundingClientRect();
+                    let top = termRect.bottom + window.scrollY + 8; 
+                    let left = termRect.left + window.scrollX;
+                    tooltip.style.top = `${top}px`;
+                    tooltip.style.left = `${left}px`;
+                    const tooltipRect = tooltip.getBoundingClientRect();
+                    if (tooltipRect.right > (window.innerWidth - 15)) { 
+                        tooltip.style.left = `${window.innerWidth - tooltipRect.width - 15}px`;
+                    }
+                    if (tooltipRect.left < 15) { 
+                        tooltip.style.left = `15px`;
+                    }
+                };
+                term.addEventListener('mouseenter', showTooltip);
+                term.addEventListener('focus', showTooltip); 
+                term.addEventListener('click', showTooltip); 
+                const hideTooltip = () => {
+                    tooltip.style.display = 'none';
+                };
+                term.addEventListener('mouseleave', hideTooltip);
+                term.addEventListener('blur', hideTooltip); 
+            });
+            document.addEventListener('click', function(event) {
+                let isClickInsideTerm = false;
+                interactiveTerms.forEach(term => {
+                    if (term.contains(event.target)) {
+                        isClickInsideTerm = true;
+                    }
+                });
+                if (!isClickInsideTerm && !tooltip.contains(event.target)) {
+                    tooltip.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
