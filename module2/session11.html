@@ -7,11 +7,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Chosen Palette: "Warm Neutral Harmony" -->
-    <!-- Application Structure Plan: A comprehensive lab guide. Structure: Header, Export, Session Details, Objectives, Setup, Detailed sections for Basic and Advanced Imputation methods (each with detailed pros/cons and use cases), an interactive section on KNN hyperparameters with a dynamic chart, a section on distributional effects with KDE visualizations, followed by sections on Transformation and Encoding. Goal: A deep, practical, and interactive reference for data preprocessing. -->
+    <!-- Application Structure Plan: The definitive comprehensive lab guide. Structure: Header, Export, Session Details, Objectives, Setup, Detailed sections for Basic and Advanced Imputation methods (with full pros/cons/use-cases), integrated interactive demos for KNN (n_neighbors) and IterativeImputer (max_iter), a summary section on distributional effects with KDE visualization, followed by sections on Transformation and Encoding. Goal: A deep, practical, and fully interactive reference for all discussed data preprocessing techniques. -->
     <!-- Visualization & Content Choices: 
-        - Well-commented Python code blocks for all imputation, scaling, and encoding methods.
-        - Detailed explanations for every technique.
+        - Well-commented Python code blocks.
+        - Detailed textual explanations for every technique.
         - Interactive scatter plot (Chart.js) to visualize the effect of the n_neighbors hyperparameter in KNN Imputation.
+        - Interactive line chart (Chart.js) to visualize the effect of the max_iter hyperparameter in IterativeImputer.
         - Kernel Density Estimate (KDE) plots using Chart.js to visually demonstrate imputation impact.
         - Interactive tooltips for technical terms.
         - PDF Export: Print-specific CSS.
@@ -83,10 +84,10 @@
             max-height: 400px;
         }
         
-        .k-selector-btn {
+        .selector-btn {
             transition: all 0.2s ease-in-out;
         }
-        .k-selector-btn.active {
+        .selector-btn.active {
             transform: scale(1.1);
             background-color: #1d4ed8; /* blue-700 */
             color: white;
@@ -159,9 +160,8 @@
                 <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Lab Objectives</h2> 
                 <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1"> 
                     <li>Implement and contrast both basic and advanced strategies for handling missing data.</li>
-                    <li>Analyze the impact of the `n_neighbors` hyperparameter in KNN Imputation through interactive visualization.</li>
+                    <li>Analyze the impact of key hyperparameters (`n_neighbors` for KNN, `max_iter` for Iterative Imputer) through interactive visualizations.</li>
                     <li>Critically analyze and articulate how different imputation methods can affect the underlying distribution of a feature.</li>
-                    <li>Use KDE visualizations to demonstrate the impact of imputation.</li>
                     <li>Apply a complete data preprocessing pipeline, including imputation, scaling, and encoding.</li>
                 </ul>
             </section>
@@ -170,7 +170,7 @@
             
             <section class="mb-8 content-section">
                 <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 1: Loading and Inspecting a Sample Dataset</h2>
-                <div class="code-block">
+                 <div class="code-block">
                     <pre><code><span class="keyword">import</span> pandas <span class="keyword">as</span> pd
 <span class="keyword">import</span> numpy <span class="keyword">as</span> np
 
@@ -227,36 +227,28 @@ df_knn_imputed = pd.DataFrame(imputer_knn.fit_transform(df_knn), columns=df.colu
 <span class="keyword">print</span>(<span class="string">"\nDataFrame after KNN Imputation:"</span>)
 <span class="keyword">print</span>(df_knn_imputed)</code></pre>
                     </div>
-                </div>
-
-                <div class="technique-card advanced-card viz-card no-print">
-                    <h3 class="subsection-title text-lg font-medium text-indigo-700 mb-2">Interactive Demo: The Impact of `n_neighbors` (k)</h3>
-                    <p class="text-base text-gray-700 leading-relaxed mb-2">
-                        The choice of `n_neighbors` is critical. It determines how many neighboring data points are considered, creating a trade-off between bias and variance.
-                    </p>
-                    <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-2 mb-4 text-sm">
-                        <li><strong>Small `k` (e.g., 1):</strong> Sensitive to local noise/outliers (high variance, low bias).</li>
-                        <li><strong>Moderate `k` (e.g., 3-7):</strong> Often a good balance, robust to outliers while capturing local structure.</li>
-                        <li><strong>Large `k`:</strong> Result approaches a global mean imputation (low variance, high bias).</li>
-                    </ul>
-                    <h4 class="detail-title text-base font-medium text-gray-700 text-center mt-6 mb-4">Select a 'k' value to see how the imputed salary changes:</h4>
-                    <div class="flex justify-center items-center space-x-4 mb-4">
-                        <button class="k-selector-btn bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg shadow" data-k="1">k = 1</button>
-                        <button class="k-selector-btn bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg shadow" data-k="3">k = 3</button>
-                        <button class="k-selector-btn bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg shadow" data-k="9">k = 9</button>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="knnChart"></canvas>
-                    </div>
-                    <div id="knn-explanation" class="text-center text-gray-700 mt-4 p-3 bg-gray-100 rounded-md text-sm leading-relaxed">
-                        Select a 'k' value to begin the interactive demonstration.
+                    <div class="viz-card no-print mt-6">
+                        <h4 class="detail-title text-lg font-medium text-indigo-700 mb-2">Interactive Demo: The Impact of `n_neighbors` (k)</h4>
+                        <p class="text-sm text-gray-700 leading-relaxed mb-4">The choice of `n_neighbors` involves a trade-off: small `k` is sensitive to local noise (high variance), while large `k` might over-simplify and trend toward a global mean (high bias).</p>
+                        <h5 class="text-base font-medium text-gray-700 text-center mt-6 mb-4">Select a 'k' value to see how the imputed salary changes:</h5>
+                        <div class="flex justify-center items-center space-x-4 mb-4">
+                            <button class="selector-btn bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg shadow" data-k="1">k = 1</button>
+                            <button class="selector-btn bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg shadow" data-k="3">k = 3</button>
+                            <button class="selector-btn bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg shadow" data-k="9">k = 9</button>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="knnChart"></canvas>
+                        </div>
+                        <div id="knn-explanation" class="text-center text-gray-700 mt-4 p-3 bg-gray-100 rounded-md text-sm leading-relaxed">
+                            Select a 'k' value to begin the interactive demonstration.
+                        </div>
                     </div>
                 </div>
 
                 <div class="technique-card advanced-card">
                     <h3 class="subsection-title text-lg font-medium text-emerald-700 mb-2">B. Iterative Imputation (MICE)</h3>
                     <p class="text-base text-gray-700 leading-relaxed"><strong>How it works:</strong> This advanced method models each feature with missing values as a function of other features. It iterates through this process, refining its guesses in each round until the imputed values converge.</p>
-                    <p class="text-sm font-semibold text-gray-600 mt-2">When to use:</p>
+                     <p class="text-sm font-semibold text-gray-600 mt-2">When to use:</p>
                     <ul class="list-disc list-inside text-sm text-gray-600 ml-5"><li>When accuracy is paramount and computational time is available.</li><li>When data relationships are complex and need to be preserved.</li></ul>
                      <div class="code-block mt-3">
                         <pre><code><span class="keyword">from</span> sklearn.experimental <span class="keyword">import</span> enable_iterative_imputer
@@ -267,21 +259,31 @@ df_iterative_imputed = pd.DataFrame(imputer_iterative.fit_transform(df_iterative
 <span class="keyword">print</span>(<span class="string">"\nDataFrame after Iterative Imputation:"</span>)
 <span class="keyword">print</span>(df_iterative_imputed)</code></pre>
                     </div>
+                     <div class="viz-card no-print mt-6">
+                        <h4 class="detail-title text-lg font-medium text-indigo-700 mb-2">Interactive Demo: The Impact of `max_iter`</h4>
+                         <p class="text-base text-gray-700 leading-relaxed mb-4">`max_iter` controls how many imputation rounds are performed. A small value might not allow the model to <span class="interactive-term" data-definition="Convergence, in this context, means the imputed values stabilize and stop changing significantly between iterations.">converge</span>, while a very large value can be computationally expensive for diminishing returns.</p>
+                         <h5 class="text-base font-medium text-gray-700 text-center mt-6 mb-4">Select a missing value to visualize its convergence over iterations:</h5>
+                         <div class="flex justify-center items-center space-x-4 mb-4">
+                            <button class="selector-btn bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg shadow" data-feature="age">Impute Missing Age</button>
+                            <button class="selector-btn bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg shadow" data-feature="salary">Impute Missing Salary</button>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="miceChart"></canvas>
+                        </div>
+                         <div id="mice-explanation" class="text-center text-gray-700 mt-4 p-3 bg-gray-100 rounded-md text-sm leading-relaxed">
+                            Select a feature to visualize its imputation convergence.
+                        </div>
+                    </div>
                 </div>
             </section>
             
             <section class="mb-8 content-section">
                 <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 4: Visualizing the Impact of Imputation</h2>
-                <p class="text-base text-gray-700 leading-relaxed mb-4">The following <span class="interactive-term" data-definition="A Kernel Density Estimate (KDE) plot is a way to estimate the probability density function of a continuous random variable. It can be viewed as a smoothed histogram.">KDE plot</span> visually demonstrates how simple mean imputation distorts a feature's distribution compared to more advanced methods.</p>
                 <div class="bg-gray-50 p-4 rounded-lg viz-card no-print">
                     <div class="chart-container">
                         <canvas id="kdeChart"></canvas>
                     </div>
                 </div>
-                 <p class="text-sm text-gray-600 leading-relaxed mt-4">
-                    <strong>Interpreting the Chart:</strong>
-                    The <strong>red line (Mean Imputation)</strong> shows a sharp, artificial spike at the mean value, distorting the data's natural shape seen in the <strong>blue line (Original Data)</strong>. The <strong>green line (Advanced Imputation)</strong> more closely follows the original distribution, better preserving the data's integrity.
-                </p>
             </section>
             
             <section class="mb-8 content-section">
@@ -293,9 +295,9 @@ df_iterative_imputed = pd.DataFrame(imputer_iterative.fit_transform(df_iterative
              <section class="content-section">
                 <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Key Takeaways for Session 11</h2>
                 <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1 leading-relaxed">
-                    <li>The choice of imputation method is a critical decision involving a trade-off between computational cost and the need for data integrity.</li>
-                    <li>Hyperparameters like `n_neighbors` in KNN Imputation significantly influence the outcome and involve a bias-variance trade-off.</li>
-                    <li>Visualizing data distributions (e.g., with KDE plots) is an essential diagnostic step to understand the impact of your preprocessing choices.</li>
+                    <li>The choice of imputation method and its hyperparameters (like `n_neighbors` or `max_iter`) involves critical trade-offs between accuracy, computational cost, and potential data distortion.</li>
+                    <li>Interactive visualizations are powerful tools for understanding how hyperparameters influence model behavior and outcomes.</li>
+                    <li>A complete preprocessing pipeline often involves a sequence of imputation, scaling, and encoding steps.</li>
                 </ul>
             </section>
         </article>
@@ -311,7 +313,6 @@ df_iterative_imputed = pd.DataFrame(imputer_iterative.fit_transform(df_iterative
     <script>
         document.getElementById('currentYearModule').textContent = new Date().getFullYear();
 
-        // Tooltip logic
         const interactiveTerms = document.querySelectorAll('.interactive-term');
         const tooltip = document.querySelector('.definition-tooltip');
         if (tooltip) {
@@ -320,10 +321,8 @@ df_iterative_imputed = pd.DataFrame(imputer_iterative.fit_transform(df_iterative
                     tooltip.textContent = term.dataset.definition;
                     tooltip.style.display = 'block';
                     const termRect = term.getBoundingClientRect();
-                    let top = termRect.bottom + window.scrollY + 8; 
-                    let left = termRect.left + window.scrollX;
-                    tooltip.style.top = `${top}px`;
-                    tooltip.style.left = `${left}px`;
+                    tooltip.style.top = `${termRect.bottom + window.scrollY + 8}px`;
+                    tooltip.style.left = `${termRect.left + window.scrollX}px`;
                 });
             });
             document.addEventListener('click', function(event) {
@@ -333,83 +332,77 @@ df_iterative_imputed = pd.DataFrame(imputer_iterative.fit_transform(df_iterative
             });
         }
         
-        // KDE Chart Visualization
         const kdeCtx = document.getElementById('kdeChart');
         if (kdeCtx) {
-            const labels = [20, 25, 30, 35, 40, 45, 50, 55, 60, 65]; 
-            const originalData = [0.5, 2.5, 3.5, 4.0, 3.8, 3.0, 2.0, 1.5, 1.0, 0.5];
-            const meanImputedData = [0.4, 2.0, 2.8, 5.5, 3.0, 2.4, 1.6, 1.2, 0.8, 0.4]; 
-            const advancedImputedData = [0.5, 2.4, 3.4, 4.1, 3.7, 3.1, 2.1, 1.6, 1.1, 0.6]; 
             new Chart(kdeCtx, {
                 type: 'line',
-                data: { labels: labels, datasets: [ { label: 'Original Data Distribution', data: originalData, borderColor: 'rgb(59, 130, 246)', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.4, borderWidth: 2 }, { label: 'After Mean Imputation', data: meanImputedData, borderColor: 'rgb(239, 68, 68)', fill: false, tension: 0.4, borderWidth: 2, borderDash: [5, 5] }, { label: 'After Advanced Imputation (Conceptual)', data: advancedImputedData, borderColor: 'rgb(22, 163, 74)', fill: false, tension: 0.4, borderWidth: 2, borderDash: [5, 5] } ] },
+                data: { labels: [20, 25, 30, 35, 40, 45, 50, 55, 60, 65], datasets: [ { label: 'Original Data Distribution', data: [0.5, 2.5, 3.5, 4.0, 3.8, 3.0, 2.0, 1.5, 1.0, 0.5], borderColor: 'rgb(59, 130, 246)', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.4, borderWidth: 2 }, { label: 'After Mean Imputation', data: [0.4, 2.0, 2.8, 5.5, 3.0, 2.4, 1.6, 1.2, 0.8, 0.4], borderColor: 'rgb(239, 68, 68)', fill: false, tension: 0.4, borderWidth: 2, borderDash: [5, 5] }, { label: 'After Advanced Imputation (Conceptual)', data: [0.5, 2.4, 3.4, 4.1, 3.7, 3.1, 2.1, 1.6, 1.1, 0.6], borderColor: 'rgb(22, 163, 74)', fill: false, tension: 0.4, borderWidth: 2, borderDash: [5, 5] } ] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: "Effect of Imputation Methods on 'Age' Distribution (KDE Plot)", font: { size: 16 } }, legend: { position: 'top' } }, scales: { y: { title: { display: true, text: 'Density' } }, x: { title: { display: true, text: 'Age' } } } }
             });
         }
 
-        // KNN Interactive Visualization
         const knnCtx = document.getElementById('knnChart');
         const knnExplanation = document.getElementById('knn-explanation');
-        const kSelectorBtns = document.querySelectorAll('.k-selector-btn');
+        const kSelectorBtns = document.querySelectorAll('.selector-btn[data-k]');
 
         if (knnCtx && knnExplanation && kSelectorBtns.length > 0) {
-            const allDataPoints = [
-                {x: 5, y: 70}, {x: 10, y: 90}, {x: 7, y: 65}, {x: 20, y: 120}, 
-                {x: 2, y: 45}, {x: 15, y: 95}, {x: 25, y: 140}, {x: 6, y: 72}, 
-                {x: 18, y: 110}, {x: 12, y: 88}, {x: 35, y: 150}, {x: 14, y: 85}
-            ];
+            const allDataPoints = [ {x: 5, y: 70}, {x: 10, y: 90}, {x: 7, y: 65}, {x: 20, y: 120}, {x: 2, y: 45}, {x: 15, y: 95}, {x: 25, y: 140}, {x: 6, y: 72}, {x: 18, y: 110}, {x: 12, y: 88}, {x: 35, y: 150}, {x: 14, y: 85} ];
             const targetPoint = {x: 16, y: null};
-
-            const neighbors = allDataPoints
-                .map(p => ({ ...p, dist: Math.sqrt(Math.pow(p.x - targetPoint.x, 2)) }))
-                .sort((a, b) => a.dist - b.dist);
-
+            const neighbors = allDataPoints.map(p => ({ ...p, dist: Math.sqrt(Math.pow(p.x - targetPoint.x, 2)) })).sort((a, b) => a.dist - b.dist);
             const knnChart = new Chart(knnCtx, {
                 type: 'scatter',
-                data: {
-                    datasets: [
-                        { label: 'Existing Data', data: allDataPoints, backgroundColor: 'rgb(107, 114, 128)' }, // Gray
-                        { label: 'Target Point (to impute)', data: [ {x: targetPoint.x, y: 105} ], backgroundColor: 'rgb(239, 68, 68)', pointRadius: 8, pointStyle: 'star'},
-                        { label: 'Neighbors', data: [], backgroundColor: 'rgb(22, 163, 74)', pointRadius: 6 } // Green
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        title: { display: true, text: "KNN Imputation: Effect of 'k'", font: {size: 16} },
-                        legend: { position: 'bottom' }
-                    },
-                    scales: {
-                        x: { title: { display: true, text: 'Experience (Years)'} },
-                        y: { title: { display: true, text: 'Salary (in 1000s)'} }
-                    }
-                }
+                data: { datasets: [ { label: 'Existing Data', data: allDataPoints, backgroundColor: 'rgb(107, 114, 128)' }, { label: 'Target Point (to impute)', data: [ {x: targetPoint.x, y: 105} ], backgroundColor: 'rgb(239, 68, 68)', pointRadius: 8, pointStyle: 'star'}, { label: 'Neighbors', data: [], backgroundColor: 'rgb(22, 163, 74)', pointRadius: 6 } ] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: "KNN Imputation: Effect of 'k'", font: {size: 16} }, legend: { position: 'bottom' } }, scales: { x: { title: { display: true, text: 'Experience (Years)'} }, y: { title: { display: true, text: 'Salary (in 1000s)'} } } }
             });
-
             const updateKnnChart = (k) => {
                 const kNeighbors = neighbors.slice(0, k);
                 const imputedSalary = kNeighbors.reduce((acc, p) => acc + p.y, 0) / k;
-                
                 knnChart.data.datasets[1].data = [{x: targetPoint.x, y: imputedSalary}];
                 knnChart.data.datasets[2].data = kNeighbors;
                 knnChart.update();
-
                 const neighborSalaries = kNeighbors.map(p => p.y).join(', ');
                 knnExplanation.innerHTML = `With <strong>k=${k}</strong>, the neighbors have salaries of [${neighborSalaries}].<br>The imputed salary is their average: <strong>${imputedSalary.toFixed(2)}k</strong>.`;
             };
-
             kSelectorBtns.forEach(btn => {
                 btn.addEventListener('click', () => {
                     kSelectorBtns.forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
-                    const k = parseInt(btn.dataset.k);
-                    updateKnnChart(k);
+                    updateKnnChart(parseInt(btn.dataset.k));
                 });
             });
             kSelectorBtns[1].click();
         }
-
+        
+        const miceCtx = document.getElementById('miceChart');
+        const miceExplanation = document.getElementById('mice-explanation');
+        const miceSelectorBtns = document.querySelectorAll('.selector-btn[data-feature]');
+        if(miceCtx && miceExplanation && miceSelectorBtns.length > 0) {
+            const iterations = Array.from({length: 15}, (_, i) => i + 1);
+            const convergenceData = {
+                age: [30.5, 35.2, 37.8, 38.9, 39.4, 39.6, 39.7, 39.75, 39.78, 39.8, 39.81, 39.81, 39.82, 39.82, 39.82],
+                salary: [80000, 85000, 88500, 90100, 90800, 91200, 91350, 91450, 91500, 91520, 91530, 91535, 91538, 91539, 91539]
+            };
+            const miceChart = new Chart(miceCtx, {
+                type: 'line',
+                data: { labels: iterations, datasets: [{ label: 'Imputed Value', data: [], borderColor: 'rgb(234, 88, 12)', backgroundColor: 'rgba(234, 88, 12, 0.1)', fill: false, tension: 0.2, borderWidth: 2 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: "Iterative Imputer: Convergence of Imputed Value", font: {size: 16} }, legend: { display: false } }, scales: { x: { title: { display: true, text: 'Iteration Number'} }, y: { title: { display: true, text: 'Imputed Value'} } } }
+            });
+            const updateMiceChart = (feature) => {
+                miceChart.data.datasets[0].data = convergenceData[feature];
+                miceChart.options.scales.y.title.text = `Imputed ${feature.charAt(0).toUpperCase() + feature.slice(1)}`;
+                miceChart.update();
+                const finalValue = convergenceData[feature][convergenceData[feature].length - 1];
+                miceExplanation.innerHTML = `Visualizing the convergence for the missing <strong>${feature}</strong>. Notice how the imputed value changes significantly in early iterations and then stabilizes or "converges" around a value of <strong>${finalValue.toFixed(2)}</strong> after several rounds. This demonstrates why a sufficient \`max_iter\` is needed.`;
+            };
+            miceSelectorBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    miceSelectorBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    updateMiceChart(btn.dataset.feature);
+                });
+            });
+            miceSelectorBtns[0].click();
+        }
     </script>
 </body>
 </html>
