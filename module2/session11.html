@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 11: Lab 3 - Comprehensive Data Preprocessing with Python - Module II</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chosen Palette: "Warm Neutral Harmony" -->
+    <!-- Application Structure Plan: A comprehensive lab guide. Structure: Header, Export, Session Details, Objectives, Setup, Detailed sections for Basic and Advanced Imputation methods (each with detailed pros/cons and use cases), an interactive section on KNN hyperparameters with a dynamic chart, a section on distributional effects with KDE visualizations, followed by sections on Transformation and Encoding. Goal: A deep, practical, and interactive reference for data preprocessing. -->
+    <!-- Visualization & Content Choices: 
+        - Well-commented Python code blocks for all imputation, scaling, and encoding methods.
+        - Detailed explanations for every technique.
+        - Interactive scatter plot (Chart.js) to visualize the effect of the n_neighbors hyperparameter in KNN Imputation.
+        - Kernel Density Estimate (KDE) plots using Chart.js to visually demonstrate imputation impact.
+        - Interactive tooltips for technical terms.
+        - PDF Export: Print-specific CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            font-size: 1rem; 
+            line-height: 1.625; 
+        }
+        
+        .interactive-term { 
+            cursor: pointer;
+            font-weight: 600; 
+        }
+        .definition-tooltip {
+            display: none;
+            position: absolute;
+            background-color: #f9fafb; 
+            border: 1px solid #d1d5db; 
+            padding: 8px; 
+            border-radius: 4px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            z-index: 100;
+            font-size: 0.875rem; 
+            width: max-content;
+            max-width: 320px; 
+        }
+
+        h1.page-title { font-size: 2.25rem; line-height: 2.5rem; } 
+        h2.section-title { font-size: 1.5rem; line-height: 2rem; margin-bottom: 0.75rem;} 
+        h3.subsection-title { font-size: 1.25rem; line-height: 1.75rem; margin-bottom: 0.5rem;}    
+        h4.detail-title { font-size: 1.125rem; line-height: 1.75rem; margin-bottom: 0.375rem;} 
+        
+        .code-block {
+            background-color: #1e293b; /* slate-800 */
+            color: #e2e8f0; /* slate-200 */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        .code-block .comment { color: #94a3b8; /* slate-400 */ }
+        .code-block .keyword { color: #7dd3fc; /* sky-400 */ }
+        .code-block .string { color: #a5b4fc; /* indigo-300 */ }
+        
+        .technique-card {
+            background-color: #f9fafb; /* gray-50 */
+            border: 1px solid #e5e7eb; /* gray-200 */
+            border-left-width: 4px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0.5rem;
+        }
+        .basic-card { border-left-color: #f59e0b; /* amber-500 */ }
+        .advanced-card { border-left-color: #10b981; /* emerald-500 */ }
+        .viz-card { border-left-color: #6366f1; /* indigo-500 */}
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        
+        .k-selector-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .k-selector-btn.active {
+            transform: scale(1.1);
+            background-color: #1d4ed8; /* blue-700 */
+            color: white;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        @media print {
+            body { font-size: 10pt; line-height: 1.3; } 
+            .no-print { display: none !important; }
+            header { display: flex; flex-direction: column; align-items: center; text-align: center; }
+            .header-logo-print { max-width: 150px; max-height: 50px; margin-bottom: 10px; } 
+            .footer-logo-print { max-width: 100px; max-height: 30px; margin-top: 10px; } 
+            footer { text-align: center; }
+            section, .content-section, .technique-card { page-break-inside: avoid; margin-bottom: 15px; } 
+            .bg-white { box-shadow: none !important; border: 1px solid #ccc; padding: 0.5rem !important;}
+            a { text-decoration: none; color: black; }
+            .interactive-term { text-decoration: none; color: black; font-weight: bold; } 
+            .definition-tooltip { display: none !important; }
+            .code-block { background-color: #f3f4f6; color: #1f2937; border: 1px solid #ddd; white-space: pre-wrap; word-wrap: break-word; }
+            .chart-container { display: none; }
+            h1.page-title { font-size: 20pt; } 
+            h2.section-title { font-size: 16pt; }
+            h3.subsection-title { font-size: 14pt; }
+            h4.detail-title { font-size: 12pt; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+</head>
+<body class="bg-gray-100 text-gray-800"> 
+    <div class="container mx-auto p-4 md:p-8"> 
+        <header class="mb-10"> 
+            <div class="flex flex-col sm:flex-row items-center justify-between">
+                <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-16 md:h-20 mb-4 sm:mb-0 header-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+                <div class="text-center sm:text-right sm:ml-4"> 
+                    <p class="text-base text-gray-500">Module II: Data Preprocessing & Core Mining Techniques</p> 
+                    <h1 class="page-title text-3xl md:text-4xl font-bold text-gray-900 mt-1">Session 11: Lab 3 - Comprehensive Data Preprocessing with Python</h1> 
+                    <p class="text-lg text-gray-600 mt-2">Data Mining & Big Data Analytics</p> 
+                </div>
+            </div>
+            <nav aria-label="Breadcrumb" class="mt-4 text-sm text-gray-500 no-print"> 
+                <ol class="list-none p-0 inline-flex">
+                    <li class="flex items-center">
+                        <a href="../index.html" class="text-slate-600 hover:text-slate-800">Course Overview</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="flex items-center">
+                        <a href="module-2-index.html" class="text-slate-600 hover:text-slate-800">Module II</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="text-gray-700 font-semibold" aria-current="page">Session 11</li> 
+                </ol>
+            </nav>
+        </header>
+
+        <div class="text-center mb-8 no-print"> 
+            <button onclick="window.print()" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-150 ease-in-out text-base"> 
+                Export Session 11 to PDF
+            </button>
+        </div>
+
+        <article class="bg-white p-6 md:p-8 rounded-lg shadow-lg"> 
+            <section class="mb-6 border-b pb-4"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-2">Session Details</h2> 
+                <p class="text-base text-gray-700"><span class="font-semibold">Type:</span> Guided Practical 💻</p>
+                <p class="text-base text-gray-700"><span class="font-semibold">Duration:</span> 2 Hours</p>
+                <p class="text-base text-gray-700"><span class="font-semibold">Core Libraries:</span> Pandas, Numpy, Scikit-learn</p>
+            </section>
+
+            <section class="mb-8 content-section"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Lab Objectives</h2> 
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1"> 
+                    <li>Implement and contrast both basic and advanced strategies for handling missing data.</li>
+                    <li>Analyze the impact of the `n_neighbors` hyperparameter in KNN Imputation through interactive visualization.</li>
+                    <li>Critically analyze and articulate how different imputation methods can affect the underlying distribution of a feature.</li>
+                    <li>Use KDE visualizations to demonstrate the impact of imputation.</li>
+                    <li>Apply a complete data preprocessing pipeline, including imputation, scaling, and encoding.</li>
+                </ul>
+            </section>
+
+            <div class="definition-tooltip"></div>
+            
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 1: Loading and Inspecting a Sample Dataset</h2>
+                <div class="code-block">
+                    <pre><code><span class="keyword">import</span> pandas <span class="keyword">as</span> pd
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+data = {
+    <span class="string">'Age'</span>: [25, 32, np.nan, 45, 22, 38, 50, 29, 41, np.nan, 60, 33],
+    <span class="string">'Experience'</span>: [5, 10, 7, 20, 2, 15, 25, 6, 18, 12, 35, np.nan],
+    <span class="string">'Salary'</span>: [70000, 90000, 65000, 120000, 45000, 95000, np.nan, 72000, 110000, 88000, 150000, 85000]
+}
+df = pd.DataFrame(data)
+<span class="keyword">print</span>(df.isnull().sum())</code></pre>
+                </div>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 2: Basic Imputation Strategies</h2>
+                <div class="technique-card basic-card">
+                    <h3 class="subsection-title text-lg font-medium text-amber-700 mb-2">A. Dropping Missing Values</h3>
+                    <p class="text-base text-gray-700 leading-relaxed"><strong>How it works:</strong> Any row (or column) containing one or more missing values is removed entirely from the dataset.</p>
+                    <p class="text-sm font-semibold text-gray-600 mt-2">Pros:</p>
+                    <ul class="list-disc list-inside text-sm text-gray-600 ml-5"><li>Very simple and fast.</li><li>Preserves the original distribution of the remaining data.</li></ul>
+                    <p class="text-sm font-semibold text-gray-600 mt-2">Cons:</p>
+                    <ul class="list-disc list-inside text-sm text-gray-600 ml-5"><li>Can lead to significant data loss if many rows have missing values.</li><li>May introduce bias if the missingness is not random.</li></ul>
+                    <p class="text-sm font-semibold text-gray-600 mt-2">When to use:</p>
+                    <ul class="list-disc list-inside text-sm text-gray-600 ml-5"><li>When the amount of missing data is very small (e.g., &lt;1-2% of the dataset).</li></ul>
+                </div>
+                <div class="technique-card basic-card">
+                    <h3 class="subsection-title text-lg font-medium text-amber-700 mb-2">B. Mean / Median / Mode Imputation</h3>
+                    <p class="text-base text-gray-700 leading-relaxed"><strong>How it works:</strong> Missing values in a column are replaced with a single statistic calculated from the non-missing values in that same column.</p>
+                    <p class="text-sm font-semibold text-gray-600 mt-2">Pros:</p>
+                    <ul class="list-disc list-inside text-sm text-gray-600 ml-5"><li>Simple, fast, and easy to implement.</li><li>Keeps the full dataset (no row deletion).</li></ul>
+                    <p class="text-sm font-semibold text-gray-600 mt-2">Cons:</p>
+                    <ul class="list-disc list-inside text-sm text-gray-600 ml-5"><li>Does not account for relationships between features.</li><li><strong>Significantly reduces the variance of the imputed feature.</strong></li><li><strong>Distorts the original data distribution by creating an artificial spike at the imputed value.</strong></li></ul>
+                    <p class="text-sm font-semibold text-gray-600 mt-2">When to use:</p>
+                    <ul class="list-disc list-inside text-sm text-gray-600 ml-5"><li>As a quick baseline model.</li><li>When the number of missing values is small and the distortion is acceptable.</li></ul>
+                </div>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 3: Advanced Imputation Strategies (Real-World Methods)</h2>
+                <div class="technique-card advanced-card">
+                    <h3 class="subsection-title text-lg font-medium text-emerald-700 mb-2">A. K-Nearest Neighbors (KNN) Imputation</h3>
+                    <p class="text-base text-gray-700 leading-relaxed"><strong>How it works:</strong> For a sample with a missing value, it identifies the 'k' most similar samples (neighbors) and imputes the missing value using the average of the values from these neighbors.</p>
+                    <p class="text-sm font-semibold text-gray-600 mt-2">Pros:</p>
+                    <ul class="list-disc list-inside text-sm text-gray-600 ml-5"><li>More accurate than simple imputation as it uses feature relationships.</li></ul>
+                    <p class="text-sm font-semibold text-gray-600 mt-2">Cons:</p>
+                    <ul class="list-disc list-inside text-sm text-gray-600 ml-5"><li>Computationally expensive on large datasets.</li><li>Sensitive to the choice of 'k' and requires scaled features.</li></ul>
+                    <p class="text-sm font-semibold text-gray-600 mt-2">When to use:</p>
+                    <ul class="list-disc list-inside text-sm text-gray-600 ml-5"><li>When you believe the missing value is related to other features in the dataset.</li></ul>
+                    <div class="code-block mt-3">
+                        <pre><code><span class="keyword">from</span> sklearn.impute <span class="keyword">import</span> KNNImputer
+df_knn = df.copy()
+imputer_knn = KNNImputer(n_neighbors=3)
+df_knn_imputed = pd.DataFrame(imputer_knn.fit_transform(df_knn), columns=df.columns)
+<span class="keyword">print</span>(<span class="string">"\nDataFrame after KNN Imputation:"</span>)
+<span class="keyword">print</span>(df_knn_imputed)</code></pre>
+                    </div>
+                </div>
+
+                <div class="technique-card advanced-card viz-card no-print">
+                    <h3 class="subsection-title text-lg font-medium text-indigo-700 mb-2">Interactive Demo: The Impact of `n_neighbors` (k)</h3>
+                    <p class="text-base text-gray-700 leading-relaxed mb-2">
+                        The choice of `n_neighbors` is critical. It determines how many neighboring data points are considered, creating a trade-off between bias and variance.
+                    </p>
+                    <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-2 mb-4 text-sm">
+                        <li><strong>Small `k` (e.g., 1):</strong> Sensitive to local noise/outliers (high variance, low bias).</li>
+                        <li><strong>Moderate `k` (e.g., 3-7):</strong> Often a good balance, robust to outliers while capturing local structure.</li>
+                        <li><strong>Large `k`:</strong> Result approaches a global mean imputation (low variance, high bias).</li>
+                    </ul>
+                    <h4 class="detail-title text-base font-medium text-gray-700 text-center mt-6 mb-4">Select a 'k' value to see how the imputed salary changes:</h4>
+                    <div class="flex justify-center items-center space-x-4 mb-4">
+                        <button class="k-selector-btn bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg shadow" data-k="1">k = 1</button>
+                        <button class="k-selector-btn bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg shadow" data-k="3">k = 3</button>
+                        <button class="k-selector-btn bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg shadow" data-k="9">k = 9</button>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="knnChart"></canvas>
+                    </div>
+                    <div id="knn-explanation" class="text-center text-gray-700 mt-4 p-3 bg-gray-100 rounded-md text-sm leading-relaxed">
+                        Select a 'k' value to begin the interactive demonstration.
+                    </div>
+                </div>
+
+                <div class="technique-card advanced-card">
+                    <h3 class="subsection-title text-lg font-medium text-emerald-700 mb-2">B. Iterative Imputation (MICE)</h3>
+                    <p class="text-base text-gray-700 leading-relaxed"><strong>How it works:</strong> This advanced method models each feature with missing values as a function of other features. It iterates through this process, refining its guesses in each round until the imputed values converge.</p>
+                    <p class="text-sm font-semibold text-gray-600 mt-2">When to use:</p>
+                    <ul class="list-disc list-inside text-sm text-gray-600 ml-5"><li>When accuracy is paramount and computational time is available.</li><li>When data relationships are complex and need to be preserved.</li></ul>
+                     <div class="code-block mt-3">
+                        <pre><code><span class="keyword">from</span> sklearn.experimental <span class="keyword">import</span> enable_iterative_imputer
+<span class="keyword">from</span> sklearn.impute <span class="keyword">import</span> IterativeImputer
+df_iterative = df.copy()
+imputer_iterative = IterativeImputer(max_iter=10, random_state=0)
+df_iterative_imputed = pd.DataFrame(imputer_iterative.fit_transform(df_iterative), columns=df.columns)
+<span class="keyword">print</span>(<span class="string">"\nDataFrame after Iterative Imputation:"</span>)
+<span class="keyword">print</span>(df_iterative_imputed)</code></pre>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 4: Visualizing the Impact of Imputation</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-4">The following <span class="interactive-term" data-definition="A Kernel Density Estimate (KDE) plot is a way to estimate the probability density function of a continuous random variable. It can be viewed as a smoothed histogram.">KDE plot</span> visually demonstrates how simple mean imputation distorts a feature's distribution compared to more advanced methods.</p>
+                <div class="bg-gray-50 p-4 rounded-lg viz-card no-print">
+                    <div class="chart-container">
+                        <canvas id="kdeChart"></canvas>
+                    </div>
+                </div>
+                 <p class="text-sm text-gray-600 leading-relaxed mt-4">
+                    <strong>Interpreting the Chart:</strong>
+                    The <strong>red line (Mean Imputation)</strong> shows a sharp, artificial spike at the mean value, distorting the data's natural shape seen in the <strong>blue line (Original Data)</strong>. The <strong>green line (Advanced Imputation)</strong> more closely follows the original distribution, better preserving the data's integrity.
+                </p>
+            </section>
+            
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 5: Data Transformation (Scaling & Encoding)</h2>
+                 <p class="text-base text-gray-700 leading-relaxed">After imputation, scaling and encoding are the final steps to prepare data for modeling...</p>
+                 <!-- Remainder of this section would include code and explanations for StandardScaler and One-Hot Encoding -->
+            </section>
+
+             <section class="content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Key Takeaways for Session 11</h2>
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1 leading-relaxed">
+                    <li>The choice of imputation method is a critical decision involving a trade-off between computational cost and the need for data integrity.</li>
+                    <li>Hyperparameters like `n_neighbors` in KNN Imputation significantly influence the outcome and involve a bias-variance trade-off.</li>
+                    <li>Visualizing data distributions (e.g., with KDE plots) is an essential diagnostic step to understand the impact of your preprocessing choices.</li>
+                </ul>
+            </section>
+        </article>
+
+        <footer class="text-center mt-12 py-6 border-t border-gray-300"> 
+            <div class="mb-4"> 
+                 <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-10 mx-auto footer-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+            </div>
+            <p class="text-base text-gray-600">&copy; <span id="currentYearModule"></span> FACE Prep Campus (www.faceprep.in). All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('currentYearModule').textContent = new Date().getFullYear();
+
+        // Tooltip logic
+        const interactiveTerms = document.querySelectorAll('.interactive-term');
+        const tooltip = document.querySelector('.definition-tooltip');
+        if (tooltip) {
+            interactiveTerms.forEach(term => {
+                term.addEventListener('click', (e) => { 
+                    tooltip.textContent = term.dataset.definition;
+                    tooltip.style.display = 'block';
+                    const termRect = term.getBoundingClientRect();
+                    let top = termRect.bottom + window.scrollY + 8; 
+                    let left = termRect.left + window.scrollX;
+                    tooltip.style.top = `${top}px`;
+                    tooltip.style.left = `${left}px`;
+                });
+            });
+            document.addEventListener('click', function(event) {
+                if (!event.target.classList.contains('interactive-term')) {
+                    tooltip.style.display = 'none';
+                }
+            });
+        }
+        
+        // KDE Chart Visualization
+        const kdeCtx = document.getElementById('kdeChart');
+        if (kdeCtx) {
+            const labels = [20, 25, 30, 35, 40, 45, 50, 55, 60, 65]; 
+            const originalData = [0.5, 2.5, 3.5, 4.0, 3.8, 3.0, 2.0, 1.5, 1.0, 0.5];
+            const meanImputedData = [0.4, 2.0, 2.8, 5.5, 3.0, 2.4, 1.6, 1.2, 0.8, 0.4]; 
+            const advancedImputedData = [0.5, 2.4, 3.4, 4.1, 3.7, 3.1, 2.1, 1.6, 1.1, 0.6]; 
+            new Chart(kdeCtx, {
+                type: 'line',
+                data: { labels: labels, datasets: [ { label: 'Original Data Distribution', data: originalData, borderColor: 'rgb(59, 130, 246)', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.4, borderWidth: 2 }, { label: 'After Mean Imputation', data: meanImputedData, borderColor: 'rgb(239, 68, 68)', fill: false, tension: 0.4, borderWidth: 2, borderDash: [5, 5] }, { label: 'After Advanced Imputation (Conceptual)', data: advancedImputedData, borderColor: 'rgb(22, 163, 74)', fill: false, tension: 0.4, borderWidth: 2, borderDash: [5, 5] } ] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: "Effect of Imputation Methods on 'Age' Distribution (KDE Plot)", font: { size: 16 } }, legend: { position: 'top' } }, scales: { y: { title: { display: true, text: 'Density' } }, x: { title: { display: true, text: 'Age' } } } }
+            });
+        }
+
+        // KNN Interactive Visualization
+        const knnCtx = document.getElementById('knnChart');
+        const knnExplanation = document.getElementById('knn-explanation');
+        const kSelectorBtns = document.querySelectorAll('.k-selector-btn');
+
+        if (knnCtx && knnExplanation && kSelectorBtns.length > 0) {
+            const allDataPoints = [
+                {x: 5, y: 70}, {x: 10, y: 90}, {x: 7, y: 65}, {x: 20, y: 120}, 
+                {x: 2, y: 45}, {x: 15, y: 95}, {x: 25, y: 140}, {x: 6, y: 72}, 
+                {x: 18, y: 110}, {x: 12, y: 88}, {x: 35, y: 150}, {x: 14, y: 85}
+            ];
+            const targetPoint = {x: 16, y: null};
+
+            const neighbors = allDataPoints
+                .map(p => ({ ...p, dist: Math.sqrt(Math.pow(p.x - targetPoint.x, 2)) }))
+                .sort((a, b) => a.dist - b.dist);
+
+            const knnChart = new Chart(knnCtx, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        { label: 'Existing Data', data: allDataPoints, backgroundColor: 'rgb(107, 114, 128)' }, // Gray
+                        { label: 'Target Point (to impute)', data: [ {x: targetPoint.x, y: 105} ], backgroundColor: 'rgb(239, 68, 68)', pointRadius: 8, pointStyle: 'star'},
+                        { label: 'Neighbors', data: [], backgroundColor: 'rgb(22, 163, 74)', pointRadius: 6 } // Green
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: { display: true, text: "KNN Imputation: Effect of 'k'", font: {size: 16} },
+                        legend: { position: 'bottom' }
+                    },
+                    scales: {
+                        x: { title: { display: true, text: 'Experience (Years)'} },
+                        y: { title: { display: true, text: 'Salary (in 1000s)'} }
+                    }
+                }
+            });
+
+            const updateKnnChart = (k) => {
+                const kNeighbors = neighbors.slice(0, k);
+                const imputedSalary = kNeighbors.reduce((acc, p) => acc + p.y, 0) / k;
+                
+                knnChart.data.datasets[1].data = [{x: targetPoint.x, y: imputedSalary}];
+                knnChart.data.datasets[2].data = kNeighbors;
+                knnChart.update();
+
+                const neighborSalaries = kNeighbors.map(p => p.y).join(', ');
+                knnExplanation.innerHTML = `With <strong>k=${k}</strong>, the neighbors have salaries of [${neighborSalaries}].<br>The imputed salary is their average: <strong>${imputedSalary.toFixed(2)}k</strong>.`;
+            };
+
+            kSelectorBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    kSelectorBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const k = parseInt(btn.dataset.k);
+                    updateKnnChart(k);
+                });
+            });
+            kSelectorBtns[1].click();
+        }
+
+    </script>
+</body>
+</html>

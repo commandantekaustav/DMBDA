@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 10: Data Preprocessing - Cleaning & Transformation - Module II</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: "Warm Neutral Harmony" -->
+    <!-- Application Structure Plan: Single session detail page. Structure: Header, Export, Session Details, Objectives, Extensive Content (Importance, Data Cleaning techniques, Data Transformation techniques) with detailed examples, Key Takeaways, Footer. Goal: Deep, detailed understanding of methods. -->
+    <!-- Visualization & Content Choices: 
+        - Detailed textual explanations with multiple examples for each preprocessing technique.
+        - Before/After examples for missing data handling.
+        - Numerical walkthroughs for normalization methods.
+        - Interactive tooltips for technical terms.
+        - PDF Export: Print-specific CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            font-size: 1rem; 
+            line-height: 1.625; 
+        }
+        
+        .interactive-term { 
+            cursor: pointer;
+            font-weight: 600; 
+        }
+        .definition-tooltip {
+            display: none;
+            position: absolute;
+            background-color: #f9fafb; 
+            border: 1px solid #d1d5db; 
+            padding: 8px; 
+            border-radius: 4px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            z-index: 100;
+            font-size: 0.875rem; 
+            width: max-content;
+            max-width: 320px; 
+        }
+
+        h1.page-title { font-size: 2.25rem; line-height: 2.5rem; } 
+        h2.section-title { font-size: 1.5rem; line-height: 2rem; margin-bottom: 0.75rem;} 
+        h3.subsection-title { font-size: 1.25rem; line-height: 1.75rem; margin-bottom: 0.5rem;}    
+        h4.detail-title { font-size: 1.125rem; line-height: 1.75rem; margin-bottom: 0.375rem;} 
+        
+        .technique-card {
+            background-color: #f9fafb; /* gray-50 */
+            border: 1px solid #e5e7eb; /* gray-200 */
+            border-left-width: 4px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0.5rem;
+        }
+        .cleaning-card { border-left-color: #ef4444; /* red-500 */ }
+        .transformation-card { border-left-color: #3b82f6; /* blue-500 */ }
+        .component-icon { /* Reusing for visual consistency */
+            font-size: 1.25rem; /* text-xl */
+            margin-right: 0.5rem;
+            vertical-align: middle;
+        }
+        .example-box {
+            background-color: #f3f4f6; /* gray-100 */
+            border: 1px dashed #d1d5db; /* gray-300 */
+            padding: 1rem;
+            border-radius: 0.375rem;
+            margin-top: 0.75rem;
+        }
+
+
+        @media print {
+            body { font-size: 10pt; line-height: 1.3; } 
+            .no-print { display: none !important; }
+            header { display: flex; flex-direction: column; align-items: center; text-align: center; }
+            .header-logo-print { max-width: 150px; max-height: 50px; margin-bottom: 10px; } 
+            .footer-logo-print { max-width: 100px; max-height: 30px; margin-top: 10px; } 
+            footer { text-align: center; }
+            section, .content-section, .technique-card { page-break-inside: avoid; margin-bottom: 15px; } 
+            .bg-white { box-shadow: none !important; border: 1px solid #ccc; padding: 0.5rem !important;}
+            a { text-decoration: none; color: black; }
+            .interactive-term { text-decoration: none; color: black; font-weight: bold; } 
+            .definition-tooltip { display: none !important; }
+            .print-only-definition { display: block !important; position: static !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin-top: 2px; font-style: italic; font-size: 0.9em;} 
+            .technique-card { border: 1px solid #eee; padding: 10px; border-left-width: 2px !important; }
+            .example-box { border: 1px solid #eee; padding: 5px; }
+            .component-icon { display: none; }
+            h1.page-title { font-size: 20pt; } 
+            h2.section-title { font-size: 16pt; }
+            h3.subsection-title { font-size: 14pt; }
+            h4.detail-title { font-size: 12pt; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+</head>
+<body class="bg-gray-100 text-gray-800"> 
+    <div class="container mx-auto p-4 md:p-8"> 
+        <header class="mb-10"> 
+            <div class="flex flex-col sm:flex-row items-center justify-between">
+                <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-16 md:h-20 mb-4 sm:mb-0 header-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+                <div class="text-center sm:text-right sm:ml-4"> 
+                    <p class="text-base text-gray-500">Module II: Data Preprocessing & Core Mining Techniques</p> 
+                    <h1 class="page-title text-3xl md:text-4xl font-bold text-gray-900 mt-1">Session 10: Data Preprocessing - Cleaning & Transformation</h1> 
+                    <p class="text-lg text-gray-600 mt-2">Data Mining & Big Data Analytics</p> 
+                </div>
+            </div>
+            <nav aria-label="Breadcrumb" class="mt-4 text-sm text-gray-500 no-print"> 
+                <ol class="list-none p-0 inline-flex">
+                    <li class="flex items-center">
+                        <a href="../index.html" class="text-slate-600 hover:text-slate-800">Course Overview</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="flex items-center">
+                        <a href="module-2-index.html" class="text-slate-600 hover:text-slate-800">Module II</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="text-gray-700 font-semibold" aria-current="page">Session 10</li> 
+                </ol>
+            </nav>
+        </header>
+
+        <div class="text-center mb-8 no-print"> 
+            <button onclick="window.print()" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-150 ease-in-out text-base"> 
+                Export Session 10 to PDF
+            </button>
+        </div>
+
+        <article class="bg-white p-6 md:p-8 rounded-lg shadow-lg"> 
+            <section class="mb-6 border-b pb-4"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-2">Session Details</h2> 
+                <p class="text-base text-gray-700"><span class="font-semibold">Type:</span> Theory 📖</p>
+                <p class="text-base text-gray-700"><span class="font-semibold">Duration:</span> 1 Hour</p>
+                <p class="text-base text-gray-700"><span class="font-semibold">Textbook References:</span> Han et al.: Ch. 3 (Data Preprocessing - Overview, Data Cleaning, Data Transformation)</p>
+            </section>
+
+            <section class="mb-8 content-section"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Learning Objectives</h2> 
+                <p class="text-base text-gray-700 mb-3">By the end of this session, you will be able to:</p>
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1"> 
+                    <li>Explain the critical importance of data preprocessing in the data mining lifecycle.</li>
+                    <li>Identify and describe common data quality problems (e.g., missing data, noisy data, inconsistencies).</li>
+                    <li>Discuss various techniques for data cleaning, including methods for handling missing values and noisy data.</li>
+                    <li>Describe common data transformation techniques, such as normalization, aggregation, and discretization.</li>
+                    <li>Understand the purpose and basic application of these preprocessing techniques through detailed examples.</li>
+                </ul>
+            </section>
+
+            <div class="definition-tooltip"></div>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">The Importance of Data Preprocessing</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    Real-world data is often messy, incomplete, inconsistent, and contains errors or outliers. Directly applying data mining algorithms to such "raw" data can lead to misleading results, inaccurate models, and ultimately, poor decision-making. This underscores the adage: <strong class="text-red-600">"Garbage In, Garbage Out" (GIGO)</strong>.
+                </p>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    <span class="interactive-term" data-definition="Data preprocessing refers to a broad set of techniques used to clean, transform, and reduce raw data into a suitable format for data mining algorithms, improving data quality and the reliability of mining results.">Data Preprocessing</span> is a crucial step in the <span class="interactive-term" data-definition="The structured sequence of phases involved in a data mining project, typically including business understanding, data understanding, data preparation, modeling, evaluation, and deployment.">Data Mining Lifecycle</span> (specifically, the Data Preparation phase of CRISP-DM). It involves a collection of techniques to improve the quality of the data and, consequently, the efficiency and effectiveness of the mining process. High-quality data leads to high-quality patterns and models.
+                </p>
+                <div class="print-only-definition">
+                    <p><strong>Data Preprocessing:</strong> Techniques to clean, transform, and reduce raw data for better data mining results.</p>
+                </div>
+                <h3 class="subsection-title text-lg font-medium text-gray-700 mt-4 mb-2">Why Preprocess Data?</h3>
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1 leading-relaxed">
+                    <li><strong>Improve Data Quality:</strong> Address issues like missing values, noise, and inconsistencies.</li>
+                    <li><strong>Enhance Mining Efficiency:</strong> Some algorithms perform better or faster with well-prepared data.</li>
+                    <li><strong>Increase Accuracy of Results:</strong> Cleaner data leads to more reliable and accurate models.</li>
+                    <li><strong>Better Understandability:</strong> Transformed data can sometimes be easier to interpret.</li>
+                </ul>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Major Tasks in Data Preprocessing</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    Data preprocessing encompasses several major tasks. In this session, we will focus on Data Cleaning and Data Transformation. Other tasks like Data Reduction and Data Discretization (which can also be seen as a form of transformation) will be covered in more detail later or are subsets of these broader categories.
+                </p>
+                <ol class="list-decimal list-inside text-base text-gray-700 ml-5 space-y-1 leading-relaxed">
+                    <li><strong>Data Cleaning:</strong> Fill in missing values, smooth noisy data, identify or remove outliers, and resolve inconsistencies.</li>
+                    <li><strong>Data Integration (Covered in more detail if project requires):</strong> Integrate data from multiple sources (databases, files, data cubes) into a coherent data store.</li>
+                    <li><strong>Data Transformation:</strong> Normalize data, aggregate data, construct new attributes (features).</li>
+                    <li><strong>Data Reduction:</strong> Obtain a reduced representation of the data set that is much smaller in volume but produces the same (or similar) analytical results (e.g., dimensionality reduction, numerosity reduction).</li>
+                </ol>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">I. Data Cleaning</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-4">
+                    Real-world data often contains imperfections. Data cleaning routines attempt to fill in missing values, smooth out noise while identifying outliers, and correct inconsistencies in the data.
+                </p>
+                <div class="space-y-6">
+                    <div class="technique-card cleaning-card">
+                        <h3 class="subsection-title text-lg font-medium text-red-700 mb-2">
+                            <span class="component-icon">❓</span>A. Handling Missing Data
+                        </h3>
+                        <p class="text-base text-gray-700 leading-relaxed mb-2">
+                            Data is not always available. For example, many tuples may have no recorded value for several attributes, such as customer income. Missing data may be due to equipment malfunction, misunderstanding, or simply not being entered.
+                        </p>
+                        <h4 class="detail-title text-base font-semibold text-gray-600 mt-3 mb-1">Strategies:</h4>
+                        <ul class="list-disc list-inside text-sm text-gray-600 ml-5 space-y-2">
+                            <li><strong>Ignore the tuple (Row Deletion):</strong> Usually done when the class label is missing (for classification) or if the record has many attributes with missing values. <br><em>Example: If a customer record is missing age, income, and location, it might be better to remove it than to make many guesses.</em></li>
+                            <li><strong>Fill in the missing value manually:</strong> Tedious and often infeasible for large datasets, but can be appropriate for small, critical datasets.</li>
+                            <li><strong>Use a global constant:</strong> Replace all missing attribute values with the same constant (e.g., "Unknown", N/A, 0, or -1). This is simple but can introduce a new "category" that a model might misinterpret as a meaningful pattern.</li>
+                            <li><strong>Use the attribute mean/median (quantitative) or mode (categorical):</strong> For example, if the average income is $56,000, use this value. If the most common hair color is "brown", use "brown". Median is often preferred over mean when the data has outliers.</li>
+                            <li><strong>Use the attribute mean/mode for all samples belonging to the same class:</strong> A more sophisticated version of the above. E.g., fill missing income with the average income of customers in the same "High-Value Customer" class.</li>
+                            <li><strong>Use an inference-based method:</strong> Use a model to predict the missing value. A decision tree or regression model can be trained on the data to predict the missing value based on other attributes. This is often the most sophisticated approach.</li>
+                        </ul>
+                         <div class="example-box text-sm">
+                            <p class="font-semibold mb-1">Example: Handling a Missing `Income` Value</p>
+                            <p><strong>Before:</strong> (Age: 35, City: "New York", Income: ?)</p>
+                            <p><strong>After (Mean Imputation):</strong> Assuming average income is $62,000 -> (Age: 35, City: "New York", Income: 62000)</p>
+                             <p><strong>After (Class-based Mean Imputation):</strong> If average income for people in "New York" is $75,000 -> (Age: 35, City: "New York", Income: 75000)</p>
+                        </div>
+                    </div>
+
+                    <div class="technique-card cleaning-card">
+                        <h3 class="subsection-title text-lg font-medium text-red-700 mb-2">
+                            <span class="component-icon">🔊</span>B. Handling Noisy Data
+                        </h3>
+                        <p class="text-base text-gray-700 leading-relaxed mb-2">
+                            <span class="interactive-term" data-definition="Noise is a random error or variance in a measured variable. Incorrect attribute values may be due to faulty data collection instruments, data entry problems, data transmission problems, technology limitation, or inconsistency in naming convention.">Noisy data</span> refers to random errors or variance in measured variables.
+                        </p>
+                         <div class="print-only-definition">
+                           <p><strong>Noisy Data:</strong> Random error or variance in a measured variable.</p>
+                        </div>
+                        <h4 class="detail-title text-base font-semibold text-gray-600 mt-3 mb-1">Techniques:</h4>
+                        <ul class="list-disc list-inside text-sm text-gray-600 ml-5 space-y-2">
+                            <li>
+                                <strong>Binning:</strong> Sort data and partition into (equal-frequency or equal-width) bins. Then smooth by bin means, bin medians, or bin boundaries. This method is effective for smoothing out minor errors.
+                                <div class="example-box text-xs mt-1">
+                                    <p><strong>Example:</strong> Sorted prices: 4, 8, 15, 21, 21, 24, 25, 28, 34.</p>
+                                    <p><strong>Partition into 3 bins (Equal Frequency):</strong><br>Bin 1: [4, 8, 15], Bin 2: [21, 21, 24], Bin 3: [25, 28, 34].</p>
+                                    <p><strong>Smoothing by bin means:</strong><br>Bin 1 -> [9, 9, 9], Bin 2 -> [22, 22, 22], Bin 3 -> [29, 29, 29].</p>
+                                    <p><strong>Smoothing by bin boundaries:</strong><br>Bin 1 -> [4, 4, 15], Bin 2 -> [21, 21, 24], Bin 3 -> [25, 25, 34].</p>
+                                </div>
+                            </li>
+                            <li><strong>Regression:</strong> Fit data into a regression function to smooth it. For instance, fit a linear regression line to a set of `(x, y)` points; the points on the line are the "smoothed" values.</li>
+                            <li><strong>Clustering (Outlier Analysis):</strong> Outliers may be considered noise. Values can be grouped into clusters, and any data points that do not fall into a cluster can be identified as outliers and potentially removed or investigated. For example, in a dataset of house prices, a house with a price of $100 might be an outlier caused by a data entry error.</li>
+                            <li><strong>Combined Computer and Human Inspection:</strong> The most robust approach. Use analytical tools to detect suspicious values (e.g., values outside a normal range, outliers), and then have a human expert verify whether they are errors or genuinely unusual (and potentially important) values.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">II. Data Transformation</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-4">
+                    In data transformation, the data are transformed or consolidated into forms appropriate for mining. This is done to improve the accuracy of models and make the data easier to work with.
+                </p>
+                <div class="space-y-6">
+                    <div class="technique-card transformation-card">
+                        <h3 class="subsection-title text-lg font-medium text-blue-700 mb-2">
+                           <span class="component-icon">📏</span>A. Normalization
+                        </h3>
+                        <p class="text-base text-gray-700 leading-relaxed mb-2">
+                            Attributes are scaled to fall within a smaller, specified range, such as 0 to 1. This is critical for distance-based algorithms like k-Nearest Neighbors (k-NN) and clustering, or algorithms that use gradient descent (like neural networks), where attributes with larger ranges can disproportionately influence the results.
+                        </p>
+                        <h4 class="detail-title text-base font-semibold text-gray-600 mt-3 mb-1">Common Methods:</h4>
+                        <ul class="list-disc list-inside text-sm text-gray-600 ml-5 space-y-2">
+                            <li><strong>Min-Max Normalization:</strong> Scales the data to a fixed range, usually [0, 1]. The formula is: `v' = (v - min(A)) / (max(A) - min(A))`. <br><em>Example: For ages [20, 30, 60], min=20, max=60. The age 30 becomes (30-20)/(60-20) = 10/40 = 0.25.</em></li>
+                            <li><strong>Z-score Normalization (Standardization):</strong> Transforms data to have a mean of 0 and a standard deviation of 1. The formula is: `v' = (v - mean(A)) / std_dev(A)`. It's useful when you don't know the min/max of your data or if it contains outliers. <br><em>Example: For ages [20, 30, 40], mean=30, std_dev=8.16. The age 40 becomes (40-30)/8.16 ≈ 1.22.</em></li>
+                            <li><strong>Normalization by Decimal Scaling:</strong> Moves the decimal point of values. Useful for a quick, rough normalization.</li>
+                        </ul>
+                    </div>
+
+                    <div class="technique-card transformation-card">
+                        <h3 class="subsection-title text-lg font-medium text-blue-700 mb-2">
+                            <span class="component-icon">➕</span>B. Attribute Construction (Feature Engineering)
+                        </h3>
+                        <p class="text-base text-gray-700 leading-relaxed">
+                            New, potentially more useful attributes are constructed from the original attribute set. This is a creative and often crucial step for model performance.
+                        </p>
+                        <h4 class="detail-title text-base font-semibold text-gray-600 mt-3 mb-1">Examples:</h4>
+                         <ul class="list-disc list-inside text-sm text-gray-600 ml-5 space-y-1">
+                            <li>From a `date_of_birth` attribute, construct `age`.</li>
+                            <li>From `transaction_date` and `customer_first_purchase_date`, construct `customer_tenure`.</li>
+                            <li>From `revenue` and `cost`, construct `profit` or `profit_margin`.</li>
+                            <li>From `city` and `state`, construct a combined `region` attribute.</li>
+                        </ul>
+                    </div>
+                    <div class="technique-card transformation-card">
+                        <h3 class="subsection-title text-lg font-medium text-blue-700 mb-2">
+                            <span class="component-icon">📊</span>C. Aggregation
+                        </h3>
+                        <p class="text-base text-gray-700 leading-relaxed">
+                            Summary or aggregation operations are applied to the data, typically to change the granularity.
+                        </p>
+                        <div class="example-box text-sm">
+                            <p class="font-semibold mb-1">Example: From Transactional to Customer Level</p>
+                            <p><strong>Before (Transactional Data):</strong><br>
+                            (CustID: 1, Date: Jan-01, Amount: $50)<br>
+                            (CustID: 2, Date: Jan-01, Amount: $75)<br>
+                            (CustID: 1, Date: Jan-02, Amount: $30)</p>
+                            <p class="mt-2"><strong>After (Aggregated to Customer Level):</strong><br>
+                            (CustID: 1, Total_Spent: $80, Num_Transactions: 2)<br>
+                            (CustID: 2, Total_Spent: $75, Num_Transactions: 1)</p>
+                        </div>
+                    </div>
+                    <div class="technique-card transformation-card">
+                        <h3 class="subsection-title text-lg font-medium text-blue-700 mb-2">
+                            <span class="component-icon">🔗</span>D. Discretization
+                        </h3>
+                        <p class="text-base text-gray-700 leading-relaxed mb-2">
+                            <span class="interactive-term" data-definition="Data discretization transforms numeric data by mapping values to interval or concept labels. Such methods can be used to reduce the number of values for a given continuous attribute by dividing the range of the attribute into intervals.">Data Discretization</span> replaces raw values of a numeric attribute with interval or conceptual labels. This can make the data easier to understand and work with for certain algorithms (like decision trees).
+                        </p>
+                        <h4 class="detail-title text-base font-semibold text-gray-600 mt-3 mb-1">Examples:</h4>
+                         <ul class="list-disc list-inside text-sm text-gray-600 ml-5 space-y-1">
+                            <li>A continuous `age` attribute can be discretized into categorical bins: "Young" (18-29), "Middle-Aged" (30-49), "Senior" (50+).</li>
+                            <li>A `temperature` attribute can be discretized into "Cold", "Warm", "Hot".</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Key Takeaways for Session 10</h2>
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1 leading-relaxed">
+                    <li>Data preprocessing is a mandatory and often time-consuming step for effective data mining. "Garbage In, Garbage Out" is a fundamental principle.</li>
+                    <li>Data cleaning addresses issues like missing data (e.g., by imputation or deletion) and noisy data (e.g., through binning or regression).</li>
+                    <li>Data transformation converts data into forms suitable for mining, including normalization (scaling values), attribute construction (creating new features), aggregation (summarizing data), and discretization (converting numeric to categorical).</li>
+                    <li>The choice of preprocessing techniques depends heavily on the data characteristics and the specific data mining task at hand.</li>
+                </ul>
+            </section>
+        </article>
+
+        <footer class="text-center mt-12 py-6 border-t border-gray-300"> 
+            <div class="mb-4"> 
+                 <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-10 mx-auto footer-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+            </div>
+            <p class="text-base text-gray-600">&copy; <span id="currentYearModule"></span> FACE Prep Campus (www.faceprep.in). All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('currentYearModule').textContent = new Date().getFullYear();
+
+        const interactiveTerms = document.querySelectorAll('.interactive-term');
+        const tooltip = document.querySelector('.definition-tooltip');
+
+        if (tooltip) {
+            interactiveTerms.forEach(term => {
+                const showTooltip = (e) => {
+                    tooltip.textContent = term.dataset.definition;
+                    tooltip.style.display = 'block';
+                    const termRect = term.getBoundingClientRect();
+                    let top = termRect.bottom + window.scrollY + 8; 
+                    let left = termRect.left + window.scrollX;
+                    tooltip.style.top = `${top}px`;
+                    tooltip.style.left = `${left}px`;
+                    const tooltipRect = tooltip.getBoundingClientRect();
+                    if (tooltipRect.right > (window.innerWidth - 15)) { 
+                        tooltip.style.left = `${window.innerWidth - tooltipRect.width - 15}px`;
+                    }
+                    if (tooltipRect.left < 15) { 
+                        tooltip.style.left = `15px`;
+                    }
+                };
+                term.addEventListener('mouseenter', showTooltip);
+                term.addEventListener('focus', showTooltip); 
+                term.addEventListener('click', showTooltip); 
+                const hideTooltip = () => {
+                    tooltip.style.display = 'none';
+                };
+                term.addEventListener('mouseleave', hideTooltip);
+                term.addEventListener('blur', hideTooltip); 
+            });
+            document.addEventListener('click', function(event) {
+                let isClickInsideTerm = false;
+                interactiveTerms.forEach(term => {
+                    if (term.contains(event.target)) {
+                        isClickInsideTerm = true;
+                    }
+                });
+                if (!isClickInsideTerm && !tooltip.contains(event.target)) {
+                    tooltip.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
