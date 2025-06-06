@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 12: Lab 4 - Intro to Unstructured Data Handling - Module II</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: "Warm Neutral Harmony" -->
+    <!-- Application Structure Plan: This is a single session detail page for a lab. Structure: Header, Export, Session Details, Objectives, Setup, Lab Introduction (Structured vs. Unstructured), Challenges of Text Data, Text Preprocessing Pipeline, Detailed step-by-step tasks with code blocks and their corresponding outputs, Exercises, Key Takeaways, Footer. Goal: A practical, self-contained guide to basic NLP preprocessing. -->
+    <!-- Visualization & Content Choices: 
+        - Well-commented Python code blocks using pandas and NLTK.
+        - Clear "Before" and "After" examples for each preprocessing step, with code outputs shown directly on the page.
+        - A responsive, wrapping conceptual diagram of the text preprocessing pipeline using HTML/CSS.
+        - Interactive tooltips for technical terms like Tokenization, Stop Words, Stemming, and Lemmatization.
+        - PDF Export: Print-specific CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            font-size: 1rem; 
+            line-height: 1.625; 
+        }
+        
+        .interactive-term { 
+            cursor: pointer;
+            font-weight: 600; 
+        }
+        .definition-tooltip {
+            display: none;
+            position: absolute;
+            background-color: #f9fafb; 
+            border: 1px solid #d1d5db; 
+            padding: 8px; 
+            border-radius: 4px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            z-index: 100;
+            font-size: 0.875rem; 
+            width: max-content;
+            max-width: 320px; 
+        }
+
+        h1.page-title { font-size: 2.25rem; line-height: 2.5rem; } 
+        h2.section-title { font-size: 1.5rem; line-height: 2rem; margin-bottom: 0.75rem;} 
+        h3.subsection-title { font-size: 1.25rem; line-height: 1.75rem; margin-bottom: 0.5rem;}    
+        h4.detail-title { font-size: 1.125rem; line-height: 1.75rem; margin-bottom: 0.375rem;} 
+        
+        .code-block {
+            background-color: #1e293b; /* slate-800 */
+            color: #e2e8f0; /* slate-200 */
+            padding: 1rem;
+            border-radius: 0.5rem 0.5rem 0 0; /* Rounded top corners */
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        .output-block {
+            background-color: #f8fafc; /* slate-50 */
+            color: #334155; /* slate-700 */
+            padding: 1rem;
+            border-radius: 0 0 0.5rem 0.5rem; /* Rounded bottom corners */
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            border: 1px solid #e2e8f0; /* slate-200 */
+            white-space: pre;
+        }
+        .code-block .comment { color: #94a3b8; /* slate-400 */ }
+        .code-block .keyword { color: #7dd3fc; /* sky-400 */ }
+        .code-block .string { color: #a5b4fc; /* indigo-300 */ }
+        
+        .pipeline-box {
+            background-color: #f3f4f6; /* gray-100 */
+            border: 1px solid #d1d5db; /* gray-300 */
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            text-align: center;
+            font-size: 0.875rem;
+            white-space: nowrap;
+        }
+        .pipeline-arrow {
+            font-size: 1.5rem;
+            color: #9ca3af; /* gray-400 */
+            margin: 0 0.25rem;
+            flex-shrink: 0;
+        }
+
+        @media print {
+            body { font-size: 10pt; line-height: 1.3; } 
+            .no-print { display: none !important; }
+            header { display: flex; flex-direction: column; align-items: center; text-align: center; }
+            .header-logo-print { max-width: 150px; max-height: 50px; margin-bottom: 10px; } 
+            .footer-logo-print { max-width: 100px; max-height: 30px; margin-top: 10px; } 
+            footer { text-align: center; }
+            section, .content-section { page-break-inside: avoid; margin-bottom: 15px; } 
+            .bg-white { box-shadow: none !important; border: 1px solid #ccc; padding: 0.5rem !important;}
+            a { text-decoration: none; color: black; }
+            .interactive-term { text-decoration: none; color: black; font-weight: bold; } 
+            .definition-tooltip { display: none !important; }
+            .code-block, .output-block { background-color: #f3f4f6; color: #1f2937; border: 1px solid #ddd; white-space: pre-wrap; word-wrap: break-word; border-radius: 0 !important; }
+            .pipeline-container-web { display: none; } 
+            .print-only-explanation { display: block !important; position: static !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin-top: 2px; font-style: normal !important; font-size: 0.9em;} 
+            h1.page-title { font-size: 20pt; } 
+            h2.section-title { font-size: 16pt; }
+            h3.subsection-title { font-size: 14pt; }
+            h4.detail-title { font-size: 12pt; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+</head>
+<body class="bg-gray-100 text-gray-800"> 
+    <div class="container mx-auto p-4 md:p-8"> 
+        <header class="mb-10"> 
+            <div class="flex flex-col sm:flex-row items-center justify-between">
+                <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-16 md:h-20 mb-4 sm:mb-0 header-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+                <div class="text-center sm:text-right sm:ml-4"> 
+                    <p class="text-base text-gray-500">Module II: Data Preprocessing & Core Mining Techniques</p> 
+                    <h1 class="page-title text-3xl md:text-4xl font-bold text-gray-900 mt-1">Session 12: Lab 4 - Intro to Unstructured Data Handling</h1> 
+                    <p class="text-lg text-gray-600 mt-2">Data Mining & Big Data Analytics</p> 
+                </div>
+            </div>
+            <nav aria-label="Breadcrumb" class="mt-4 text-sm text-gray-500 no-print"> 
+                <ol class="list-none p-0 inline-flex">
+                    <li class="flex items-center">
+                        <a href="../index.html" class="text-slate-600 hover:text-slate-800">Course Overview</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="flex items-center">
+                        <a href="module-2-index.html" class="text-slate-600 hover:text-slate-800">Module II</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="text-gray-700 font-semibold" aria-current="page">Session 12</li> 
+                </ol>
+            </nav>
+        </header>
+
+        <div class="text-center mb-8 no-print"> 
+            <button onclick="window.print()" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-150 ease-in-out text-base"> 
+                Export Session 12 to PDF
+            </button>
+        </div>
+
+        <article class="bg-white p-6 md:p-8 rounded-lg shadow-lg"> 
+            <section class="mb-6 border-b pb-4"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-2">Session Details</h2> 
+                <p class="text-base text-gray-700"><span class="font-semibold">Type:</span> Guided Practical 💻</p>
+                <p class="text-base text-gray-700"><span class="font-semibold">Duration:</span> 1 Hour</p>
+                <p class="text-base text-gray-700"><span class="font-semibold">Core Libraries:</span> Pandas, NLTK (Natural Language Toolkit)</p>
+            </section>
+
+            <section class="mb-8 content-section"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Lab Objectives</h2> 
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1"> 
+                    <li>Differentiate between structured and unstructured data.</li>
+                    <li>Identify the common challenges associated with processing text data.</li>
+                    <li>Perform basic text preprocessing tasks using Python and the NLTK library.</li>
+                    <li>Implement techniques such as lowercasing, punctuation removal, tokenization, stop word removal, stemming, and lemmatization.</li>
+                    <li>Understand the purpose of converting text into a numerical format for machine learning.</li>
+                </ul>
+            </section>
+
+            <div class="definition-tooltip"></div>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Setup & Prerequisites</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    This lab requires the Natural Language Toolkit (NLTK) library. After installation, you'll also need to download specific NLTK data packages.
+                </p>
+                <div class="code-block">
+                    <pre><code><span class="comment"># Step 1: Install the library</span>
+pip install nltk
+
+<span class="comment"># Step 2: Run this in a Python script or notebook to download necessary data</span>
+<span class="keyword">import</span> nltk
+nltk.download(<span class="string">'punkt'</span>)      <span class="comment"># For tokenization</span>
+nltk.download(<span class="string">'stopwords'</span>)  <span class="comment"># For stop words</span>
+nltk.download(<span class="string">'wordnet'</span>)    <span class="comment"># For lemmatization</span></code></pre>
+                </div>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Text Preprocessing Pipeline</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-4">
+                    Our goal is to convert raw, messy text into a clean, structured format. The process typically follows a pipeline of steps:
+                </p>
+                <div class="pipeline-container-web no-print rounded-lg border border-gray-200 p-4">
+                    <div class="flex flex-wrap items-center justify-center gap-x-2 gap-y-4">
+                        <div class="pipeline-box">Raw Text</div>
+                        <div class="pipeline-arrow">→</div>
+                        <div class="pipeline-box">Lowercase</div>
+                        <div class="pipeline-arrow">→</div>
+                        <div class="pipeline-box">Remove Punctuation</div>
+                        <div class="pipeline-arrow">→</div>
+                        <div class="pipeline-box">Tokenize</div>
+                        <div class="pipeline-arrow">→</div>
+                        <div class="pipeline-box">Remove Stop Words</div>
+                        <div class="pipeline-arrow">→</div>
+                        <div class="pipeline-box">Stem/Lemmatize</div>
+                        <div class="pipeline-arrow">→</div>
+                        <div class="pipeline-box">Clean Tokens</div>
+                    </div>
+                </div>
+                 <div class="print-only-explanation" style="display:none;">
+                    <h4 class="font-semibold">Text Preprocessing Pipeline:</h4>
+                    <ol class="list-decimal list-inside">
+                        <li>Raw Text</li>
+                        <li>Convert to Lowercase</li>
+                        <li>Remove Punctuation</li>
+                        <li>Tokenize (Split into words)</li>
+                        <li>Remove Stop Words</li>
+                        <li>Stemming or Lemmatization</li>
+                        <li>Final Clean Tokens</li>
+                    </ol>
+                </div>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Lab Tasks: Preprocessing Text Data</h2>
+                 <p class="text-base text-gray-700 leading-relaxed mb-3">Let's start by creating a sample DataFrame with some messy text data representing product reviews.</p>
+                <div class="code-block">
+                    <pre><code><span class="keyword">import</span> pandas <span class="keyword">as</span> pd
+<span class="keyword">import</span> re
+<span class="keyword">from</span> nltk.corpus <span class="keyword">import</span> stopwords
+<span class="keyword">from</span> nltk.stem.porter <span class="keyword">import</span> PorterStemmer
+<span class="keyword">from</span> nltk.stem <span class="keyword">import</span> WordNetLemmatizer
+<span class="keyword">from</span> nltk.tokenize <span class="keyword">import</span> word_tokenize
+
+reviews = [
+    <span class="string">'This product is AMAZING! I love it, works great... 10/10.'</span>,
+    <span class="string">'Worst purchase ever. It broke after 2 days. DO NOT BUY!!'</span>,
+    <span class="string">'Its an okay product, not bad but not the best either.'</span>,
+    <span class="string">'I have been using these for years, they are very reliable.'</span>
+]
+df_text = pd.DataFrame(reviews, columns=[<span class="string">'review'</span>])
+<span class="keyword">print</span>(<span class="string">"Original Text Data:"</span>)
+<span class="keyword">print</span>(df_text)</code></pre>
+                </div>
+                <div class="output-block mt-0 mb-4">
+Original Text Data:
+                                              review
+0  This product is AMAZING! I love it, works grea...
+1  Worst purchase ever. It broke after 2 days. DO...
+2  Its an okay product, not bad but not the best ...
+3  I have been using these for years, they are ve...
+                </div>
+                
+                <h3 class="subsection-title text-lg font-medium text-gray-700 mt-6 mb-2">A. Lowercasing & Removing Punctuation</h3>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">We convert all text to lowercase to ensure words like "Product" and "product" are treated as the same word. We also remove punctuation which typically doesn't add analytical value.</p>
+                <div class="code-block">
+                    <pre><code>df_text[<span class="string">'cleaned_review'</span>] = df_text[<span class="string">'review'</span>].str.lower()
+df_text[<span class="string">'cleaned_review'</span>] = df_text[<span class="string">'cleaned_review'</span>].apply(<span class="keyword">lambda</span> x: re.sub(<span class="string">'[^a-z\s]'</span>, <span class="string">''</span>, x))
+<span class="keyword">print</span>(<span class="string">"\nAfter Lowercasing & Punctuation Removal:"</span>)
+<span class="keyword">print</span>(df_text[[<span class="string">'review'</span>, <span class="string">'cleaned_review'</span>]])</code></pre>
+                </div>
+                 <div class="output-block mt-0 mb-4">
+After Lowercasing & Punctuation Removal:
+                                              review                                     cleaned_review
+0  This product is AMAZING! I love it, works grea...  this product is amazing i love it works great 
+1  Worst purchase ever. It broke after 2 days. DO...    worst purchase ever it broke after  days do not buy
+2  Its an okay product, not bad but not the best ...       its an okay product not bad but not the best either
+3  I have been using these for years, they are ve...    i have been using these for years they are very reliable
+                </div>
+
+                <h3 class="subsection-title text-lg font-medium text-gray-700 mt-6 mb-2">B. Tokenization & Removing Stop Words</h3>
+                 <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    <span class="interactive-term" data-definition="Tokenization is the process of splitting a string of text into a list of individual words or terms, called tokens.">Tokenization</span> breaks sentences into words. After that, we remove <span class="interactive-term" data-definition="Stop words are common words (like 'a', 'the', 'is', 'in') that occur frequently but usually carry little semantic meaning. Removing them helps focus on the important words.">stop words</span> (common words like 'a', 'the', 'is') which don't add much meaning.
+                </p>
+                <div class="print-only-definition">
+                    <p><strong>Tokenization:</strong> Splitting text into a list of words (tokens).</p>
+                    <p><strong>Stop Words:</strong> Common words (e.g., 'a', 'the', 'is') that are often removed to focus on meaningful terms.</p>
+                </div>
+                <div class="code-block">
+                    <pre><code>df_text[<span class="string">'tokens'</span>] = df_text[<span class="string">'cleaned_review'</span>].apply(<span class="keyword">lambda</span> x: word_tokenize(x))
+stop_words = set(stopwords.words(<span class="string">'english'</span>))
+df_text[<span class="string">'tokens_no_stop'</span>] = df_text[<span class="string">'tokens'</span>].apply(<span class="keyword">lambda</span> x: [word <span class="keyword">for</span> word <span class="keyword">in</span> x <span class="keyword">if</span> word <span class="keyword">not</span> <span class="keyword">in</span> stop_words])
+<span class="keyword">print</span>(<span class="string">"\nAfter Tokenization and Stop Word Removal:"</span>)
+<span class="keyword">print</span>(df_text[[<span class="string">'review'</span>, <span class="string">'tokens_no_stop'</span>]])</code></pre>
+                </div>
+                 <div class="output-block mt-0 mb-4">
+After Tokenization and Stop Word Removal:
+                                              review                                     tokens_no_stop
+0  This product is AMAZING! I love it, works grea...      [product, amazing, love, works, great]
+1  Worst purchase ever. It broke after 2 days. DO...  [worst, purchase, ever, broke, days, buy]
+2  Its an okay product, not bad but not the best ...        [okay, product, bad, best, either]
+3  I have been using these for years, they are ve...           [using, years, reliable]
+                </div>
+
+                 <h3 class="subsection-title text-lg font-medium text-gray-700 mt-6 mb-2">C. Stemming & Lemmatization</h3>
+                 <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    These are two techniques for word normalization. 
+                    <span class="interactive-term" data-definition="Stemming is a process of reducing words to their root or base form by chopping off endings. It's a crude heuristic that can sometimes result in non-dictionary words (e.g., 'studies' -> 'studi').">Stemming</span> is a faster, cruder method of chopping off word endings to get to the root form. 
+                    <span class="interactive-term" data-definition="Lemmatization is a more advanced technique that uses vocabulary and morphological analysis to reduce words to their base or dictionary form, known as the 'lemma'. It's slower but more accurate than stemming (e.g., 'better' -> 'good').">Lemmatization</span> is a more advanced method that uses vocabulary and morphological analysis to return the base or dictionary form of a word, known as a lemma.
+                </p>
+                <div class="print-only-definition">
+                    <p><strong>Stemming:</strong> Reducing words to their root form by chopping off endings (e.g., 'studies' -> 'studi').</p>
+                    <p><strong>Lemmatization:</strong> Reducing words to their dictionary form (lemma) using vocabulary analysis (e.g., 'better' -> 'good').</p>
+                </div>
+                <div class="code-block">
+                    <pre><code>stemmer = PorterStemmer()
+lemmatizer = WordNetLemmatizer()
+df_text[<span class="string">'stemmed'</span>] = df_text[<span class="string">'tokens_no_stop'</span>].apply(<span class="keyword">lambda</span> x: [stemmer.stem(word) <span class="keyword">for</span> word <span class="keyword">in</span> x])
+df_text[<span class="string">'lemmatized'</span>] = df_text[<span class="string">'tokens_no_stop'</span>].apply(<span class="keyword">lambda</span> x: [lemmatizer.lemmatize(word) <span class="keyword">for</span> word <span class="keyword">in</span> x])
+<span class="keyword">print</span>(<span class="string">"\nAfter Stemming vs. Lemmatization:"</span>)
+<span class="keyword">print</span>(df_text[[<span class="string">'tokens_no_stop'</span>, <span class="string">'stemmed'</span>, <span class="string">'lemmatized'</span>]])</code></pre>
+                </div>
+                 <div class="output-block mt-0 mb-4">
+After Stemming vs. Lemmatization:
+                                   tokens_no_stop                                 stemmed                                lemmatized
+0      [product, amazing, love, works, great]      [product, amaz, love, work, great]      [product, amazing, love, work, great]
+1  [worst, purchase, ever, broke, days, buy]  [worst, purchas, ever, broke, day, buy]  [worst, purchase, ever, broke, day, buy]
+2        [okay, product, bad, best, either]        [okay, product, bad, best, either]        [okay, product, bad, best, either]
+3           [using, years, reliable]                   [use, year, reliabl]                   [using, year, reliable]
+                </div>
+                 <p class="text-base text-gray-700 leading-relaxed mt-3">
+                    Notice the subtle differences. In row 3, "using" is stemmed to "use" but lemmatized to "using" (as it's a valid verb form). Lemmatization often produces more interpretable, actual words, making it preferable for many applications, while stemming is faster.
+                </p>
+            </section>
+            
+            <section class="content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Key Takeaways for Session 12</h2>
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1 leading-relaxed">
+                    <li>Unstructured text data is a vast and valuable resource, but it presents unique challenges compared to structured data.</li>
+                    <li>Text preprocessing is a fundamental pipeline in NLP used to clean and standardize raw text for analysis.</li>
+                    <li>Key preprocessing steps include lowercasing, removing punctuation and stop words, tokenization, and normalization (stemming/lemmatization).</li>
+                    <li>The NLTK library in Python is a powerful tool for performing these text preprocessing tasks.</li>
+                    <li>The goal of preprocessing is to create a clean, structured representation of text (a "bag of words" or tokens) that can be used as input for data mining algorithms.</li>
+                </ul>
+            </section>
+        </article>
+
+        <footer class="text-center mt-12 py-6 border-t border-gray-300"> 
+            <div class="mb-4"> 
+                 <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-10 mx-auto footer-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+            </div>
+            <p class="text-base text-gray-600">&copy; <span id="currentYearModule"></span> FACE Prep Campus (www.faceprep.in). All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('currentYearModule').textContent = new Date().getFullYear();
+
+        const interactiveTerms = document.querySelectorAll('.interactive-term');
+        const tooltip = document.querySelector('.definition-tooltip');
+
+        if (tooltip) {
+            interactiveTerms.forEach(term => {
+                const showTooltip = (e) => {
+                    tooltip.textContent = term.dataset.definition;
+                    tooltip.style.display = 'block';
+                    const termRect = term.getBoundingClientRect();
+                    let top = termRect.bottom + window.scrollY + 8; 
+                    let left = termRect.left + window.scrollX;
+                    tooltip.style.top = `${top}px`;
+                    tooltip.style.left = `${left}px`;
+                    const tooltipRect = tooltip.getBoundingClientRect();
+                    if (tooltipRect.right > (window.innerWidth - 15)) { 
+                        tooltip.style.left = `${window.innerWidth - tooltipRect.width - 15}px`;
+                    }
+                    if (tooltipRect.left < 15) { 
+                        tooltip.style.left = `15px`;
+                    }
+                };
+                term.addEventListener('mouseenter', showTooltip);
+                term.addEventListener('focus', showTooltip); 
+                term.addEventListener('click', showTooltip); 
+                const hideTooltip = () => {
+                    tooltip.style.display = 'none';
+                };
+                term.addEventListener('mouseleave', hideTooltip);
+                term.addEventListener('blur', hideTooltip); 
+            });
+            document.addEventListener('click', function(event) {
+                let isClickInsideTerm = false;
+                interactiveTerms.forEach(term => {
+                    if (term.contains(event.target)) {
+                        isClickInsideTerm = true;
+                    }
+                });
+                if (!isClickInsideTerm && !tooltip.contains(event.target)) {
+                    tooltip.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

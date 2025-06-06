@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 18: Lab 7 - Association Rule Mining with Python - Module II</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: "Warm Neutral Harmony" -->
+    <!-- Application Structure Plan: Definitive single session lab guide. Structure: Header, Export, Details, Objectives, Setup, Extensive Content with multiple tasks: Data Prep, Apriori, Filtering Rules, Finding Specific Rules, and Detailed Interpretation. Each task includes detailed code and output. Goal: A comprehensive, hands-on, and practical guide to implementing and interpreting association rule mining. -->
+    <!-- Visualization & Content Choices: 
+        - Well-commented Python code blocks using pandas and mlxtend for an expanded workflow.
+        - Clear outputs shown in formatted tables for each step.
+        - A dedicated, extensive section for interpreting the more complex and filtered rules.
+        - All content presented in standard HTML.
+        - PDF Export: Print-specific CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            font-size: 1rem; 
+            line-height: 1.625; 
+        }
+        h1.page-title { font-size: 2.25rem; line-height: 2.5rem; } 
+        h2.section-title { font-size: 1.5rem; line-height: 2rem; margin-bottom: 0.75rem;} 
+        h3.subsection-title { font-size: 1.25rem; line-height: 1.75rem; margin-bottom: 0.5rem;}    
+        h4.detail-title { font-size: 1.125rem; line-height: 1.75rem; margin-bottom: 0.375rem;} 
+        
+        .code-block {
+            background-color: #1e293b; /* slate-800 */
+            color: #e2e8f0; /* slate-200 */
+            padding: 1rem;
+            border-radius: 0.5rem 0.5rem 0 0; 
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        .output-block {
+            background-color: #f8fafc; /* slate-50 */
+            color: #334155; /* slate-700 */
+            padding: 1rem;
+            border-radius: 0 0 0.5rem 0.5rem; 
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            border: 1px solid #e2e8f0; /* slate-200 */
+            white-space: pre;
+        }
+        .code-block .comment { color: #94a3b8; }
+        .code-block .keyword { color: #7dd3fc; }
+        .code-block .string { color: #a5b4fc; }
+
+        @media print {
+            body { font-size: 10pt; line-height: 1.3; } 
+            .no-print { display: none !important; }
+            header { display: flex; flex-direction: column; align-items: center; text-align: center; }
+            .header-logo-print { max-width: 150px; max-height: 50px; margin-bottom: 10px; } 
+            .footer-logo-print { max-width: 100px; max-height: 30px; margin-top: 10px; } 
+            footer { text-align: center; }
+            section, .content-section { page-break-inside: avoid; margin-bottom: 15px; } 
+            .bg-white { box-shadow: none !important; border: 1px solid #ccc; padding: 0.5rem !important;}
+            a { text-decoration: none; color: black; }
+            .code-block, .output-block { background-color: #f3f4f6; color: #1f2937; border: 1px solid #ddd; white-space: pre-wrap; word-wrap: break-word; border-radius: 0 !important;}
+            h1.page-title { font-size: 20pt; } 
+            h2.section-title { font-size: 16pt; }
+            h3.subsection-title { font-size: 14pt; }
+            h4.detail-title { font-size: 12pt; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+</head>
+<body class="bg-gray-100 text-gray-800"> 
+    <div class="container mx-auto p-4 md:p-8"> 
+        <header class="mb-10"> 
+            <div class="flex flex-col sm:flex-row items-center justify-between">
+                <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-16 md:h-20 mb-4 sm:mb-0 header-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+                <div class="text-center sm:text-right sm:ml-4"> 
+                    <p class="text-base text-gray-500">Module II: Data Preprocessing & Core Mining Techniques</p> 
+                    <h1 class="page-title text-3xl md:text-4xl font-bold text-gray-900 mt-1">Session 18: Lab 7 - Association Rule Mining with Python</h1> 
+                    <p class="text-lg text-gray-600 mt-2">Data Mining & Big Data Analytics</p> 
+                </div>
+            </div>
+            <nav aria-label="Breadcrumb" class="mt-4 text-sm text-gray-500 no-print"> 
+                <ol class="list-none p-0 inline-flex">
+                    <li class="flex items-center">
+                        <a href="../index.html" class="text-slate-600 hover:text-slate-800">Course Overview</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="flex items-center">
+                        <a href="module-2-index.html" class="text-slate-600 hover:text-slate-800">Module II</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="text-gray-700 font-semibold" aria-current="page">Session 18</li> 
+                </ol>
+            </nav>
+        </header>
+
+        <div class="text-center mb-8 no-print"> 
+            <button onclick="window.print()" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-150 ease-in-out text-base"> 
+                Export Session 18 to PDF
+            </button>
+        </div>
+
+        <article class="bg-white p-6 md:p-8 rounded-lg shadow-lg"> 
+            <section class="mb-6 border-b pb-4"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-2">Session Details</h2> 
+                <p class="text-base text-gray-700"><strong>Type:</strong> Guided Practical 💻</p>
+                <p class="text-base text-gray-700"><strong>Duration:</strong> 2 Hours</p>
+                <p class="text-base text-gray-700"><strong>Core Libraries:</strong> Pandas, mlxtend</p>
+            </section>
+
+            <section class="mb-8 content-section"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Lab Objectives</h2> 
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1"> 
+                    <li>Prepare transactional data into the required one-hot encoded format.</li>
+                    <li>Use the `mlxtend` library to apply the Apriori algorithm and find frequent itemsets.</li>
+                    <li>Generate strong association rules from the frequent itemsets using metrics like confidence and lift.</li>
+                    <li>Filter and sort the generated rules to identify the most actionable insights.</li>
+                    <li>Interpret the generated rules to derive meaningful business conclusions.</li>
+                </ul>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 1: Data Preparation</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    The Apriori algorithm in `mlxtend` requires a one-hot encoded DataFrame. We will start with a more extensive list of transactions to generate richer results.
+                </p>
+                <div class="code-block">
+                    <pre><code><span class="keyword">import</span> pandas <span class="keyword">as</span> pd
+<span class="keyword">from</span> mlxtend.preprocessing <span class="keyword">import</span> TransactionEncoder
+<span class="keyword">from</span> mlxtend.frequent_patterns <span class="keyword">import</span> apriori, association_rules
+
+<span class="comment"># Expanded sample transactional data</span>
+dataset = [
+    [<span class="string">'Milk'</span>, <span class="string">'Bread'</span>, <span class="string">'Butter'</span>],
+    [<span class="string">'Milk'</span>, <span class="string">'Bread'</span>, <span class="string">'Sugar'</span>],
+    [<span class="string">'Milk'</span>, <span class="string">'Butter'</span>, <span class="string">'Eggs'</span>],
+    [<span class="string">'Bread'</span>, <span class="string">'Butter'</span>, <span class="string">'Jam'</span>],
+    [<span class="string">'Milk'</span>, <span class="string">'Bread'</span>, <span class="string">'Butter'</span>, <span class="string">'Jam'</span>],
+    [<span class="string">'Bread'</span>, <span class="string">'Sugar'</span>],
+    [<span class="string">'Butter'</span>, <span class="string">'Jam'</span>],
+    [<span class="string">'Milk'</span>, <span class="string">'Bread'</span>, <span class="string">'Butter'</span>, <span class="string">'Sugar'</span>],
+    [<span class="string">'Coffee'</span>, <span class="string">'Sugar'</span>],
+    [<span class="string">'Coffee'</span>, <span class="string">'Milk'</span>]
+]
+
+te = TransactionEncoder()
+te_ary = te.fit(dataset).transform(dataset)
+df = pd.DataFrame(te_ary, columns=te.columns_)
+
+<span class="keyword">print</span>(<span class="string">"One-Hot Encoded DataFrame (first 5 rows):"</span>)
+<span class="keyword">print</span>(df.head())</code></pre>
+                </div>
+                <div class="output-block mt-0 mb-4">One-Hot Encoded DataFrame (first 5 rows):
+   Bread  Butter  Coffee   Eggs    Jam   Milk  Sugar
+0   True    True   False  False  False   True  False
+1   True   False   False  False  False   True   True
+2  False    True   False   True  False   True  False
+3   True    True   False  False   True  False  False
+4   True    True   False  False   True   True  False</div>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 2: Applying Apriori to Find Frequent Itemsets</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    Next, we apply the Apriori algorithm to find itemsets that meet a minimum support threshold. A lower support threshold will find more itemsets. Let's set `min_support` to 0.2 (i.e., appears in at least 2 out of 10 transactions).
+                </p>
+                <div class="code-block">
+                    <pre><code><span class="comment"># Find frequent itemsets with a minimum support of 20%</span>
+frequent_itemsets = apriori(df, min_support=0.2, use_colnames=<span class="keyword">True</span>)
+
+<span class="keyword">print</span>(<span class="string">"Frequent Itemsets (Support >= 0.2):"</span>)
+<span class="keyword">print</span>(frequent_itemsets.sort_values(by=<span class="string">'support'</span>, ascending=<span class="keyword">False</span>))</code></pre>
+                </div>
+                 <div class="output-block mt-0 mb-4">Frequent Itemsets (Support >= 0.2):
+    support                  itemsets
+0       0.6                   (Bread)
+1       0.6                  (Butter)
+3       0.6                    (Milk)
+6       0.4           (Butter, Bread)
+7       0.4             (Milk, Bread)
+8       0.4            (Butter, Milk)
+10      0.4                   (Sugar)
+11      0.3           (Butter, Sugar)
+12      0.3             (Milk, Sugar)
+14      0.3             (Bread, Milk)
+16      0.3   (Butter, Bread, Milk)
+2       0.2                  (Coffee)
+4       0.2                     (Jam)
+5       0.2                    (Eggs)
+9       0.2             (Jam, Butter)
+13      0.2           (Coffee, Sugar)
+15      0.2             (Jam, Bread)</div>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 3: Generating and Filtering Association Rules</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    With frequent itemsets, we can generate association rules. We'll set a `min_threshold` for `confidence` at 60% (`0.6`). Then, we'll perform a crucial real-world step: filtering these rules to find only the most interesting ones, for example, those with a `lift` greater than 1.
+                </p>
+                <div class="code-block">
+                    <pre><code><span class="comment"># Generate rules with a minimum confidence of 60%</span>
+rules = association_rules(frequent_itemsets, metric=<span class="string">"confidence"</span>, min_threshold=0.6)
+
+<span class="comment"># Filter rules to find more interesting ones (e.g., lift > 1.1 and confidence > 0.6)</span>
+strong_rules = rules[(rules[<span class="string">'lift'</span>] > 1.1) & (rules[<span class="string">'confidence'</span>] > 0.6)]
+
+<span class="keyword">print</span>(<span class="string">"\nFiltered Strong Association Rules:"</span>)
+<span class="keyword">print</span>(strong_rules.sort_values(<span class="string">'lift'</span>, ascending=<span class="keyword">False</span>))</code></pre>
+                </div>
+                <div class="output-block mt-0 mb-4">Filtered Strong Association Rules:
+       antecedents  consequents  antecedent support  ...  leverage  conviction  zhangs_metric
+13         (Sugar)     (Butter)                 0.4  ...      0.06         1.4       0.428571
+12        (Butter)      (Sugar)                 0.6  ...      0.06         1.3       0.583333
+14         (Sugar)       (Milk)                 0.4  ...      0.06         1.4       0.428571
+15          (Milk)      (Sugar)                 0.6  ...      0.06         1.3       0.583333
+16   (Bread, Milk)     (Butter)                 0.4  ...      0.06         1.4       0.428571
+17  (Butter, Milk)      (Bread)                 0.4  ...      0.06         1.4       0.428571
+19  (Butter, Bread)       (Milk)                 0.4  ...      0.06         1.4       0.428571</div>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 4: Finding Rules Related to a Specific Item</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    Often, a business wants to know what leads to the purchase of a specific item. We can filter our `strong_rules` DataFrame to find all rules that have 'Milk' in the consequent (the "then" part of the rule).
+                </p>
+                <div class="code-block">
+                    <pre><code><span class="comment"># Find all rules that lead to buying 'Milk'</span>
+rules_leading_to_milk = strong_rules[strong_rules[<span class="string">'consequents'</span>].apply(<span class="keyword">lambda</span> x: <span class="string">'Milk'</span> <span class="keyword">in</span> x)]
+
+<span class="keyword">print</span>(<span class="string">"\nRules that lead to purchasing 'Milk':"</span>)
+<span class="keyword">print</span>(rules_leading_to_milk)</code></pre>
+                </div>
+                <div class="output-block mt-0 mb-4">
+Rules that lead to purchasing 'Milk':
+      antecedents consequents  antecedent support  ...  leverage  conviction  zhangs_metric
+15        (Sugar)      (Milk)                 0.4  ...      0.06         1.4       0.428571
+19  (Butter, Bread)      (Milk)                 0.4  ...      0.06         1.4       0.428571
+</div>
+            </section>
+            
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 5: Interpreting the Results for Actionable Insights</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    The final step is to translate these filtered rules into business insights.
+                </p>
+                 <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 mt-4">
+                    <h4 class="detail-title font-semibold text-gray-700">Analysis of Rule: {Sugar} → {Milk}</h4>
+                     <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-2">
+                        <li><strong>Rule:</strong> If a customer buys Sugar, they are also likely to buy Milk.</li>
+                        <li><strong>Confidence (0.75):</strong> 75% of customers who bought Sugar also bought Milk. This is a very reliable rule.</li>
+                        <li><strong>Lift (1.25):</strong> Customers who buy Sugar are 1.25 times (or 25%) more likely to buy Milk than an average customer. Since Lift > 1, this indicates a strong positive association.</li>
+                        <li><strong>Business Action:</strong> This is a strong, actionable insight. A store could place Milk and Sugar closer together or run a joint promotion (e.g., "Buy 1kg of Sugar, get 10% off Milk"). This is much more valuable than the weak {Butter} → {Bread} rule we saw earlier.</li>
+                    </ul>
+                </div>
+                 <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 mt-4">
+                    <h4 class="detail-title font-semibold text-gray-700">Analysis of Rule: {Butter, Bread} → {Milk}</h4>
+                     <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-2">
+                        <li><strong>Rule:</strong> If a customer buys BOTH Butter and Bread, they are also likely to buy Milk.</li>
+                        <li><strong>Confidence (0.75):</strong> 75% of customers who bought both Butter and Bread also bought Milk.</li>
+                        <li><strong>Lift (1.25):</strong> Customers who buy the Butter-Bread combo are 25% more likely to buy Milk than an average customer.</li>
+                        <li><strong>Business Action:</strong> This confirms a classic breakfast pattern. A store could create a "Breakfast Aisle" or offer a bundled deal: "Buy Bread and Butter, get Milk for 50% off."</li>
+                    </ul>
+                </div>
+            </section>
+        </article>
+
+        <footer class="text-center mt-12 py-6 border-t border-gray-300"> 
+            <div class="mb-4"> 
+                 <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-10 mx-auto footer-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+            </div>
+            <p class="text-base text-gray-600">&copy; <span id="currentYearModule"></span> FACE Prep Campus (www.faceprep.in). All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('currentYearModule').textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>

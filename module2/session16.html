@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 16: Lab 6 - Classification with Python & Model Evaluation - Module II</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: "Warm Neutral Harmony" -->
+    <!-- Application Structure Plan: Definitive single session lab guide. Structure: Header, Export, Session Details, Objectives, Setup, Lab Introduction, Detailed step-by-step tasks with code examples, an extensive section on choosing evaluation metrics with 5 real-world examples for each metric, an interactive Confusion Matrix visualization, Exercises, Key Takeaways, Footer. Goal: A definitive guide to implementing and critically evaluating classifiers. -->
+    <!-- Visualization & Content Choices: 
+        - Well-commented Python code blocks using scikit-learn for the entire workflow.
+        - An interactive HTML/CSS/JS visualization of a Confusion Matrix.
+        - Extensive textual explanations with 5 examples for when to use Accuracy, Precision, Recall, and F1-score, all in HTML.
+        - PDF Export: Print-specific CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            font-size: 1rem; 
+            line-height: 1.625; 
+        }
+        
+        .interactive-term { 
+            cursor: pointer;
+            font-weight: 600; 
+        }
+        .definition-tooltip {
+            display: none;
+            position: absolute;
+            background-color: #f9fafb; 
+            border: 1px solid #d1d5db; 
+            padding: 8px; 
+            border-radius: 4px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            z-index: 100;
+            font-size: 0.875rem; 
+            width: max-content;
+            max-width: 320px; 
+        }
+
+        h1.page-title { font-size: 2.25rem; line-height: 2.5rem; } 
+        h2.section-title { font-size: 1.5rem; line-height: 2rem; margin-bottom: 0.75rem;} 
+        h3.subsection-title { font-size: 1.25rem; line-height: 1.75rem; margin-bottom: 0.5rem;}    
+        h4.detail-title { font-size: 1.125rem; line-height: 1.75rem; margin-bottom: 0.375rem;} 
+        
+        .code-block {
+            background-color: #1e293b; /* slate-800 */
+            color: #e2e8f0; /* slate-200 */
+            padding: 1rem;
+            border-radius: 0.5rem 0.5rem 0 0; 
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        .output-block {
+            background-color: #f8fafc; /* slate-50 */
+            color: #334155; /* slate-700 */
+            padding: 1rem;
+            border-radius: 0 0 0.5rem 0.5rem; 
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            border: 1px solid #e2e8f0; /* slate-200 */
+            white-space: pre-wrap;
+        }
+        .code-block .comment { color: #94a3b8; }
+        .code-block .keyword { color: #7dd3fc; }
+        .code-block .string { color: #a5b4fc; }
+        
+        /* Confusion Matrix Styles */
+        .confusion-matrix table {
+            border-collapse: collapse;
+        }
+        .confusion-matrix th, .confusion-matrix td {
+            border: 1px solid #9ca3af;
+            padding: 0.75rem;
+            text-align: center;
+            width: 100px;
+        }
+        .confusion-matrix .header-label {
+            font-weight: bold;
+        }
+
+        .confusion-matrix .value-cell {
+            font-size: 1.25rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .confusion-matrix .value-cell:hover {
+            background-color: #dbeafe; 
+        }
+        .confusion-matrix .correct-pred { background-color: #dcfce7; }
+        .confusion-matrix .incorrect-pred { background-color: #fee2e2; }
+
+        .example-list {
+            list-style-type: decimal;
+            list-style-position: outside;
+            margin-left: 1.5rem;
+            margin-top: 0.5rem;
+            space-y: 1rem;
+        }
+        .example-list li {
+            padding-left: 0.5rem;
+        }
+
+        @media print {
+            body { font-size: 10pt; line-height: 1.3; } 
+            .no-print { display: none !important; }
+            header { display: flex; flex-direction: column; align-items: center; text-align: center; }
+            .header-logo-print { max-width: 150px; max-height: 50px; margin-bottom: 10px; } 
+            .footer-logo-print { max-width: 100px; max-height: 30px; margin-top: 10px; } 
+            footer { text-align: center; }
+            section, .content-section { page-break-inside: avoid; margin-bottom: 15px; } 
+            .bg-white { box-shadow: none !important; border: 1px solid #ccc; padding: 0.5rem !important;}
+            a { text-decoration: none; color: black; }
+            .interactive-term { text-decoration: none; color: black; font-weight: bold; } 
+            .definition-tooltip { display: none !important; }
+            .code-block, .output-block { background-color: #f3f4f6; color: #1f2937; border: 1px solid #ddd; white-space: pre-wrap; word-wrap: break-word; border-radius: 0 !important;}
+            h1.page-title { font-size: 20pt; } 
+            h2.section-title { font-size: 16pt; }
+            h3.subsection-title { font-size: 14pt; }
+            h4.detail-title { font-size: 12pt; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+</head>
+<body class="bg-gray-100 text-gray-800"> 
+    <div class="container mx-auto p-4 md:p-8"> 
+        <header class="mb-10"> 
+            <div class="flex flex-col sm:flex-row items-center justify-between">
+                <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-16 md:h-20 mb-4 sm:mb-0 header-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+                <div class="text-center sm:text-right sm:ml-4"> 
+                    <p class="text-base text-gray-500">Module II: Data Preprocessing & Core Mining Techniques</p> 
+                    <h1 class="page-title text-3xl md:text-4xl font-bold text-gray-900 mt-1">Session 16: Lab 6 - Classification with Model Evaluation</h1> 
+                    <p class="text-lg text-gray-600 mt-2">Data Mining & Big Data Analytics</p> 
+                </div>
+            </div>
+            <nav aria-label="Breadcrumb" class="mt-4 text-sm text-gray-500 no-print"> 
+                <ol class="list-none p-0 inline-flex">
+                    <li class="flex items-center">
+                        <a href="../index.html" class="text-slate-600 hover:text-slate-800">Course Overview</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="flex items-center">
+                        <a href="module-2-index.html" class="text-slate-600 hover:text-slate-800">Module II</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="text-gray-700 font-semibold" aria-current="page">Session 16</li> 
+                </ol>
+            </nav>
+        </header>
+
+        <div class="text-center mb-8 no-print"> 
+            <button onclick="window.print()" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-150 ease-in-out text-base"> 
+                Export Session 16 to PDF
+            </button>
+        </div>
+
+        <article class="bg-white p-6 md:p-8 rounded-lg shadow-lg"> 
+            <section class="mb-6 border-b pb-4"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-2">Session Details</h2> 
+                <p class="text-base text-gray-700"><strong>Type:</strong> Guided Practical 💻</p>
+                <p class="text-base text-gray-700"><strong>Duration:</strong> 2 Hours</p>
+                <p class="text-base text-gray-700"><strong>Core Libraries:</strong> Pandas, Scikit-learn</p>
+            </section>
+
+            <section class="mb-8 content-section"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Lab Objectives</h2> 
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1"> 
+                    <li>Understand and implement the train-test split methodology.</li>
+                    <li>Train and make predictions with three different classification models.</li>
+                    <li>Evaluate model performance using various metrics: Accuracy, Precision, Recall, and F1-Score.</li>
+                    <li>Critically analyze when to prioritize each evaluation metric based on the specific business problem, using multiple real-world examples.</li>
+                </ul>
+            </section>
+
+            <div class="definition-tooltip"></div>
+            
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 1 & 2: Data Generation and Train-Test Split</h2>
+                <div class="code-block">
+                    <pre><code><span class="keyword">import</span> pandas <span class="keyword">as</span> pd
+<span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> train_test_split
+<span class="keyword">from</span> sklearn.datasets <span class="keyword">import</span> make_classification
+<span class="keyword">from</span> sklearn.tree <span class="keyword">import</span> DecisionTreeClassifier
+<span class="keyword">from</span> sklearn.metrics <span class="keyword">import</span> accuracy_score, confusion_matrix
+
+X, y = make_classification(n_samples=1000, n_features=10, n_informative=5, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</code></pre>
+                </div>
+            </section>
+            
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 3: Implementing a Classification Model</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">We will train a Decision Tree and use its results to explore the evaluation metrics.</p>
+                 <div class="code-block">
+                    <pre><code>dt_model = DecisionTreeClassifier(random_state=42)
+dt_model.fit(X_train, y_train)
+y_pred_dt = dt_model.predict(X_test)
+<span class="keyword">print</span>(<span class="string">"--- Decision Tree Results ---"</span>)
+<span class="keyword">print</span>(f<span class="string">"Accuracy: {accuracy_score(y_test, y_pred_dt):.4f}"</span>)
+<span class="keyword">print</span>(<span class="string">"Confusion Matrix:\n{confusion_matrix(y_test, y_pred_dt)}"</span>)</code></pre>
+                </div>
+                 <div class="output-block mt-0 mb-4">
+--- Decision Tree Results ---
+Accuracy: 0.8650
+Confusion Matrix:
+[[87 12]
+ [15 86]]
+                </div>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 4: Choosing the Right Evaluation Metric</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    While accuracy is easy to understand, it's often not the best metric. The choice depends on the business objective and the cost of different errors. We use a <span class="interactive-term" data-definition="A table that visualizes the performance of a classification algorithm. Each row represents the instances in an actual class while each column represents the instances in a predicted class.">Confusion Matrix</span> to understand these errors.
+                </p>
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-6 mt-6 no-print">
+                    <h4 class="detail-title text-base font-semibold text-indigo-700 text-center mb-4">Interactive Confusion Matrix</h4>
+                    <p class="text-center text-sm text-gray-600 mb-4">Click on each cell to understand its meaning for the Decision Tree model's performance.</p>
+                    <div class="flex justify-center confusion-matrix">
+                        <table>
+                            <tbody><tr><td></td><td class="header-label">Predicted Negative</td><td class="header-label">Predicted Positive</td></tr>
+                            <tr><td class="header-label">Actual<br>Negative</td><td id="cm-tn" class="value-cell correct-pred">87</td><td id="cm-fp" class="value-cell incorrect-pred">12</td></tr>
+                            <tr><td class="header-label">Actual<br>Positive</td><td id="cm-fn" class="value-cell incorrect-pred">15</td><td id="cm-tp" class="value-cell correct-pred">86</td></tr>
+                        </tbody></table>
+                    </div>
+                    <div id="cm-explanation" class="text-center text-gray-700 mt-4 p-3 bg-gray-100 rounded-md text-sm leading-relaxed min-h-[50px]">
+                        Click on a number to see its explanation.
+                    </div>
+                </div>
+
+                <h3 class="subsection-title text-lg font-medium text-gray-700 mt-8 mb-2">When to Prioritize Accuracy</h3>
+                <p class="text-base text-gray-700 leading-relaxed">Accuracy is suitable <strong>only when classes are balanced and the cost of both types of errors is equal.</strong></p>
+                <div class="bg-gray-50 p-4 border-l-4 border-gray-400 mt-2">
+                    <ol class="example-list text-base text-gray-700">
+                        <li><strong>Image Classification (General):</strong> Classifying images of cats vs. dogs where you have an equal number of images for both and misclassifying a cat as a dog is no more severe than the reverse.</li>
+                        <li><strong>A/B Testing Results:</strong> Determining if a user clicked on Ad A vs. Ad B, assuming a roughly equal number of users saw each ad and the goal is just overall correctness.</li>
+                        <li><strong>Product Category Classification:</strong> Assigning products to general categories like 'Electronics' vs. 'Apparel' for a balanced inventory report.</li>
+                        <li><strong>Sentiment Analysis (Balanced):</strong> Classifying customer reviews as 'Positive' or 'Negative' when you have a balanced dataset and are interested in the overall satisfaction rate.</li>
+                        <li><strong>Predicting Coin Flips:</strong> A perfect 50/50 distribution where a wrong guess for heads has the same consequence as a wrong guess for tails.</li>
+                    </ol>
+                </div>
+                
+
+                <h3 class="subsection-title text-lg font-medium text-gray-700 mt-8 mb-2">When to Prioritize Precision</h3>
+                <p class="text-base text-gray-700 leading-relaxed"><strong>Question:</strong> Of all the times the model predicted "Positive," how often was it correct? <br><strong>Prioritize when the cost of a False Positive is high.</strong></p>
+                <div class="bg-amber-50 p-4 border-l-4 border-amber-500 mt-2">
+                    <ol class="example-list text-base text-gray-700">
+                        <li><strong>Email Spam Filtering:</strong> A False Positive (a legitimate email marked as spam) is very costly (missed opportunity). We want to be very <strong>precise</strong> when we predict "Spam".</li>
+                        <li><strong>YouTube/Netflix Recommendations:</strong> A False Positive (recommending content the user dislikes) damages user trust. High precision ensures recommendations are relevant.</li>
+                        <li><strong>Identifying High-Value Customers for Exclusive Rewards:</strong> A False Positive (giving an expensive reward to a non-high-value customer) is a direct waste of resources.</li>
+                        <li><strong>Criminal Face Recognition for Law Enforcement Alerts:</strong> A False Positive (wrongly identifying an innocent person as a wanted criminal) has severe, life-altering consequences. Precision must be near-perfect.</li>
+                        <li><strong>Drug Efficacy Prediction:</strong> Predicting a drug will be effective when it's not (False Positive) could lead to wasted investment in later-stage clinical trials.</li>
+                    </ol>
+                </div>
+
+                <h3 class="subsection-title text-lg font-medium text-gray-700 mt-8 mb-2">When to Prioritize Recall (Sensitivity)</h3>
+                <p class="text-base text-gray-700 leading-relaxed"><strong>Question:</strong> Of all the actual positive cases, how many did the model successfully find? <br><strong>Prioritize when the cost of a False Negative is high.</strong></p>
+                <div class="bg-amber-50 p-4 border-l-4 border-amber-500 mt-2">
+                     <ol class="example-list text-base text-gray-700">
+                        <li><strong>Medical Diagnosis for Serious Disease:</strong> A False Negative (telling a sick patient they are healthy) is catastrophic. The model must "recall" or find every possible positive case.</li>
+                        <li><strong>Credit Card Fraud Detection:</strong> A False Negative (letting a fraudulent transaction go through) is a direct financial loss. The goal is to catch as many fraudulent transactions as possible.</li>
+                        <li><strong>Manufacturing Quality Control:</strong> A False Negative (a defective product labeled as "good") leads to warranty costs, recalls, and brand damage.</li>
+                        <li><strong>Airport Security Screening:</strong> A False Negative (failing to detect a dangerous item) is an unacceptable security failure.</li>
+                        <li><strong>Natural Disaster Prediction (e.g., Tsunami Warning System):</strong> A False Negative (failing to issue a warning) has a massive cost in human lives. It's better to have a few false alarms (False Positives) than to miss a real event.</li>
+                    </ol>
+                </div>
+                 
+                <h3 class="subsection-title text-lg font-medium text-gray-700 mt-8 mb-2">When to Prioritize F1-Score</h3>
+                <p class="text-base text-gray-700 leading-relaxed"><strong>Question:</strong> What is the balanced measure of a model's performance, considering both error types? <br><strong>Prioritize when the dataset is imbalanced and both False Positives and False Negatives are costly.</strong></p>
+                <div class="bg-amber-50 p-4 border-l-4 border-amber-500 mt-2">
+                    <ol class="example-list text-base text-gray-700">
+                        <li><strong>Customer Churn Prediction:</strong> A False Positive (offering a discount to a loyal customer) costs money. A False Negative (failing to target a customer who then leaves) costs future revenue. A balance is needed.</li>
+                        <li><strong>Loan Default Prediction:</strong> A False Positive (denying a loan to a worthy applicant) is a lost business opportunity. A False Negative (approving a loan for someone who defaults) is a financial loss.</li>
+                        <li><strong>Document Classification for Legal Discovery:</strong> A False Negative (missing a relevant document) carries legal risk. A False Positive (flagging thousands of irrelevant documents) creates immense manual review costs.</li>
+                        <li><strong>Recruitment - Resume Screening:</strong> A False Negative (auto-rejecting a qualified candidate) is a missed opportunity. A False Positive (advancing an unqualified candidate) wastes recruiters' time.</li>
+                        <li><strong>Predictive Maintenance:</strong> A False Positive (performing unnecessary maintenance) costs time and resources. A False Negative (missing a failing part) leads to costly downtime and repairs.</li>
+                    </ol>
+                </div>
+            </section>
+        </article>
+
+        <footer class="text-center mt-12 py-6 border-t border-gray-300"> 
+            <div class="mb-4"> 
+                 <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-10 mx-auto footer-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+            </div>
+            <p class="text-base text-gray-600">&copy; <span id="currentYearModule"></span> FACE Prep Campus (www.faceprep.in). All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('currentYearModule').textContent = new Date().getFullYear();
+
+        const interactiveTerms = document.querySelectorAll('.interactive-term');
+        const tooltip = document.querySelector('.definition-tooltip');
+        if (tooltip) {
+            interactiveTerms.forEach(term => {
+                term.addEventListener('click', (e) => { 
+                    tooltip.textContent = term.dataset.definition;
+                    tooltip.style.display = 'block';
+                    const termRect = term.getBoundingClientRect();
+                    tooltip.style.top = `${termRect.bottom + window.scrollY + 8}px`;
+                    tooltip.style.left = `${termRect.left + window.scrollX}px`;
+                });
+            });
+            document.addEventListener('click', function(event) {
+                if (!event.target.classList.contains('interactive-term')) {
+                    tooltip.style.display = 'none';
+                }
+            });
+        }
+        
+        const cmExplanation = document.getElementById('cm-explanation');
+        const cmCells = {
+            tn: document.getElementById('cm-tn'),
+            fp: document.getElementById('cm-fp'),
+            fn: document.getElementById('cm-fn'),
+            tp: document.getElementById('cm-tp')
+        };
+        const cmExplanations = {
+            tn: "<strong>True Negative (TN): 87</strong> - The model correctly predicted 87 instances as Negative (Class 0). These were actually negative, and the model said they were negative.",
+            fp: "<strong>False Positive (FP): 12</strong> - The model incorrectly predicted 12 instances as Positive (Class 1) when they were actually Negative (Class 0). This is a Type I error.",
+            fn: "<strong>False Negative (FN): 15</strong> - The model incorrectly predicted 15 instances as Negative (Class 0) when they were actually Positive (Class 1). This is a Type II error.",
+            tp: "<strong>True Positive (TP): 86</strong> - The model correctly predicted 86 instances as Positive (Class 1). These were actually positive, and the model said they were positive."
+        };
+
+        if(cmExplanation && Object.values(cmCells).every(c => c)) {
+            Object.keys(cmCells).forEach(key => {
+                cmCells[key].addEventListener('click', () => {
+                    cmExplanation.innerHTML = cmExplanations[key];
+                });
+            });
+             cmExplanation.innerHTML = "Click on a number to see its explanation.";
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 13: Overview of Clustering Algorithms (K-Means) - Module II</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chosen Palette: "Warm Neutral Harmony" -->
+    <!-- Application Structure Plan: Single session detail page. Structure: Header, Export, Session Details, Objectives, Extensive Content (Intro to Clustering, Types, Deep Dive on K-Means algorithm), Animated K-Means visualization, Elbow Method explanation with chart, Strengths/Weaknesses, Key Takeaways, Footer. Goal: Comprehensive understanding of clustering and K-Means with improved visualization. -->
+    <!-- Visualization & Content Choices: 
+        - Detailed textual explanations converted to standard HTML.
+        - An animated step-by-step visualization of the K-Means algorithm using Chart.js and requestAnimationFrame to show centroid movement.
+        - A static line chart to illustrate the concept of the Elbow Method for selecting 'k'.
+        - Interactive tooltips for technical terms.
+        - PDF Export: Print-specific CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            font-size: 1rem; 
+            line-height: 1.625; 
+        }
+        
+        .interactive-term { 
+            cursor: pointer;
+            font-weight: 600; 
+        }
+        .definition-tooltip {
+            display: none;
+            position: absolute;
+            background-color: #f9fafb; 
+            border: 1px solid #d1d5db; 
+            padding: 8px; 
+            border-radius: 4px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            z-index: 100;
+            font-size: 0.875rem; 
+            width: max-content;
+            max-width: 320px; 
+        }
+
+        h1.page-title { font-size: 2.25rem; line-height: 2.5rem; } 
+        h2.section-title { font-size: 1.5rem; line-height: 2rem; margin-bottom: 0.75rem;} 
+        h3.subsection-title { font-size: 1.25rem; line-height: 1.75rem; margin-bottom: 0.5rem;}    
+        h4.detail-title { font-size: 1.125rem; line-height: 1.75rem; margin-bottom: 0.375rem;} 
+        
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+
+        .selector-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .selector-btn.active, .selector-btn:disabled {
+            transform: scale(1.05);
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+
+        @media print {
+            body { font-size: 10pt; line-height: 1.3; } 
+            .no-print { display: none !important; }
+            header { display: flex; flex-direction: column; align-items: center; text-align: center; }
+            .header-logo-print { max-width: 150px; max-height: 50px; margin-bottom: 10px; } 
+            .footer-logo-print { max-width: 100px; max-height: 30px; margin-top: 10px; } 
+            footer { text-align: center; }
+            section, .content-section { page-break-inside: avoid; margin-bottom: 15px; } 
+            .bg-white { box-shadow: none !important; border: 1px solid #ccc; padding: 0.5rem !important;}
+            a { text-decoration: none; color: black; }
+            .interactive-term { text-decoration: none; color: black; font-weight: bold; } 
+            .definition-tooltip { display: none !important; }
+            .chart-container { display: none; }
+            h1.page-title { font-size: 20pt; } 
+            h2.section-title { font-size: 16pt; }
+            h3.subsection-title { font-size: 14pt; }
+            h4.detail-title { font-size: 12pt; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+</head>
+<body class="bg-gray-100 text-gray-800"> 
+    <div class="container mx-auto p-4 md:p-8"> 
+        <header class="mb-10"> 
+            <div class="flex flex-col sm:flex-row items-center justify-between">
+                <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-16 md:h-20 mb-4 sm:mb-0 header-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+                <div class="text-center sm:text-right sm:ml-4"> 
+                    <p class="text-base text-gray-500">Module II: Data Preprocessing & Core Mining Techniques</p> 
+                    <h1 class="page-title text-3xl md:text-4xl font-bold text-gray-900 mt-1">Session 13: Overview of Clustering Algorithms</h1> 
+                    <p class="text-lg text-gray-600 mt-2">Data Mining & Big Data Analytics</p> 
+                </div>
+            </div>
+            <nav aria-label="Breadcrumb" class="mt-4 text-sm text-gray-500 no-print"> 
+                <ol class="list-none p-0 inline-flex">
+                    <li class="flex items-center">
+                        <a href="../index.html" class="text-slate-600 hover:text-slate-800">Course Overview</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="flex items-center">
+                        <a href="module-2-index.html" class="text-slate-600 hover:text-slate-800">Module II</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="text-gray-700 font-semibold" aria-current="page">Session 13</li> 
+                </ol>
+            </nav>
+        </header>
+
+        <div class="text-center mb-8 no-print"> 
+            <button onclick="window.print()" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-150 ease-in-out text-base"> 
+                Export Session 13 to PDF
+            </button>
+        </div>
+
+        <article class="bg-white p-6 md:p-8 rounded-lg shadow-lg"> 
+            <section class="mb-6 border-b pb-4"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-2">Session Details</h2> 
+                <p class="text-base text-gray-700"><strong>Type:</strong> Theory 📖</p>
+                <p class="text-base text-gray-700"><strong>Duration:</strong> 1 Hour</p>
+                <p class="text-base text-gray-700"><strong>Textbook References:</strong> Han et al.: Ch. 10 (Cluster Analysis: Basic Concepts and Methods)</p>
+            </section>
+
+            <section class="mb-8 content-section"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Learning Objectives</h2> 
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1"> 
+                    <li>Define Cluster Analysis and its role as an unsupervised learning technique.</li>
+                    <li>Differentiate clustering from classification.</li>
+                    <li>Describe the K-Means algorithm, including its steps and objective.</li>
+                    <li>Explain the importance of choosing an appropriate number of clusters ('k').</li>
+                    <li>Recognize the strengths and weaknesses of the K-Means algorithm.</li>
+                </ul>
+            </section>
+
+            <div class="definition-tooltip"></div>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Introduction to Cluster Analysis</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    Cluster analysis, or clustering, is the task of grouping a set of objects in such a way that objects in the same group (called a <span class="interactive-term" data-definition="A collection of data objects that are similar to one another within the same cluster and are dissimilar to the objects in other clusters.">cluster</span>) are more similar to each other than to those in other clusters. It is a fundamental task in data mining and a common technique for statistical data analysis.
+                </p>
+                <h3 class="subsection-title text-lg font-medium text-gray-700 mt-4 mb-2">Clustering as Unsupervised Learning</h3>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    Clustering is a primary example of <span class="interactive-term" data-definition="A type of machine learning where the algorithm learns patterns from data that has not been labeled or classified. The goal is to discover hidden structures or groupings in the data.">unsupervised learning</span>. This means we do not have predefined labels or categories for our data points. The goal is for the algorithm to discover the natural groupings or structure within the data on its own.
+                </p>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    This is in direct contrast to <span class="interactive-term" data-definition="A type of machine learning where the algorithm learns from data that has been manually labeled with the correct output. The goal is to learn a mapping function that can predict the output for new, unseen data.">supervised learning</span> tasks like classification, where we provide the algorithm with a labeled training dataset (e.g., historical emails already marked as 'spam' or 'not spam') to learn from. In clustering, there are no such labels.
+                </p>
+                <h3 class="subsection-title text-lg font-medium text-gray-700 mt-4 mb-2">Common Applications of Clustering:</h3>
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1">
+                    <li><strong>Marketing:</strong> Segmenting customers into distinct groups based on purchasing behavior, demographics, or browsing history to enable targeted marketing campaigns.</li>
+                    <li><strong>Biology:</strong> Grouping genes with similar expression patterns, or classifying plants and animals based on their features.</li>
+                    <li><strong>Image Processing:</strong> Segmenting images into regions with similar color or texture for object recognition.</li>
+                    <li><strong>Document Analysis:</strong> Grouping similar documents or articles based on their content for topic modeling or information retrieval.</li>
+                    <li><strong>Anomaly Detection:</strong> Identifying outliers that do not belong to any cluster, which can be useful for fraud detection or identifying system errors.</li>
+                </ul>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Deep Dive: The K-Means Algorithm</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    K-Means is one of the most popular and straightforward partitioning clustering methods. Its objective is to partition a set of `n` observations into `k` clusters in which each observation belongs to the cluster with the nearest mean (cluster center or <span class="interactive-term" data-definition="A centroid is the geometric center of a cluster, calculated as the mean position of all the points in that cluster.">centroid</span>), serving as a prototype of the cluster.
+                </p>
+                <h3 class="subsection-title text-lg font-medium text-gray-700 mt-4 mb-2">The K-Means Algorithm: Step-by-Step</h3>
+                <ol class="list-decimal list-inside text-base text-gray-700 ml-5 space-y-1">
+                    <li><strong>Choose 'k':</strong> Decide the number of clusters (`k`) you want to find in the data.</li>
+                    <li><strong>Initialize Centroids:</strong> Randomly select `k` data points from the dataset to serve as the initial centroids.</li>
+                    <li><strong>Assign Clusters:</strong> For each data point, calculate its distance (typically Euclidean distance) to each of the `k` centroids. Assign the data point to the cluster of its nearest centroid.</li>
+                    <li><strong>Update Centroids:</strong> For each of the `k` clusters, recalculate its centroid by taking the mean of all data points assigned to that cluster.</li>
+                    <li><strong>Repeat:</strong> Repeat steps 3 (Assign Clusters) and 4 (Update Centroids) until the centroids no longer move significantly or a maximum number of iterations is reached.</li>
+                </ol>
+
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-6 mt-6 no-print">
+                    <h3 class="subsection-title text-lg font-medium text-indigo-700 text-center mb-4">Animated K-Means Visualization (k=3)</h3>
+                    <p class="text-center text-sm text-gray-600 mb-4">Click the buttons in order to step through the K-Means algorithm. Watch the centroids shift!</p>
+                    <div class="flex justify-center items-center flex-wrap gap-2 mb-4">
+                        <button id="kmeans-step-0" class="selector-btn bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg shadow">Reset & Show Data</button>
+                        <button id="kmeans-step-1" class="selector-btn bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg shadow" disabled>1. Initialize Centroids</button>
+                        <button id="kmeans-step-2" class="selector-btn bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg shadow" disabled>2. Assign Clusters</button>
+                        <button id="kmeans-step-3" class="selector-btn bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg shadow" disabled>3. Update Centroids</button>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="kmeansChart"></canvas>
+                    </div>
+                    <div id="kmeans-explanation" class="text-center text-gray-700 mt-4 p-3 bg-gray-100 rounded-md text-sm leading-relaxed min-h-[50px]">
+                        Start by clicking "Reset & Show Data".
+                    </div>
+                </div>
+            </section>
+            
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Choosing the Right Number of Clusters ('k')</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-4">
+                    A major challenge in K-Means is determining the optimal number of clusters (`k`). There's no single perfect answer, but a common heuristic is the <strong>Elbow Method</strong>.
+                </p>
+                <h3 class="subsection-title text-lg font-medium text-gray-700 mt-4 mb-2">The Elbow Method</h3>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    The Elbow Method involves running the K-Means algorithm for a range of `k` values (e.g., from 1 to 10) and calculating the <strong>Within-Cluster Sum of Squares (WCSS)</strong> for each run. WCSS is the sum of squared distances between each data point and its assigned centroid.
+                </p>
+                 <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1 mb-4">
+                    <li>When `k` increases, the data points will be closer to their centroids, so the WCSS will always decrease.</li>
+                    <li>We plot WCSS against the number of clusters `k`. The plot typically looks like an arm.</li>
+                    <li>The "elbow" of the arm—the point where the rate of decrease in WCSS sharply slows down—is considered a good estimate for the optimal `k`.</li>
+                 </ul>
+                 <div class="chart-container bg-slate-50 p-4 rounded-lg border border-slate-200">
+                    <canvas id="elbowChart"></canvas>
+                 </div>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Strengths and Weaknesses of K-Means</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                    <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                        <h3 class="subsection-title text-lg font-medium text-green-700">Strengths 👍</h3>
+                        <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1">
+                            <li><strong>Fast and Scalable:</strong> Relatively efficient and can be applied to large datasets. Its time complexity is `O(n*k*i*d)`, where `n` is samples, `k` is clusters, `i` is iterations, and `d` is attributes.</li>
+                            <li><strong>Simple to Understand and Implement:</strong> The algorithm's logic is straightforward.</li>
+                            <li><strong>Guaranteed to Converge:</strong> The algorithm will always converge to a solution (though not necessarily the global optimum).</li>
+                        </ul>
+                    </div>
+                    <div class="bg-red-50 p-4 rounded-lg border border-red-200">
+                        <h3 class="subsection-title text-lg font-medium text-red-700">Weaknesses 👎</h3>
+                        <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1">
+                            <li><strong>Need to Specify `k`:</strong> Requires the number of clusters to be specified beforehand, which may not be known.</li>
+                            <li><strong>Sensitive to Initial Centroids:</strong> The random initialization of centroids can lead to different final clusters. Running the algorithm multiple times with different initializations is recommended.</li>
+                            <li><strong>Assumes Spherical Clusters:</strong> Struggles with clusters that are non-spherical, have varying sizes, or different densities.</li>
+                            <li><strong>Sensitive to Outliers:</strong> Outliers can significantly pull a centroid away from its true cluster center.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Key Takeaways for Session 13</h2>
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1 leading-relaxed">
+                    <li>Clustering is an unsupervised learning task that groups data based on similarity, without predefined labels.</li>
+                    <li>K-Means is a popular partitioning algorithm that aims to create `k` clusters by minimizing the distance between data points and their cluster's centroid.</li>
+                    <li>The K-Means process is iterative: it repeatedly assigns points to the nearest centroid and then updates the centroid's position based on its new members.</li>
+                    <li>Choosing the right value for `k` is a critical challenge, and methods like the Elbow Method can help guide this decision.</li>
+                    <li>While simple and fast, K-Means has limitations, including its sensitivity to initialization and its difficulty with non-spherical clusters and outliers.</li>
+                </ul>
+            </section>
+        </article>
+
+        <footer class="text-center mt-12 py-6 border-t border-gray-300"> 
+            <div class="mb-4"> 
+                 <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-10 mx-auto footer-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+            </div>
+            <p class="text-base text-gray-600">&copy; <span id="currentYearModule"></span> FACE Prep Campus (www.faceprep.in). All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('currentYearModule').textContent = new Date().getFullYear();
+
+        const interactiveTerms = document.querySelectorAll('.interactive-term');
+        const tooltip = document.querySelector('.definition-tooltip');
+        if (tooltip) {
+            interactiveTerms.forEach(term => {
+                term.addEventListener('click', (e) => { 
+                    tooltip.textContent = term.dataset.definition;
+                    tooltip.style.display = 'block';
+                    const termRect = term.getBoundingClientRect();
+                    tooltip.style.top = `${termRect.bottom + window.scrollY + 8}px`;
+                    tooltip.style.left = `${termRect.left + window.scrollX}px`;
+                });
+            });
+            document.addEventListener('click', function(event) {
+                if (!event.target.classList.contains('interactive-term')) {
+                    tooltip.style.display = 'none';
+                }
+            });
+        }
+        
+        const elbowCtx = document.getElementById('elbowChart');
+        if (elbowCtx) {
+            new Chart(elbowCtx, {
+                type: 'line',
+                data: {
+                    labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
+                    datasets: [{
+                        label: 'WCSS (Within-Cluster Sum of Squares)',
+                        data: [300, 180, 100, 75, 60, 50, 45, 42, 40, 39],
+                        borderColor: 'rgb(59, 130, 246)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.1,
+                        fill: true,
+                        pointBackgroundColor: 'rgb(59, 130, 246)',
+                        pointRadius: 5
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: "Elbow Method for Optimal 'k'", font: { size: 16 } }, legend: { display: false } }, scales: { y: { title: { display: true, text: 'WCSS' } }, x: { title: { display: true, text: 'Number of Clusters (k)' } } } }
+            });
+        }
+        
+        const kmeansCtx = document.getElementById('kmeansChart');
+        const kmeansExplanation = document.getElementById('kmeans-explanation');
+        const kmeansStepBtns = [
+            document.getElementById('kmeans-step-0'),
+            document.getElementById('kmeans-step-1'),
+            document.getElementById('kmeans-step-2'),
+            document.getElementById('kmeans-step-3')
+        ];
+
+        if (kmeansCtx && kmeansExplanation && kmeansStepBtns.every(b => b)) {
+            const initialDataPoints = [ {x: 2, y: 10}, {x: 2, y: 5}, {x: 8, y: 4}, {x: 5, y: 8}, {x: 7, y: 5}, {x: 6, y: 4}, {x: 1, y: 2}, {x: 4, y: 9}, {x: 10, y: 2}, {x: 11, y: 6}, {x: 12, y: 8}, {x: 9, y: 1} ];
+            const clusterColors = ['rgba(239, 68, 68, 0.7)', 'rgba(59, 130, 246, 0.7)', 'rgba(22, 163, 74, 0.7)'];
+            let kmeansChart, centroids, pointAssignments, animationFrameId;
+
+            const initChart = () => {
+                if (animationFrameId) cancelAnimationFrame(animationFrameId);
+                pointAssignments = Array(initialDataPoints.length).fill(null);
+                centroids = [];
+                if (kmeansChart) kmeansChart.destroy();
+                kmeansChart = new Chart(kmeansCtx, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [
+                            { label: 'Data Points', data: initialDataPoints.map(p => ({...p})), backgroundColor: 'rgb(156, 163, 175)' },
+                            { label: 'Centroids', data: [], backgroundColor: clusterColors, pointRadius: 8, pointStyle: 'rectRot', borderWidth: 2, borderColor: '#000' }
+                        ]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, animation: false }, scales: { x: { min: 0, max: 13 }, y: { min: 0, max: 11 } } }
+                });
+                kmeansExplanation.textContent = 'Data is ready. Click "1. Initialize Centroids" to begin.';
+                kmeansStepBtns.forEach((btn, i) => {
+                    btn.disabled = (i > 1);
+                    btn.classList.remove('active');
+                });
+            };
+
+            const step1_initCentroids = () => {
+                centroids = [ {x:2, y:2}, {x:7, y:9}, {x:10, y:5} ]; 
+                kmeansChart.data.datasets[1].data = centroids.map(c => ({...c}));
+                kmeansChart.update();
+                kmeansExplanation.textContent = 'Step 1 Complete: Three centroids have been initialized.';
+                kmeansStepBtns.forEach(b => b.classList.remove('active'));
+                kmeansStepBtns[1].classList.add('active');
+                kmeansStepBtns[2].disabled = false;
+            };
+
+            const step2_assignClusters = () => {
+                initialDataPoints.forEach((point, i) => {
+                    let minDistance = Infinity;
+                    let closestCentroidIndex = -1;
+                    centroids.forEach((centroid, j) => {
+                        const distance = Math.sqrt(Math.pow(point.x - centroid.x, 2) + Math.pow(point.y - centroid.y, 2));
+                        if (distance < minDistance) {
+                            minDistance = distance;
+                            closestCentroidIndex = j;
+                        }
+                    });
+                    pointAssignments[i] = closestCentroidIndex;
+                });
+                kmeansChart.data.datasets[0].backgroundColor = pointAssignments.map(i => clusterColors[i]);
+                kmeansChart.update();
+                kmeansExplanation.textContent = 'Step 2 Complete: Each point is assigned to its nearest centroid.';
+                kmeansStepBtns.forEach(b => b.classList.remove('active'));
+                kmeansStepBtns[2].classList.add('active');
+                kmeansStepBtns[3].disabled = false;
+            };
+
+            const step3_updateCentroids = () => {
+                const oldCentroids = centroids.map(c => ({...c}));
+                const newCentroids = [];
+                for (let i = 0; i < 3; i++) {
+                    const clusterPoints = initialDataPoints.filter((_, j) => pointAssignments[j] === i);
+                    if (clusterPoints.length > 0) {
+                        const sumX = clusterPoints.reduce((acc, p) => acc + p.x, 0);
+                        const sumY = clusterPoints.reduce((acc, p) => acc + p.y, 0);
+                        newCentroids.push({ x: sumX / clusterPoints.length, y: sumY / clusterPoints.length });
+                    } else {
+                        newCentroids.push(oldCentroids[i]); 
+                    }
+                }
+                animateCentroidShift(oldCentroids, newCentroids);
+                centroids = newCentroids;
+            };
+            
+            const animateCentroidShift = (startPos, endPos) => {
+                let startTime = null;
+                const duration = 750; // ms
+                
+                kmeansStepBtns.forEach(b => b.disabled = true);
+                kmeansExplanation.textContent = 'Step 3: Animating centroid update...';
+                
+                const animate = (timestamp) => {
+                    if (!startTime) startTime = timestamp;
+                    const elapsed = timestamp - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    
+                    const currentPositions = startPos.map((start, i) => {
+                        const end = endPos[i];
+                        const newX = start.x + (end.x - start.x) * progress;
+                        const newY = start.y + (end.y - start.y) * progress;
+                        return {x: newX, y: newY};
+                    });
+                    
+                    kmeansChart.data.datasets[1].data = currentPositions;
+                    kmeansChart.update('none'); // Update without triggering chart.js's own animation
+
+                    if (progress < 1) {
+                        animationFrameId = requestAnimationFrame(animate);
+                    } else {
+                        kmeansExplanation.textContent = 'Step 3 Complete: Centroids have moved. Now, repeat Step 2 to re-assign points.';
+                        kmeansStepBtns.forEach(b => b.classList.remove('active'));
+                        kmeansStepBtns[3].classList.add('active');
+                        kmeansStepBtns[0].disabled = false; // Allow Reset
+                        kmeansStepBtns[2].disabled = false; // Allow re-assigning
+                    }
+                };
+                animationFrameId = requestAnimationFrame(animate);
+            };
+
+            kmeansStepBtns[0].addEventListener('click', initChart);
+            kmeansStepBtns[1].addEventListener('click', step1_initCentroids);
+            kmeansStepBtns[2].addEventListener('click', step2_assignClusters);
+            kmeansStepBtns[3].addEventListener('click', step3_updateCentroids);
+
+            initChart();
+        }
+
+    </script>
+</body>
+</html>

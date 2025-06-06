@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 20: Blended Learning - HDFS & MapReduce Fundamentals - Module II</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: "Warm Neutral Harmony" -->
+    <!-- Application Structure Plan: A definitive, extensive guide for a blended learning session. Structure: Header, Export, Session Details, Objectives, Detailed Introduction, Link to Coursera, In-depth Focus Areas (HDFS Architecture, Read/Write operations, MapReduce Paradigm with detailed example and Combiner explanation), Practical Considerations, Connecting to Mini-Project, Key Takeaways, Footer. Goal: A comprehensive self-study resource on Hadoop's core components. -->
+    <!-- Visualization & Content Choices: 
+        - Detailed textual explanations for all concepts.
+        - Conceptual diagrams for HDFS and MapReduce data flow using HTML/CSS for clarity.
+        - Interactive tooltips for technical terms.
+        - PDF Export: Print-specific CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            font-size: 1rem; 
+            line-height: 1.625; 
+        }
+        
+        .interactive-term { 
+            cursor: pointer;
+            font-weight: 600; 
+        }
+        .definition-tooltip {
+            display: none;
+            position: absolute;
+            background-color: #f9fafb; 
+            border: 1px solid #d1d5db; 
+            padding: 8px; 
+            border-radius: 4px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            z-index: 100;
+            font-size: 0.875rem; 
+            width: max-content;
+            max-width: 320px; 
+        }
+
+        h1.page-title { font-size: 2.25rem; line-height: 2.5rem; } 
+        h2.section-title { font-size: 1.5rem; line-height: 2rem; margin-bottom: 0.75rem;} 
+        h3.subsection-title { font-size: 1.25rem; line-height: 1.75rem; margin-bottom: 0.5rem;}    
+        h4.detail-title { font-size: 1.125rem; line-height: 1.75rem; margin-bottom: 0.375rem;} 
+        
+        .external-link-card {
+            background-color: #eff6ff; /* blue-50 */
+            border: 1px solid #93c5fd; /* blue-300 */
+            border-left-width: 4px;
+            border-left-color: #2563eb; /* blue-600 */
+            padding: 1.5rem;
+            margin-top: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0.5rem;
+        }
+
+        .flow-diagram {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .flow-box {
+            background-color: #f3f4f6; /* gray-100 */
+            border: 1px solid #d1d5db; /* gray-300 */
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            text-align: center;
+            font-size: 0.875rem;
+        }
+        .flow-arrow {
+            font-size: 1.5rem;
+            color: #9ca3af; /* gray-400 */
+        }
+        .info-card {
+             background-color: #f9fafb; /* gray-50 */
+            border: 1px solid #e5e7eb; /* gray-200 */
+            border-left-width: 4px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 0.5rem;
+        }
+
+        @media print {
+            body { font-size: 10pt; line-height: 1.3; } 
+            .no-print { display: none !important; }
+            header { display: flex; flex-direction: column; align-items: center; text-align: center; }
+            .header-logo-print { max-width: 150px; max-height: 50px; margin-bottom: 10px; } 
+            .footer-logo-print { max-width: 100px; max-height: 30px; margin-top: 10px; } 
+            footer { text-align: center; }
+            section, .content-section { page-break-inside: avoid; margin-bottom: 15px; } 
+            .bg-white { box-shadow: none !important; border: 1px solid #ccc; padding: 0.5rem !important;}
+            a { text-decoration: none; color: black; }
+            .external-link-card { border: 1px solid #ccc; padding: 0.5rem; }
+            .interactive-term { text-decoration: none; color: black; font-weight: bold; } 
+            .definition-tooltip { display: none !important; }
+            .flow-diagram { display: none; }
+            h1.page-title { font-size: 20pt; } 
+            h2.section-title { font-size: 16pt; }
+            h3.subsection-title { font-size: 14pt; }
+            h4.detail-title { font-size: 12pt; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+</head>
+<body class="bg-gray-100 text-gray-800"> 
+    <div class="container mx-auto p-4 md:p-8"> 
+        <header class="mb-10"> 
+            <div class="flex flex-col sm:flex-row items-center justify-between">
+                <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-16 md:h-20 mb-4 sm:mb-0 header-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+                <div class="text-center sm:text-right sm:ml-4"> 
+                    <p class="text-base text-gray-500">Module II: Data Preprocessing & Core Mining Techniques</p> 
+                    <h1 class="page-title text-3xl md:text-4xl font-bold text-gray-900 mt-1">Session 20: Blended Learning - HDFS & MapReduce Fundamentals</h1> 
+                    <p class="text-lg text-gray-600 mt-2">Data Mining & Big Data Analytics</p> 
+                </div>
+            </div>
+            <nav aria-label="Breadcrumb" class="mt-4 text-sm text-gray-500 no-print"> 
+                <ol class="list-none p-0 inline-flex">
+                    <li class="flex items-center">
+                        <a href="../index.html" class="text-slate-600 hover:text-slate-800">Course Overview</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="flex items-center">
+                        <a href="module-2-index.html" class="text-slate-600 hover:text-slate-800">Module II</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="text-gray-700 font-semibold" aria-current="page">Session 20</li> 
+                </ol>
+            </nav>
+        </header>
+
+        <div class="text-center mb-8 no-print"> 
+            <button onclick="window.print()" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-150 ease-in-out text-base"> 
+                Export Session 20 to PDF
+            </button>
+        </div>
+
+        <article class="bg-white p-6 md:p-8 rounded-lg shadow-lg"> 
+            <section class="mb-6 border-b pb-4"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-2">Session Details</h2> 
+                <p class="text-base text-gray-700"><strong>Type:</strong> Blended Learning 🌐</p>
+                <p class="text-base text-gray-700"><strong>Duration:</strong> 5 Hours (Self-paced study)</p>
+                <p class="text-base text-gray-700"><strong>Primary Resource:</strong> Coursera - Hadoop Platform and Application Framework</p>
+            </section>
+
+            <section class="mb-8 content-section"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Session Objectives</h2> 
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1"> 
+                    <li>Develop a solid understanding of the HDFS architecture, including its master/slave design, data blocks, and replication strategy.</li>
+                    <li>Explain the MapReduce programming paradigm in detail, including the role of Mappers, Reducers, and the Shuffle & Sort phase.</li>
+                    <li>Comprehend how data locality is a key principle for efficiency in the Hadoop ecosystem.</li>
+                    <li>Relate these foundational concepts to higher-level tools and the broader Big Data processing landscape.</li>
+                </ul>
+            </section>
+
+            <div class="definition-tooltip"></div>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Lab Introduction</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    This extended blended learning session is dedicated to building a deep, foundational understanding of the two original pillars of the Hadoop ecosystem: the Hadoop Distributed File System (HDFS) for storage, and the MapReduce paradigm for processing. While newer tools like Spark are often used for processing today, they frequently run on top of HDFS, and understanding the principles of MapReduce is essential for grasping the evolution and design of all modern distributed data processing systems.
+                </p>
+                <p class="text-base text-gray-700 leading-relaxed">
+                    Use the 5 hours allocated for this session to thoroughly work through the relevant modules in the Coursera course, focusing on the core concepts outlined below.
+                </p>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Accessing the Coursera Course</h2>
+                <div class="external-link-card">
+                    <h3 class="subsection-title text-lg font-medium text-blue-700">Hadoop Platform and Application Framework</h3>
+                    <p class="text-base text-gray-700 mb-3">
+                        Continue your progress in this course from the University of California, San Diego on Coursera.
+                    </p>
+                    <a href="https://www.coursera.org/learn/hadoop" target="_blank" rel="noopener noreferrer" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md shadow-md transition duration-150 ease-in-out no-print">
+                        Go to Coursera Course ➔
+                    </a>
+                </div>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Focus Area 1: HDFS In-Depth</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-4">
+                    Move beyond a surface-level introduction to truly understand how HDFS stores data reliably at massive scale.
+                </p>
+                <h3 class="subsection-title text-lg font-medium text-gray-700 mt-4 mb-2">HDFS Architecture: The Library Analogy</h3>
+                 <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-3">
+                    <li><strong>The NameNode (The Head Librarian):</strong> Think of the NameNode as the single head librarian. It doesn't hold any books itself, but it has the master catalog (the metadata) that knows exactly which shelf (DataNode) and which section (block ID) every single book (data block) is located on. It's the central coordinator.</li>
+                    <li><strong>The DataNodes (The Bookshelves):</strong> These are the numerous, massive bookshelves that actually store the books (data blocks). They are the workhorses, responsible for the physical storage. They regularly report back to the NameNode, confirming their status and listing the books they hold.</li>
+                    <li><strong>Data Blocks & Replication:</strong> A massive book (a large file) is split into standardized volumes (blocks, e.g., 128MB). To prevent loss, the library keeps three copies of every volume on different bookshelves (DataNodes). If one shelf collapses, the volume is still safe elsewhere.</li>
+                </ul>
+
+                <h3 class="subsection-title text-lg font-medium text-gray-700 mt-6 mb-2">HDFS Write and Read Operations</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                    <div class="info-card border-l-green-500">
+                        <h4 class="detail-title font-semibold text-green-700">File Write Workflow (Simplified)</h4>
+                        <ol class="list-decimal list-inside text-sm text-gray-600 space-y-1 mt-2">
+                            <li><strong>Client to NameNode:</strong> Client says, "I want to write `file.txt`."</li>
+                            <li><strong>NameNode to Client:</strong> NameNode checks permissions and replies, "Okay, for the first block, write to DataNode A, B, and C."</li>
+                            <li><strong>Client to DataNodes:</strong> Client sends the first block to DataNode A.</li>
+                            <li><strong>DataNode Pipeline:</strong> DataNode A saves the block and forwards it to DataNode B. DataNode B saves it and forwards it to DataNode C.</li>
+                            <li><strong>Acknowledgements:</strong> Acknowledgements flow back up the pipeline to the client.</li>
+                            <li><strong>Repeat:</strong> The process repeats for all blocks of the file, with the NameNode providing new DataNode lists for each block.</li>
+                        </ol>
+                    </div>
+                     <div class="info-card border-l-blue-500">
+                        <h4 class="detail-title font-semibold text-blue-700">File Read Workflow (Simplified)</h4>
+                        <ol class="list-decimal list-inside text-sm text-gray-600 space-y-1 mt-2">
+                            <li><strong>Client to NameNode:</strong> Client says, "I want to read `file.txt`."</li>
+                            <li><strong>NameNode to Client:</strong> NameNode checks permissions and replies with a list of all block locations for that file (e.g., "Block 1 is on DataNode A, D, F; Block 2 is on DataNode B, C, E...").</li>
+                            <li><strong>Client to DataNodes:</strong> The client connects *directly* to the best DataNode (usually the closest one on the network) for each block and reads the data. This direct access makes reads very fast and scalable.</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <h3 class="subsection-title text-lg font-medium text-gray-700 mt-6 mb-2">The Principle of Data Locality</h3>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    This is the most critical concept for understanding Hadoop's performance. In traditional systems, you move data to the computation. For a terabyte file, this means moving a terabyte of data over the network, which is slow and expensive. In Hadoop, the philosophy is to <strong>move the computation to the data</strong>. Because HDFS knows where every block of data lives, the YARN resource manager can schedule processing tasks to run on the very same DataNodes that hold the data blocks needed for that task. This drastically reduces network traffic and is the key to Hadoop's efficiency at scale.
+                </p>
+            </section>
+
+             <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Focus Area 2: The MapReduce Paradigm In-Depth</h2>
+                 <p class="text-base text-gray-700 leading-relaxed mb-4">
+                    MapReduce is a powerful programming paradigm for processing data in parallel. Let's trace the "Word Count" example in extreme detail.
+                </p>
+                <div class="flow-diagram no-print border border-gray-200 p-4 rounded-lg">
+                    <div class="flow-box bg-red-100 border-red-300">Input Data</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box bg-blue-100 border-blue-300">Map Phase</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box bg-yellow-100 border-yellow-300">Shuffle & Sort</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box bg-green-100 border-green-300">Reduce Phase</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box bg-red-100 border-red-300">Final Output</div>
+                </div>
+                 <ol class="list-decimal list-inside text-base text-gray-700 ml-5 space-y-3 mt-4">
+                    <li>
+                        <strong>Input & Splitting:</strong> The input is a large text file. HDFS splits this file into blocks. Each block is treated as an input split for a Mapper task.
+                        <p class="text-sm text-gray-600 font-mono bg-slate-50 p-2 rounded mt-1">Split 1: "dear bear river"<br>Split 2: "dear car river"</p>
+                    </li>
+                    <li>
+                        <strong>Map Phase:</strong> A Mapper task runs on each split in parallel. Its job is to read its input, process it, and emit key-value pairs.
+                        <p class="text-sm text-gray-600 font-mono bg-slate-50 p-2 rounded mt-1">Mapper 1 Output: (dear, 1), (bear, 1), (river, 1)<br>Mapper 2 Output: (dear, 1), (car, 1), (river, 1)</p>
+                    </li>
+                     <li>
+                        <strong>Shuffle & Sort Phase:</strong> The framework automatically collects all outputs from the Mappers, shuffles them across the network, and groups them by key. This is the "magic" that brings related data together.
+                        <p class="text-sm text-gray-600 font-mono bg-slate-50 p-2 rounded mt-1">Grouped Output:<br>(bear, [1])<br>(car, [1])<br>(dear, [1, 1])<br>(river, [1, 1])</p>
+                    </li>
+                    <li>
+                        <strong>Reduce Phase:</strong> A Reducer task runs for each unique key. Its job is to process the list of values for its key and produce a final output.
+                        <p class="text-sm text-gray-600 font-mono bg-slate-50 p-2 rounded mt-1">Reducer for 'bear' -> (bear, 1)<br>Reducer for 'car' -> (car, 1)<br>Reducer for 'dear' -> (dear, 2)<br>Reducer for 'river' -> (river, 2)</p>
+                    </li>
+                </ol>
+                <h4 class="detail-title text-base font-semibold text-gray-600 mt-4 mb-2">Optimization: The Combiner</h4>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    A <span class="interactive-term" data-definition="A Combiner is an optional, local Reducer that runs on each Mapper node. It processes the output of a single Mapper before it gets sent over the network, reducing the amount of data that needs to be shuffled.">Combiner</span> is a "mini-reducer" that runs on the same machine as a Mapper. It pre-aggregates the Mapper's output, significantly reducing the amount of data sent during the Shuffle & Sort phase. In our example, the Combiner would sum the counts on each machine before sending them to the Reducers, improving performance.
+                </p>
+            </section>
+
+            <section class="content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Key Takeaways for Session 20</h2>
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1 leading-relaxed">
+                    <li>HDFS provides reliable, scalable, and distributed storage by splitting files into replicated blocks managed by a NameNode and stored on DataNodes.</li>
+                    <li>MapReduce provides a powerful paradigm for parallel processing by splitting tasks into independent Map and Reduce phases, with an automatic Shuffle and Sort in between.</li>
+                    <li>The principle of data locality—moving compute to the data—is a core tenet of the Hadoop ecosystem's efficiency.</li>
+                    <li>Understanding these foundational components is essential for effectively using any tool within the broader Big Data landscape, including more modern ones like Apache Spark.</li>
+                </ul>
+            </section>
+        </article>
+
+        <footer class="text-center mt-12 py-6 border-t border-gray-300"> 
+            <div class="mb-4"> 
+                 <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-10 mx-auto footer-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+            </div>
+            <p class="text-base text-gray-600">&copy; <span id="currentYearModule"></span> FACE Prep Campus (www.faceprep.in). All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('currentYearModule').textContent = new Date().getFullYear();
+
+        const interactiveTerms = document.querySelectorAll('.interactive-term');
+        const tooltip = document.querySelector('.definition-tooltip');
+        if (tooltip) {
+            interactiveTerms.forEach(term => {
+                term.addEventListener('click', (e) => { 
+                    tooltip.textContent = term.dataset.definition;
+                    tooltip.style.display = 'block';
+                    const termRect = term.getBoundingClientRect();
+                    tooltip.style.top = `${termRect.bottom + window.scrollY + 8}px`;
+                    tooltip.style.left = `${termRect.left + window.scrollX}px`;
+                });
+            });
+            document.addEventListener('click', function(event) {
+                if (!event.target.classList.contains('interactive-term')) {
+                    tooltip.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 20: Blended Learning - HDFS & MapReduce Fundamentals - Module II</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: "Warm Neutral Harmony" -->
+    <!-- Application Structure Plan: A definitive, extensive guide for a blended learning session. Structure: Header, Export, Session Details, Objectives, Detailed Introduction, Link to Coursera, In-depth Focus Areas (HDFS Architecture, Read/Write operations, MapReduce Paradigm with detailed example and Combiner explanation), Practical Considerations, Connecting to Mini-Project, Key Takeaways, Footer. Goal: A comprehensive self-study resource on Hadoop's core components. -->
+    <!-- Visualization & Content Choices: 
+        - Detailed textual explanations for all concepts.
+        - Conceptual diagrams for HDFS and MapReduce data flow using HTML/CSS for clarity.
+        - Interactive tooltips for technical terms.
+        - PDF Export: Print-specific CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            font-size: 1rem; 
+            line-height: 1.625; 
+        }
+        
+        .interactive-term { 
+            cursor: pointer;
+            font-weight: 600; 
+        }
+        .definition-tooltip {
+            display: none;
+            position: absolute;
+            background-color: #f9fafb; 
+            border: 1px solid #d1d5db; 
+            padding: 8px; 
+            border-radius: 4px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            z-index: 100;
+            font-size: 0.875rem; 
+            width: max-content;
+            max-width: 320px; 
+        }
+
+        h1.page-title { font-size: 2.25rem; line-height: 2.5rem; } 
+        h2.section-title { font-size: 1.5rem; line-height: 2rem; margin-bottom: 0.75rem;} 
+        h3.subsection-title { font-size: 1.25rem; line-height: 1.75rem; margin-bottom: 0.5rem;}    
+        h4.detail-title { font-size: 1.125rem; line-height: 1.75rem; margin-bottom: 0.375rem;} 
+        
+        .external-link-card {
+            background-color: #eff6ff; /* blue-50 */
+            border: 1px solid #93c5fd; /* blue-300 */
+            border-left-width: 4px;
+            border-left-color: #2563eb; /* blue-600 */
+            padding: 1.5rem;
+            margin-top: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0.5rem;
+        }
+
+        .flow-diagram {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .flow-box {
+            background-color: #f3f4f6; /* gray-100 */
+            border: 1px solid #d1d5db; /* gray-300 */
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            text-align: center;
+            font-size: 0.875rem;
+        }
+        .flow-arrow {
+            font-size: 1.5rem;
+            color: #9ca3af; /* gray-400 */
+        }
+        .info-card {
+             background-color: #f9fafb; /* gray-50 */
+            border: 1px solid #e5e7eb; /* gray-200 */
+            border-left-width: 4px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 0.5rem;
+        }
+
+        @media print {
+            body { font-size: 10pt; line-height: 1.3; } 
+            .no-print { display: none !important; }
+            header { display: flex; flex-direction: column; align-items: center; text-align: center; }
+            .header-logo-print { max-width: 150px; max-height: 50px; margin-bottom: 10px; } 
+            .footer-logo-print { max-width: 100px; max-height: 30px; margin-top: 10px; } 
+            footer { text-align: center; }
+            section, .content-section { page-break-inside: avoid; margin-bottom: 15px; } 
+            .bg-white { box-shadow: none !important; border: 1px solid #ccc; padding: 0.5rem !important;}
+            a { text-decoration: none; color: black; }
+            .external-link-card { border: 1px solid #ccc; padding: 0.5rem; }
+            .interactive-term { text-decoration: none; color: black; font-weight: bold; } 
+            .definition-tooltip { display: none !important; }
+            .flow-diagram { display: none; }
+            h1.page-title { font-size: 20pt; } 
+            h2.section-title { font-size: 16pt; }
+            h3.subsection-title { font-size: 14pt; }
+            h4.detail-title { font-size: 12pt; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+</head>
+<body class="bg-gray-100 text-gray-800"> 
+    <div class="container mx-auto p-4 md:p-8"> 
+        <header class="mb-10"> 
+            <div class="flex flex-col sm:flex-row items-center justify-between">
+                <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-16 md:h-20 mb-4 sm:mb-0 header-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+                <div class="text-center sm:text-right sm:ml-4"> 
+                    <p class="text-base text-gray-500">Module II: Data Preprocessing & Core Mining Techniques</p> 
+                    <h1 class="page-title text-3xl md:text-4xl font-bold text-gray-900 mt-1">Session 20: Blended Learning - HDFS & MapReduce Fundamentals</h1> 
+                    <p class="text-lg text-gray-600 mt-2">Data Mining & Big Data Analytics</p> 
+                </div>
+            </div>
+            <nav aria-label="Breadcrumb" class="mt-4 text-sm text-gray-500 no-print"> 
+                <ol class="list-none p-0 inline-flex">
+                    <li class="flex items-center">
+                        <a href="../index.html" class="text-slate-600 hover:text-slate-800">Course Overview</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="flex items-center">
+                        <a href="module-2-index.html" class="text-slate-600 hover:text-slate-800">Module II</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="text-gray-700 font-semibold" aria-current="page">Session 20</li> 
+                </ol>
+            </nav>
+        </header>
+
+        <div class="text-center mb-8 no-print"> 
+            <button onclick="window.print()" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-150 ease-in-out text-base"> 
+                Export Session 20 to PDF
+            </button>
+        </div>
+
+        <article class="bg-white p-6 md:p-8 rounded-lg shadow-lg"> 
+            <section class="mb-6 border-b pb-4"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-2">Session Details</h2> 
+                <p class="text-base text-gray-700"><strong>Type:</strong> Blended Learning 🌐</p>
+                <p class="text-base text-gray-700"><strong>Duration:</strong> 5 Hours (Self-paced study)</p>
+                <p class="text-base text-gray-700"><strong>Primary Resource:</strong> Coursera - Hadoop Platform and Application Framework</p>
+            </section>
+
+            <section class="mb-8 content-section"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Session Objectives</h2> 
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1"> 
+                    <li>Develop a solid understanding of the HDFS architecture, including its master/slave design, data blocks, and replication strategy.</li>
+                    <li>Explain the MapReduce programming paradigm in detail, including the role of Mappers, Reducers, and the Shuffle & Sort phase.</li>
+                    <li>Comprehend how data locality is a key principle for efficiency in the Hadoop ecosystem.</li>
+                    <li>Relate these foundational concepts to higher-level tools and the broader Big Data processing landscape.</li>
+                </ul>
+            </section>
+
+            <div class="definition-tooltip"></div>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Lab Introduction</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    This extended blended learning session is dedicated to building a deep, foundational understanding of the two original pillars of the Hadoop ecosystem: the Hadoop Distributed File System (HDFS) for storage, and the MapReduce paradigm for processing. While newer tools like Spark are often used for processing today, they frequently run on top of HDFS, and understanding the principles of MapReduce is essential for grasping the evolution and design of all modern distributed data processing systems.
+                </p>
+                <p class="text-base text-gray-700 leading-relaxed">
+                    Use the 5 hours allocated for this session to thoroughly work through the relevant modules in the Coursera course, focusing on the core concepts outlined below.
+                </p>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Accessing the Coursera Course</h2>
+                <div class="external-link-card">
+                    <h3 class="subsection-title text-lg font-medium text-blue-700">Hadoop Platform and Application Framework</h3>
+                    <p class="text-base text-gray-700 mb-3">
+                        Continue your progress in this course from the University of California, San Diego on Coursera.
+                    </p>
+                    <a href="https://www.coursera.org/learn/hadoop" target="_blank" rel="noopener noreferrer" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md shadow-md transition duration-150 ease-in-out no-print">
+                        Go to Coursera Course ➔
+                    </a>
+                </div>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Focus Area 1: HDFS In-Depth</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-4">
+                    Move beyond a surface-level introduction to truly understand how HDFS stores data reliably at massive scale.
+                </p>
+                <h3 class="subsection-title text-lg font-medium text-gray-700 mt-4 mb-2">HDFS Architecture: The Library Analogy</h3>
+                 <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-3">
+                    <li><strong>The NameNode (The Head Librarian):</strong> Think of the NameNode as the single head librarian. It doesn't hold any books itself, but it has the master catalog (the metadata) that knows exactly which shelf (DataNode) and which section (block ID) every single book (data block) is located on. It's the central coordinator.</li>
+                    <li><strong>The DataNodes (The Bookshelves):</strong> These are the numerous, massive bookshelves that actually store the books (data blocks). They are the workhorses, responsible for the physical storage. They regularly report back to the NameNode, confirming their status and listing the books they hold.</li>
+                    <li><strong>Data Blocks & Replication:</strong> A massive book (a large file) is split into standardized volumes (blocks, e.g., 128MB). To prevent loss, the library keeps three copies of every volume on different bookshelves (DataNodes). If one shelf collapses, the volume is still safe elsewhere.</li>
+                </ul>
+
+                <h3 class="subsection-title text-lg font-medium text-gray-700 mt-6 mb-2">HDFS Write and Read Operations</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                    <div class="info-card border-l-green-500">
+                        <h4 class="detail-title font-semibold text-green-700">File Write Workflow (Simplified)</h4>
+                        <ol class="list-decimal list-inside text-sm text-gray-600 space-y-1 mt-2">
+                            <li><strong>Client to NameNode:</strong> Client says, "I want to write `file.txt`."</li>
+                            <li><strong>NameNode to Client:</strong> NameNode checks permissions and replies, "Okay, for the first block, write to DataNode A, B, and C."</li>
+                            <li><strong>Client to DataNodes:</strong> Client sends the first block to DataNode A.</li>
+                            <li><strong>DataNode Pipeline:</strong> DataNode A saves the block and forwards it to DataNode B. DataNode B saves it and forwards it to DataNode C.</li>
+                            <li><strong>Acknowledgements:</strong> Acknowledgements flow back up the pipeline to the client.</li>
+                            <li><strong>Repeat:</strong> The process repeats for all blocks of the file, with the NameNode providing new DataNode lists for each block.</li>
+                        </ol>
+                    </div>
+                     <div class="info-card border-l-blue-500">
+                        <h4 class="detail-title font-semibold text-blue-700">File Read Workflow (Simplified)</h4>
+                        <ol class="list-decimal list-inside text-sm text-gray-600 space-y-1 mt-2">
+                            <li><strong>Client to NameNode:</strong> Client says, "I want to read `file.txt`."</li>
+                            <li><strong>NameNode to Client:</strong> NameNode checks permissions and replies with a list of all block locations for that file (e.g., "Block 1 is on DataNode A, D, F; Block 2 is on DataNode B, C, E...").</li>
+                            <li><strong>Client to DataNodes:</strong> The client connects *directly* to the best DataNode (usually the closest one on the network) for each block and reads the data. This direct access makes reads very fast and scalable.</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <h3 class="subsection-title text-lg font-medium text-gray-700 mt-6 mb-2">The Principle of Data Locality</h3>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    This is the most critical concept for understanding Hadoop's performance. In traditional systems, you move data to the computation. For a terabyte file, this means moving a terabyte of data over the network, which is slow and expensive. In Hadoop, the philosophy is to **move the computation to the data**. Because HDFS knows where every block of data lives, the YARN resource manager can schedule processing tasks to run on the very same DataNodes that hold the data blocks needed for that task. This drastically reduces network traffic and is the key to Hadoop's efficiency at scale.
+                </p>
+            </section>
+
+             <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Focus Area 2: The MapReduce Paradigm In-Depth</h2>
+                 <p class="text-base text-gray-700 leading-relaxed mb-4">
+                    MapReduce is a powerful programming paradigm for processing data in parallel. Let's trace the "Word Count" example in extreme detail.
+                </p>
+                <div class="flow-diagram no-print border border-gray-200 p-4 rounded-lg">
+                    <div class="flow-box bg-red-100 border-red-300">Input Data</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box bg-blue-100 border-blue-300">Map Phase</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box bg-yellow-100 border-yellow-300">Shuffle & Sort</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box bg-green-100 border-green-300">Reduce Phase</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box bg-red-100 border-red-300">Final Output</div>
+                </div>
+                 <ol class="list-decimal list-inside text-base text-gray-700 ml-5 space-y-3 mt-4">
+                    <li>
+                        <strong>Input & Splitting:</strong> The input is a large text file. HDFS splits this file into blocks. Each block is treated as an input split for a Mapper task.
+                        <p class="text-sm text-gray-600 font-mono bg-slate-50 p-2 rounded mt-1">Split 1: "dear bear river"<br>Split 2: "dear car river"</p>
+                    </li>
+                    <li>
+                        <strong>Map Phase:</strong> A Mapper task runs on each split in parallel. Its job is to read its input, process it, and emit key-value pairs.
+                        <p class="text-sm text-gray-600 font-mono bg-slate-50 p-2 rounded mt-1">Mapper 1 Output: (dear, 1), (bear, 1), (river, 1)<br>Mapper 2 Output: (dear, 1), (car, 1), (river, 1)</p>
+                    </li>
+                     <li>
+                        <strong>Shuffle & Sort Phase:</strong> The framework automatically collects all outputs from the Mappers, shuffles them across the network, and groups them by key. This is the "magic" that brings related data together.
+                        <p class="text-sm text-gray-600 font-mono bg-slate-50 p-2 rounded mt-1">Grouped Output:<br>(bear, [1])<br>(car, [1])<br>(dear, [1, 1])<br>(river, [1, 1])</p>
+                    </li>
+                    <li>
+                        <strong>Reduce Phase:</strong> A Reducer task runs for each unique key. Its job is to process the list of values for its key and produce a final output.
+                        <p class="text-sm text-gray-600 font-mono bg-slate-50 p-2 rounded mt-1">Reducer for 'bear' -> (bear, 1)<br>Reducer for 'car' -> (car, 1)<br>Reducer for 'dear' -> (dear, 2)<br>Reducer for 'river' -> (river, 2)</p>
+                    </li>
+                </ol>
+                <h4 class="detail-title text-base font-semibold text-gray-600 mt-4 mb-2">Optimization: The Combiner</h4>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    A <span class="interactive-term" data-definition="A Combiner is an optional, local Reducer that runs on each Mapper node. It processes the output of a single Mapper before it gets sent over the network, reducing the amount of data that needs to be shuffled.">Combiner</span> is a "mini-reducer" that runs on the same machine as a Mapper. It pre-aggregates the Mapper's output, significantly reducing the amount of data sent during the Shuffle & Sort phase. In our example, the Combiner would sum the counts on each machine before sending them to the Reducers, improving performance.
+                </p>
+            </section>
+
+            <section class="content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Key Takeaways for Session 20</h2>
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1 leading-relaxed">
+                    <li>HDFS provides reliable, scalable, and distributed storage by splitting files into replicated blocks managed by a NameNode and stored on DataNodes.</li>
+                    <li>MapReduce provides a powerful paradigm for parallel processing by splitting tasks into independent Map and Reduce phases, with an automatic Shuffle and Sort in between.</li>
+                    <li>The principle of data locality—moving compute to the data—is a core tenet of the Hadoop ecosystem's efficiency.</li>
+                    <li>Understanding these foundational components is essential for effectively using any tool within the broader Big Data landscape, including more modern ones like Apache Spark.</li>
+                </ul>
+            </section>
+        </article>
+
+        <footer class="text-center mt-12 py-6 border-t border-gray-300"> 
+            <div class="mb-4"> 
+                 <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-10 mx-auto footer-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+            </div>
+            <p class="text-base text-gray-600">&copy; <span id="currentYearModule"></span> FACE Prep Campus (www.faceprep.in). All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('currentYearModule').textContent = new Date().getFullYear();
+
+        const interactiveTerms = document.querySelectorAll('.interactive-term');
+        const tooltip = document.querySelector('.definition-tooltip');
+        if (tooltip) {
+            interactiveTerms.forEach(term => {
+                term.addEventListener('click', (e) => { 
+                    tooltip.textContent = term.dataset.definition;
+                    tooltip.style.display = 'block';
+                    const termRect = term.getBoundingClientRect();
+                    tooltip.style.top = `${termRect.bottom + window.scrollY + 8}px`;
+                    tooltip.style.left = `${termRect.left + window.scrollX}px`;
+                });
+            });
+            document.addEventListener('click', function(event) {
+                if (!event.target.classList.contains('interactive-term')) {
+                    tooltip.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

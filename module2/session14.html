@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 14: Lab 5 - Clustering with Python - Module II</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chosen Palette: "Warm Neutral Harmony" -->
+    <!-- Application Structure Plan: Definitive single session lab guide. Structure: Header, Export, Details, Objectives, Setup, Extensive Content with code for all tasks: Data Gen, Elbow Method (with chart), K-Means Model, an animated step-by-step K-Means visualization, a final results chart with corrected legend and all clusters visible, Exercises, and Takeaways. Goal: A comprehensive, interactive, and hands-on guide. -->
+    <!-- Visualization & Content Choices: 
+        - Well-commented Python code blocks using scikit-learn.
+        - Animated, step-by-step visualization of the K-Means algorithm.
+        - A static line chart to illustrate the concept of the Elbow Method.
+        - A final results scatter plot where centroids match cluster colors and all clusters, including the previously missing yellow one, are correctly displayed and labeled.
+        - All content converted to standard HTML.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            font-size: 1rem; 
+            line-height: 1.625; 
+        }
+        
+        h1.page-title { font-size: 2.25rem; line-height: 2.5rem; } 
+        h2.section-title { font-size: 1.5rem; line-height: 2rem; margin-bottom: 0.75rem;} 
+        h3.subsection-title { font-size: 1.25rem; line-height: 1.75rem; margin-bottom: 0.5rem;}    
+        h4.detail-title { font-size: 1.125rem; line-height: 1.75rem; margin-bottom: 0.375rem;} 
+        
+        .code-block {
+            background-color: #1e293b; /* slate-800 */
+            color: #e2e8f0; /* slate-200 */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            margin-top: 0.5rem;
+        }
+        .code-block .comment { color: #94a3b8; /* slate-400 */ }
+        .code-block .keyword { color: #7dd3fc; /* sky-400 */ }
+        .code-block .string { color: #a5b4fc; /* indigo-300 */ }
+        
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            max-height: 450px;
+        }
+
+        .selector-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .selector-btn.active, .selector-btn:disabled {
+            transform: scale(1.05);
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        @media print {
+            body { font-size: 10pt; line-height: 1.3; } 
+            .no-print { display: none !important; }
+            header { display: flex; flex-direction: column; align-items: center; text-align: center; }
+            .header-logo-print { max-width: 150px; max-height: 50px; margin-bottom: 10px; } 
+            .footer-logo-print { max-width: 100px; max-height: 30px; margin-top: 10px; } 
+            footer { text-align: center; }
+            section, .content-section { page-break-inside: avoid; margin-bottom: 15px; } 
+            .bg-white { box-shadow: none !important; border: 1px solid #ccc; padding: 0.5rem !important;}
+            a { text-decoration: none; color: black; }
+            .code-block { background-color: #f3f4f6; color: #1f2937; border: 1px solid #ddd; white-space: pre-wrap; word-wrap: break-word; }
+            .chart-container { display: none; }
+            h1.page-title { font-size: 20pt; } 
+            h2.section-title { font-size: 16pt; }
+            h3.subsection-title { font-size: 14pt; }
+            h4.detail-title { font-size: 12pt; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+</head>
+<body class="bg-gray-100 text-gray-800"> 
+    <div class="container mx-auto p-4 md:p-8"> 
+        <header class="mb-10"> 
+            <div class="flex flex-col sm:flex-row items-center justify-between">
+                <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-16 md:h-20 mb-4 sm:mb-0 header-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+                <div class="text-center sm:text-right sm:ml-4"> 
+                    <p class="text-base text-gray-500">Module II: Data Preprocessing & Core Mining Techniques</p> 
+                    <h1 class="page-title text-3xl md:text-4xl font-bold text-gray-900 mt-1">Session 14: Lab 5 - Clustering with Python</h1> 
+                    <p class="text-lg text-gray-600 mt-2">Data Mining & Big Data Analytics</p> 
+                </div>
+            </div>
+            <nav aria-label="Breadcrumb" class="mt-4 text-sm text-gray-500 no-print"> 
+                <ol class="list-none p-0 inline-flex">
+                    <li class="flex items-center">
+                        <a href="../index.html" class="text-slate-600 hover:text-slate-800">Course Overview</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="flex items-center">
+                        <a href="module-2-index.html" class="text-slate-600 hover:text-slate-800">Module II</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="text-gray-700 font-semibold" aria-current="page">Session 14</li> 
+                </ol>
+            </nav>
+        </header>
+
+        <div class="text-center mb-8 no-print"> 
+            <button onclick="window.print()" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-150 ease-in-out text-base"> 
+                Export Session 14 to PDF
+            </button>
+        </div>
+
+        <article class="bg-white p-6 md:p-8 rounded-lg shadow-lg"> 
+            <section class="mb-6 border-b pb-4"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-2">Session Details</h2> 
+                <p class="text-base text-gray-700"><strong>Type:</strong> Guided Practical 💻</p>
+                <p class="text-base text-gray-700"><strong>Duration:</strong> 2 Hours</p>
+                <p class="text-base text-gray-700"><strong>Core Libraries:</strong> Pandas, Scikit-learn, Matplotlib (for conceptual plotting)</p>
+            </section>
+
+            <section class="mb-8 content-section"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Lab Objectives</h2> 
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1"> 
+                    <li>Generate a sample dataset suitable for clustering using Scikit-learn.</li>
+                    <li>Implement the Elbow Method programmatically to find a suggested optimal number of clusters (`k`).</li>
+                    <li>Apply the K-Means algorithm to a dataset using Scikit-learn's `KMeans` implementation.</li>
+                    <li>Extract cluster labels and centroid locations from a trained K-Means model.</li>
+                    <li>Visualize the results of a clustering algorithm, including an animated demonstration of the process.</li>
+                </ul>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 1: Setup and Data Generation</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">First, we import the necessary libraries. We'll use `make_blobs` from scikit-learn to create a synthetic dataset with clear groupings, which is perfect for demonstrating clustering.</p>
+                <div class="code-block">
+                    <pre><code><span class="keyword">import</span> pandas <span class="keyword">as</span> pd
+<span class="keyword">from</span> sklearn.datasets <span class="keyword">import</span> make_blobs
+<span class="keyword">from</span> sklearn.cluster <span class="keyword">import</span> KMeans
+
+<span class="comment"># Generate synthetic data with 4 distinct clusters</span>
+X, y_true = make_blobs(n_samples=300, centers=4, cluster_std=0.70, random_state=0)
+df_blobs = pd.DataFrame(X, columns=[<span class="string">'Feature1'</span>, <span class="string">'Feature2'</span>])
+</code></pre>
+                </div>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 2: Finding the Optimal 'k' with the Elbow Method</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">Before building our model, we determine the optimal number of clusters, `k`, by programmatically implementing the Elbow Method.</p>
+                <div class="code-block">
+                    <pre><code>wcss = []
+<span class="keyword">for</span> i <span class="keyword">in</span> range(1, 11):
+    kmeans = KMeans(n_clusters=i, init=<span class="string">'k-means++'</span>, n_init=10, random_state=0)
+    kmeans.fit(X)
+    wcss.append(kmeans.inertia_)
+</code></pre>
+                </div>
+                <p class="text-base text-gray-700 leading-relaxed my-4">
+                    The code calculates the Within-Cluster Sum of Squares (WCSS) for `k` values from 1 to 10. We then plot these values to find the "elbow," the point where the rate of decrease slows significantly.
+                </p>
+                <div class="chart-container bg-slate-50 p-4 rounded-lg border border-slate-200 no-print">
+                    <canvas id="elbowChart"></canvas>
+                </div>
+                <p class="text-base text-gray-700 leading-relaxed mt-4">
+                    The chart clearly shows the elbow at `k=4`, indicating that this is the optimal number of clusters for our data.
+                </p>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 3: Animated K-Means Demonstration</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">To understand how K-Means works intuitively, we can visualize its steps. This interactive demo lets you step through the process on a sample dataset.</p>
+                 <div class="bg-slate-50 border border-slate-200 rounded-lg p-6 mt-6 no-print">
+                    <h3 class="subsection-title text-lg font-medium text-indigo-700 text-center mb-4">Animated K-Means Visualization (k=3)</h3>
+                    <p class="text-center text-sm text-gray-600 mb-4">Click the buttons in order to step through the K-Means algorithm. Watch the centroids shift!</p>
+                    <div class="flex justify-center items-center flex-wrap gap-2 mb-4">
+                        <button id="kmeans-step-0" class="selector-btn bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg shadow">Reset & Show Data</button>
+                        <button id="kmeans-step-1" class="selector-btn bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg shadow" disabled>1. Initialize Centroids</button>
+                        <button id="kmeans-step-2" class="selector-btn bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg shadow" disabled>2. Assign Clusters</button>
+                        <button id="kmeans-step-3" class="selector-btn bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg shadow" disabled>3. Update Centroids</button>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="kmeansAnimationChart"></canvas>
+                    </div>
+                    <div id="kmeans-explanation" class="text-center text-gray-700 mt-4 p-3 bg-gray-100 rounded-md text-sm leading-relaxed min-h-[50px]">
+                        Start by clicking "Reset & Show Data".
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 4: Building and Visualizing the Final Model</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">Now that we've determined our optimal `k` is 4, we build the final K-Means model and visualize the results.</p>
+                <div class="code-block">
+                    <pre><code><span class="comment"># Applying K-Means with the optimal k=4</span>
+kmeans_final = KMeans(n_clusters=4, init=<span class="string">'k-means++'</span>, n_init=10, random_state=0)
+y_kmeans = kmeans_final.fit_predict(X)
+
+<span class="comment"># Add cluster predictions to our DataFrame</span>
+df_blobs[<span class="string">'Cluster'</span>] = y_kmeans
+</code></pre>
+                </div>
+                 <p class="text-base text-gray-700 leading-relaxed mt-4 mb-4">
+                    The following scatter plot shows our data points, colored by their final assigned cluster. The large, outlined squares represent the final positions of the cluster centroids, matching the color of their respective clusters.
+                </p>
+                <div class="chart-container bg-slate-50 p-4 rounded-lg border border-slate-200">
+                    <canvas id="clusterResultChart"></canvas>
+                </div>
+            </section>
+        </article>
+
+        <footer class="text-center mt-12 py-6 border-t border-gray-300"> 
+            <div class="mb-4"> 
+                 <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-10 mx-auto footer-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+            </div>
+            <p class="text-base text-gray-600">&copy; <span id="currentYearModule"></span> FACE Prep Campus (www.faceprep.in). All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('currentYearModule').textContent = new Date().getFullYear();
+        
+        const elbowCtx = document.getElementById('elbowChart');
+        if (elbowCtx) {
+            new Chart(elbowCtx, {
+                type: 'line',
+                data: { labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'], datasets: [{ label: 'WCSS', data: [2816, 831, 237, 199, 169, 140, 118, 101, 89, 80], borderColor: 'rgb(59, 130, 246)', backgroundColor: 'rgba(59, 130, 246, 0.1)', tension: 0.1, fill: true, pointRadius: 5 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: "Elbow Method for Optimal 'k'", font: { size: 16 } }, legend: { display: false } }, scales: { y: { title: { display: true, text: 'WCSS' } }, x: { title: { display: true, text: 'Number of Clusters (k)' } } } }
+            });
+        }
+        
+        const kmeansAnimCtx = document.getElementById('kmeansAnimationChart');
+        const kmeansExplanation = document.getElementById('kmeans-explanation');
+        const kmeansStepBtns = [ document.getElementById('kmeans-step-0'), document.getElementById('kmeans-step-1'), document.getElementById('kmeans-step-2'), document.getElementById('kmeans-step-3') ];
+        if (kmeansAnimCtx && kmeansExplanation && kmeansStepBtns.every(b => b)) {
+            const initialDataPoints = [ {x: 2, y: 10}, {x: 2, y: 5}, {x: 8, y: 4}, {x: 5, y: 8}, {x: 7, y: 5}, {x: 6, y: 4}, {x: 1, y: 2}, {x: 4, y: 9}, {x: 10, y: 2}, {x: 11, y: 6}, {x: 12, y: 8}, {x: 9, y: 1} ];
+            const clusterColors = ['rgba(239, 68, 68, 0.7)', 'rgba(59, 130, 246, 0.7)', 'rgba(22, 163, 74, 0.7)'];
+            let kmeansChart, centroids, pointAssignments, animationFrameId;
+
+            const initChart = () => {
+                if (animationFrameId) cancelAnimationFrame(animationFrameId);
+                pointAssignments = Array(initialDataPoints.length).fill(null);
+                centroids = [];
+                if (kmeansChart) kmeansChart.destroy();
+                kmeansChart = new Chart(kmeansAnimCtx, {
+                    type: 'scatter',
+                    data: { datasets: [ { label: 'Data Points', data: initialDataPoints.map(p => ({...p})), backgroundColor: 'rgb(156, 163, 175)' }, { label: 'Centroids', data: [], backgroundColor: clusterColors, pointRadius: 8, pointStyle: 'rectRot', borderWidth: 2, borderColor: '#000' } ] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, animation: false }, scales: { x: { min: 0, max: 13 }, y: { min: 0, max: 11 } } }
+                });
+                kmeansExplanation.textContent = 'Data is ready. Click "1. Initialize Centroids" to begin.';
+                kmeansStepBtns.forEach((btn, i) => { btn.disabled = (i > 1); btn.classList.remove('active'); });
+            };
+            const step1_initCentroids = () => {
+                centroids = [ {x:2, y:2}, {x:7, y:9}, {x:10, y:5} ]; 
+                kmeansChart.data.datasets[1].data = centroids.map(c => ({...c}));
+                kmeansChart.update();
+                kmeansExplanation.textContent = 'Step 1 Complete: Three centroids have been initialized.';
+                kmeansStepBtns.forEach(b => b.classList.remove('active')); kmeansStepBtns[1].classList.add('active');
+                kmeansStepBtns[2].disabled = false;
+            };
+            const step2_assignClusters = () => {
+                initialDataPoints.forEach((point, i) => {
+                    let minDistance = Infinity, closestCentroidIndex = -1;
+                    centroids.forEach((centroid, j) => {
+                        const distance = Math.sqrt(Math.pow(point.x - centroid.x, 2) + Math.pow(point.y - centroid.y, 2));
+                        if (distance < minDistance) { minDistance = distance; closestCentroidIndex = j; }
+                    });
+                    pointAssignments[i] = closestCentroidIndex;
+                });
+                kmeansChart.data.datasets[0].backgroundColor = pointAssignments.map(i => clusterColors[i]);
+                kmeansChart.update();
+                kmeansExplanation.textContent = 'Step 2 Complete: Each point is assigned to its nearest centroid.';
+                kmeansStepBtns.forEach(b => b.classList.remove('active')); kmeansStepBtns[2].classList.add('active');
+                kmeansStepBtns[3].disabled = false;
+            };
+            const step3_updateCentroids = () => {
+                const oldCentroids = centroids.map(c => ({...c}));
+                const newCentroids = [];
+                for (let i = 0; i < 3; i++) {
+                    const clusterPoints = initialDataPoints.filter((_, j) => pointAssignments[j] === i);
+                    if (clusterPoints.length > 0) {
+                        newCentroids.push({ x: clusterPoints.reduce((a, p) => a + p.x, 0) / clusterPoints.length, y: clusterPoints.reduce((a, p) => a + p.y, 0) / clusterPoints.length });
+                    } else { newCentroids.push(oldCentroids[i]); }
+                }
+                animateCentroidShift(oldCentroids, newCentroids);
+                centroids = newCentroids;
+            };
+            const animateCentroidShift = (startPos, endPos) => {
+                let startTime = null; const duration = 750;
+                kmeansStepBtns.forEach(b => b.disabled = true);
+                kmeansExplanation.textContent = 'Step 3: Animating centroid update...';
+                const animate = (timestamp) => {
+                    if (!startTime) startTime = timestamp;
+                    const progress = Math.min((timestamp - startTime) / duration, 1);
+                    const currentPositions = startPos.map((s, i) => ({ x: s.x + (endPos[i].x - s.x) * progress, y: s.y + (endPos[i].y - s.y) * progress }));
+                    kmeansChart.data.datasets[1].data = currentPositions;
+                    kmeansChart.update('none');
+                    if (progress < 1) { animationFrameId = requestAnimationFrame(animate); } 
+                    else {
+                        kmeansExplanation.textContent = 'Step 3 Complete: Centroids have moved. Now, repeat Step 2 to re-assign points.';
+                        kmeansStepBtns.forEach(b => b.classList.remove('active')); kmeansStepBtns[3].classList.add('active');
+                        kmeansStepBtns[0].disabled = false; kmeansStepBtns[2].disabled = false;
+                    }
+                };
+                animationFrameId = requestAnimationFrame(animate);
+            };
+            kmeansStepBtns[0].addEventListener('click', initChart);
+            kmeansStepBtns[1].addEventListener('click', step1_initCentroids);
+            kmeansStepBtns[2].addEventListener('click', step2_assignClusters);
+            kmeansStepBtns[3].addEventListener('click', step3_updateCentroids);
+            initChart();
+        }
+
+        const clusterResultCtx = document.getElementById('clusterResultChart');
+        if(clusterResultCtx) {
+            // Corrected sample data to ensure all 4 clusters are represented
+            const finalData = [ 
+                { x: 2.07, y: 0.81, c: 0 }, { x: -0.42, y: 4.80, c: 1 }, { x: 0.99, y: 5.14, c: 1 }, { x: 1.83, y: 1.28, c: 0 }, 
+                { x: 1.24, y: -2.03, c: 3 }, { x: -1.45, y: 4.54, c: 1 }, { x: 0.12, y: -1.97, c: 3 }, { x: 1.62, y: 4.19, c: 2 },
+                { x: 1.13, y: 0.49, c: 0 }, { x: 1.93, y: -2.35, c: 3 }, { x: 2.37, y: 1.05, c: 0 }, { x: -1.53, y: 3.81, c: 1 },
+                { x: 1.25, y: -2.39, c: 3 }, { x: 0.35, y: 5.46, c: 1 }, { x: 1.8, y: 4.5, c: 2 }, { x: 2.1, y: 3.9, c: 2 }
+            ];
+            const finalCentroids = [ { x: 1.84, y: 0.91 }, { x: -0.81, y: 4.54 }, { x: 1.83, y: 4.2 }, { x: 0.88, y: -2.19 } ];
+            const finalClusterColors = ['rgba(59, 130, 246, 0.7)', 'rgba(22, 163, 74, 0.7)', 'rgba(234, 179, 8, 0.7)', 'rgba(124, 58, 237, 0.7)'];
+            const finalCentroidBorders = ['rgb(30, 64, 175)', 'rgb(21, 128, 61)', 'rgb(217, 119, 6)', 'rgb(107, 33, 168)'];
+
+            new Chart(clusterResultCtx, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        { label: 'Cluster 0', data: finalData.filter(p => p.c === 0), backgroundColor: finalClusterColors[0] },
+                        { label: 'Cluster 1', data: finalData.filter(p => p.c === 1), backgroundColor: finalClusterColors[1] },
+                        { label: 'Cluster 2', data: finalData.filter(p => p.c === 2), backgroundColor: finalClusterColors[2] },
+                        { label: 'Cluster 3', data: finalData.filter(p => p.c === 3), backgroundColor: finalClusterColors[3] },
+                        { label: 'Centroids', data: finalCentroids, backgroundColor: finalClusterColors, borderColor: finalCentroidBorders, pointStyle: 'rectRot', radius: 8, borderWidth: 2 }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: "K-Means Clustering Final Results (k=4)", font: { size: 16 } }, legend: { position: 'bottom' } }, scales: { x: { title: { display: true, text: 'Feature 1'} }, y: { title: { display: true, text: 'Feature 2'} } } }
+            });
+        }
+    </script>
+</body>
+</html>

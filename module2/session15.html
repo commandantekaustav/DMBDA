@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 15: Classification Algorithms Overview - Module II</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chosen Palette: "Warm Neutral Harmony" -->
+    <!-- Application Structure Plan: Definitive single session detail page. Structure: Header, Export, Session Details, Objectives, Extensive Content (Intro to Classification, detailed breakdowns of Decision Trees, k-NN, and Naive Bayes), Interactive Decision Tree visualization, Interactive k-NN visualization, Interactive Naive Bayes visualization, Key Takeaways, Footer. Goal: The most comprehensive theoretical understanding with all interactive demos fully functional. -->
+    <!-- Visualization & Content Choices: 
+        - Detailed textual explanations of each algorithm's concepts.
+        - Interactive HTML/CSS/JS visualization for Decision Trees, showing decision paths.
+        - A fully functional interactive scatter plot visualization for the k-Nearest Neighbors (k-NN) algorithm.
+        - An interactive demo for Naive Bayes showing probability calculations.
+        - All content converted to standard HTML.
+        - PDF Export: Print-specific CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            font-size: 1rem; 
+            line-height: 1.625; 
+        }
+        
+        .interactive-term { 
+            cursor: pointer;
+            font-weight: 600; 
+        }
+        .definition-tooltip {
+            display: none;
+            position: absolute;
+            background-color: #f9fafb; 
+            border: 1px solid #d1d5db; 
+            padding: 8px; 
+            border-radius: 4px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            z-index: 100;
+            font-size: 0.875rem; 
+            width: max-content;
+            max-width: 320px; 
+        }
+
+        h1.page-title { font-size: 2.25rem; line-height: 2.5rem; } 
+        h2.section-title { font-size: 1.5rem; line-height: 2rem; margin-bottom: 0.75rem;} 
+        h3.subsection-title { font-size: 1.25rem; line-height: 1.75rem; margin-bottom: 0.5rem;}    
+        h4.detail-title { font-size: 1.125rem; line-height: 1.75rem; margin-bottom: 0.375rem;} 
+        
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            max-height: 450px;
+        }
+        .selector-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .selector-btn.active {
+            transform: scale(1.1);
+            background-color: #1d4ed8; /* blue-700 */
+            color: white;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        /* Decision Tree Styles */
+        .tree ul {
+            position: relative;
+            padding-top: 1rem;
+            display: flex;
+            justify-content: center;
+        }
+        .tree li {
+            text-align: center;
+            list-style-type: none;
+            position: relative;
+            padding: 1rem .5rem 0 .5rem;
+        }
+        .tree li::before, .tree li::after{
+            content: '';
+            position: absolute; 
+            top: 0; 
+            right: 50%;
+            border-top: 2px solid #cbd5e1;
+            width: 50%; 
+            height: 1rem;
+        }
+        .tree li::after{
+            right: auto; 
+            left: 50%;
+            border-left: 2px solid #cbd5e1;
+        }
+        .tree li:only-child::after, .tree li:only-child::before { display: none; }
+        .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
+        .tree li:last-child::before{
+            border-right: 2px solid #cbd5e1;
+            border-radius: 0 5px 0 0;
+        }
+        .tree li:first-child::after{
+            border-radius: 5px 0 0 0;
+        }
+        .tree ul ul::before{
+            content: '';
+            position: absolute; 
+            top: 0; 
+            left: 50%;
+            border-left: 2px solid #cbd5e1;
+            width: 0; 
+            height: 1rem;
+        }
+        .tree-node {
+            border: 2px solid #9ca3af;
+            padding: .5rem 1rem;
+            text-decoration: none;
+            display: inline-block;
+            border-radius: .375rem;
+            background-color: #f9fafb;
+            transition: all 0.2s ease;
+        }
+        .tree-leaf {
+            background-color: #dcfce7; /* green-100 */
+            border-color: #22c55e; /* green-500 */
+        }
+        .tree-leaf.no {
+             background-color: #fee2e2; /* red-100 */
+            border-color: #ef4444; /* red-500 */
+        }
+        .tree-node.highlight, .tree-leaf.highlight {
+            border-color: #16a34a;
+            background-color: #bbf7d0;
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.4);
+            transform: scale(1.05);
+        }
+
+
+        @media print {
+            body { font-size: 10pt; line-height: 1.3; } 
+            .no-print { display: none !important; }
+            header { display: flex; flex-direction: column; align-items: center; text-align: center; }
+            .header-logo-print { max-width: 150px; max-height: 50px; margin-bottom: 10px; } 
+            .footer-logo-print { max-width: 100px; max-height: 30px; margin-top: 10px; } 
+            footer { text-align: center; }
+            section, .content-section { page-break-inside: avoid; margin-bottom: 15px; } 
+            .bg-white { box-shadow: none !important; border: 1px solid #ccc; padding: 0.5rem !important;}
+            a { text-decoration: none; color: black; }
+            .interactive-term { text-decoration: none; color: black; font-weight: bold; } 
+            .definition-tooltip { display: none !important; }
+            .chart-container, .tree { display: none; }
+            h1.page-title { font-size: 20pt; } 
+            h2.section-title { font-size: 16pt; }
+            h3.subsection-title { font-size: 14pt; }
+            h4.detail-title { font-size: 12pt; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+</head>
+<body class="bg-gray-100 text-gray-800"> 
+    <div class="container mx-auto p-4 md:p-8"> 
+        <header class="mb-10"> 
+            <div class="flex flex-col sm:flex-row items-center justify-between">
+                <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-16 md:h-20 mb-4 sm:mb-0 header-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+                <div class="text-center sm:text-right sm:ml-4"> 
+                    <p class="text-base text-gray-500">Module II: Data Preprocessing & Core Mining Techniques</p> 
+                    <h1 class="page-title text-3xl md:text-4xl font-bold text-gray-900 mt-1">Session 15: Classification Algorithms Overview</h1> 
+                    <p class="text-lg text-gray-600 mt-2">Data Mining & Big Data Analytics</p> 
+                </div>
+            </div>
+            <nav aria-label="Breadcrumb" class="mt-4 text-sm text-gray-500 no-print"> 
+                <ol class="list-none p-0 inline-flex">
+                    <li class="flex items-center">
+                        <a href="../index.html" class="text-slate-600 hover:text-slate-800">Course Overview</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="flex items-center">
+                        <a href="module-2-index.html" class="text-slate-600 hover:text-slate-800">Module II</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="text-gray-700 font-semibold" aria-current="page">Session 15</li> 
+                </ol>
+            </nav>
+        </header>
+
+        <div class="text-center mb-8 no-print"> 
+            <button onclick="window.print()" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-150 ease-in-out text-base"> 
+                Export Session 15 to PDF
+            </button>
+        </div>
+
+        <article class="bg-white p-6 md:p-8 rounded-lg shadow-lg"> 
+            <section class="mb-6 border-b pb-4"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-2">Session Details</h2> 
+                <p class="text-base text-gray-700"><strong>Type:</strong> Theory 📖</p>
+                <p class="text-base text-gray-700"><strong>Duration:</strong> 1 Hour</p>
+                <p class="text-base text-gray-700"><strong>Textbook References:</strong> Han et al.: Ch. 8 (Classification: Basic Concepts)</p>
+            </section>
+
+            <section class="mb-8 content-section"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Learning Objectives</h2> 
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1"> 
+                    <li>Define classification as a supervised learning technique.</li>
+                    <li>Explain the core components of a classification problem: features, class labels, training set, and test set.</li>
+                    <li>Describe the fundamental logic behind Decision Trees, k-Nearest Neighbors (k-NN), and Naive Bayes classifiers.</li>
+                    <li>Understand the concept of model building (training) and prediction (inference).</li>
+                    <li>Recognize the key differences and ideal use cases for each of these introductory algorithms.</li>
+                </ul>
+            </section>
+
+            <div class="definition-tooltip"></div>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Introduction to Classification</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    Classification is a fundamental task in data mining and machine learning. It is a <span class="interactive-term" data-definition="A type of machine learning where the algorithm learns from data that has been manually labeled with the correct output. The goal is to learn a mapping function that can predict the output for new, unseen data.">supervised learning</span> technique where the goal is to predict the categorical class label of a new instance based on past observations. In simple terms, classification is about assigning an item to a predefined category.
+                </p>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    The process involves two key steps:
+                </p>
+                <ol class="list-decimal list-inside text-base text-gray-700 ml-5 space-y-2">
+                    <li><strong>Training:</strong> A classification algorithm is "trained" on a dataset containing observations (or instances) along with their known class labels. The algorithm learns the relationship between the attributes (features) of the data and the class label. The output of this step is a classification model (or "classifier").</li>
+                    <li><strong>Prediction (or Inference):</strong> The trained model is then used to predict the class label for new, unseen data where the class label is unknown.</li>
+                </ol>
+                <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 mt-4">
+                    <h4 class="detail-title font-semibold text-gray-700">Example: Email Spam Detection</h4>
+                    <p class="text-sm text-gray-600"><strong>Training:</strong> We provide the model with thousands of emails, each labeled as either 'Spam' or 'Not Spam'. The model learns which words, phrases, or sender characteristics are associated with spam.</p>
+                    <p class="text-sm text-gray-600 mt-1"><strong>Prediction:</strong> When a new email arrives, the trained model analyzes its features and assigns it a predicted label: 'Spam' or 'Not Spam'.</p>
+                </div>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Algorithm 1: Decision Trees</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    A Decision Tree is one of the most intuitive and interpretable classification models. It creates a tree-like structure where each internal node represents a test on an attribute (a feature), each branch represents the outcome of the test, and each leaf node represents a class label (a decision).
+                </p>
+                 <h3 class="subsection-title text-lg font-medium text-gray-700 mt-4 mb-2">How it Works:</h3>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    The tree is built by recursively splitting the data into smaller and smaller subsets based on the features that best separate the classes. To classify a new instance, you start at the root and traverse down the tree according to the outcomes of the tests until you reach a leaf node, which gives you the predicted class.
+                </p>
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-6 mt-6 no-print">
+                    <h3 class="subsection-title text-lg font-medium text-indigo-700 text-center mb-4">Interactive Decision Tree Visualization</h3>
+                    <p class="text-center text-sm text-gray-600 mb-4">Select the conditions for a new day to see how the tree makes a prediction for "Play Tennis".</p>
+                    
+                    <div class="flex justify-center items-center flex-wrap gap-4 mb-6">
+                        <div>
+                            <label for="outlook" class="block text-sm font-medium text-gray-700">Outlook</label>
+                            <select id="outlook" class="dt-selector mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                                <option>Sunny</option>
+                                <option>Overcast</option>
+                                <option>Rain</option>
+                            </select>
+                        </div>
+                         <div>
+                            <label for="humidity" class="block text-sm font-medium text-gray-700">Humidity</label>
+                            <select id="humidity" class="dt-selector mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                                <option>High</option>
+                                <option>Normal</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="wind" class="block text-sm font-medium text-gray-700">Wind</label>
+                            <select id="wind" class="dt-selector mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                                <option>Weak</option>
+                                <option>Strong</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="tree text-xs md:text-sm">
+                        <ul>
+                            <li>
+                                <div class="tree-node" id="node-outlook">Outlook?</div>
+                                <ul>
+                                    <li>
+                                        <div class="tree-node" id="node-humidity">Humidity?</div>
+                                        <ul>
+                                            <li><div class="tree-leaf no" id="leaf-no-1">Play: No</div></li>
+                                            <li><div class="tree-leaf" id="leaf-yes-1">Play: Yes</div></li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <div class="tree-leaf" id="leaf-yes-2">Play: Yes</div>
+                                    </li>
+                                     <li>
+                                        <div class="tree-node" id="node-wind">Wind?</div>
+                                         <ul>
+                                            <li><div class="tree-leaf" id="leaf-yes-3">Play: Yes</div></li>
+                                            <li><div class="tree-leaf no" id="leaf-no-2">Play: No</div></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div id="dt-explanation" class="text-center text-gray-700 mt-6 p-3 bg-gray-100 rounded-md text-sm leading-relaxed min-h-[50px]">
+                        Your decision path will be highlighted here.
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Algorithm 2: k-Nearest Neighbors (k-NN)</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    k-Nearest Neighbors (k-NN) is a simple yet powerful instance-based learning algorithm. It is considered a <span class="interactive-term" data-definition="A 'lazy' algorithm does not build a general model during the training phase. Instead, it stores the entire training dataset and performs calculations only when it needs to make a prediction for a new data point.">"lazy learner"</span> because it doesn't build a model during training; it simply stores the entire training dataset.
+                </p>
+                 <h3 class="subsection-title text-lg font-medium text-gray-700 mt-4 mb-2">How it Works:</h3>
+                 <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    When a new, unlabeled data point needs to be classified, the k-NN algorithm works as follows:
+                </p>
+                <ol class="list-decimal list-inside text-base text-gray-700 ml-5 space-y-1">
+                    <li>Calculate the distance (e.g., Euclidean distance) from the new point to all points in the training dataset.</li>
+                    <li>Identify the 'k' nearest neighbors (the 'k' points with the smallest distances).</li>
+                    <li>Assign the class label to the new point based on a majority vote among its 'k' neighbors. For example, if k=5 and 3 of the 5 nearest neighbors belong to Class A, the new point is classified as Class A.</li>
+                </ol>
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-6 mt-6 no-print">
+                    <h3 class="subsection-title text-lg font-medium text-indigo-700 text-center mb-4">Interactive k-NN Visualization</h3>
+                    <p class="text-center text-sm text-gray-600 mb-4">A new data point (⭐) needs to be classified. Select a value for 'k' to see how the majority vote of its nearest neighbors determines its class.</p>
+                    <div class="flex justify-center items-center space-x-4 mb-4">
+                        <button class="selector-btn bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg shadow" data-knn-k="1">k = 1</button>
+                        <button class="selector-btn bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg shadow" data-knn-k="3">k = 3</button>
+                        <button class="selector-btn bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg shadow" data-knn-k="5">k = 5</button>
+                        <button class="selector-btn bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg shadow" data-knn-k="7">k = 7</button>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="knnClassifyChart"></canvas>
+                    </div>
+                    <div id="knnClassifyExplanation" class="text-center text-gray-700 mt-4 p-3 bg-gray-100 rounded-md text-sm leading-relaxed min-h-[50px]">
+                        Select a 'k' value to begin.
+                    </div>
+                </div>
+            </section>
+
+             <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Algorithm 3: Naive Bayes</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    Naive Bayes is a probabilistic classifier based on <span class="interactive-term" data-definition="Bayes' Theorem describes the probability of an event, based on prior knowledge of conditions that might be related to the event. P(A|B) = [P(B|A) * P(A)] / P(B)">Bayes' Theorem</span>. It's called "naive" because it makes a strong assumption that all features are independent of one another.
+                </p>
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-6 mt-6 no-print">
+                    <h3 class="subsection-title text-lg font-medium text-indigo-700 text-center mb-4">Interactive Demo: Naive Bayes for Spam Filtering</h3>
+                    <p class="text-center text-sm text-gray-600 mb-4">Let's classify a new email. First, observe the pre-calculated probabilities from our training data. Then, select words present in the "new email" to see the calculation and final prediction.</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                        <div>
+                            <h4 class="detail-title font-semibold text-gray-700">1. Prior Probabilities</h4>
+                            <p>P(Spam) = 0.3</p>
+                            <p>P(Not Spam) = 0.7</p>
+                        </div>
+                         <div>
+                            <h4 class="detail-title font-semibold text-gray-700">2. Likelihoods (Word Probabilities)</h4>
+                            <table class="w-full text-left text-xs mt-1">
+                                <thead class="bg-gray-200"><tr><th class="p-1">Word</th><th class="p-1">P(word | Spam)</th><th class="p-1">P(word | Not Spam)</th></tr></thead>
+                                <tbody>
+                                    <tr class="border-b"><td>'free'</td><td>0.30</td><td>0.01</td></tr>
+                                    <tr class="border-b"><td>'meeting'</td><td>0.05</td><td>0.40</td></tr>
+                                    <tr class="border-b"><td>'money'</td><td>0.25</td><td>0.02</td></tr>
+                                    <tr><td>'report'</td><td>0.02</td><td>0.30</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="mt-6">
+                        <h4 class="detail-title font-semibold text-gray-700">3. Classify a New Email</h4>
+                        <p class="text-sm mb-2">Select the words present in the new email:</p>
+                        <div id="bayes-word-selectors" class="flex flex-wrap gap-4">
+                            <label class="flex items-center"><input type="checkbox" data-word="free" class="mr-2"> 'free'</label>
+                            <label class="flex items-center"><input type="checkbox" data-word="meeting" class="mr-2"> 'meeting'</label>
+                            <label class="flex items-center"><input type="checkbox" data-word="money" class="mr-2"> 'money'</label>
+                            <label class="flex items-center"><input type="checkbox" data-word="report" class="mr-2"> 'report'</label>
+                        </div>
+                    </div>
+                     <div id="bayes-calculation" class="mt-4 p-3 bg-gray-100 rounded-md text-sm leading-relaxed min-h-[50px]">
+                        Select words to see the classification calculation...
+                    </div>
+                </div>
+            </section>
+            
+            <section class="content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Key Takeaways for Session 15</h2>
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1 leading-relaxed">
+                    <li>Classification is a supervised learning task that predicts a categorical label for new data based on a trained model.</li>
+                    <li><strong>Decision Trees</strong> are interpretable, flowchart-like models that make decisions based on feature tests.</li>
+                    <li><strong>k-Nearest Neighbors (k-NN)</strong> is a simple, "lazy" algorithm that classifies new data based on the majority class of its nearest neighbors.</li>
+                    <li><strong>Naive Bayes</strong> is a fast, probabilistic classifier that works well for text classification, despite its simplifying assumption of feature independence.</li>
+                    <li>Each algorithm has distinct strengths and weaknesses, making them suitable for different types of problems and data.</li>
+                </ul>
+            </section>
+        </article>
+
+        <footer class="text-center mt-12 py-6 border-t border-gray-300"> 
+            <div class="mb-4"> 
+                 <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-10 mx-auto footer-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+            </div>
+            <p class="text-base text-gray-600">&copy; <span id="currentYearModule"></span> FACE Prep Campus (www.faceprep.in). All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('currentYearModule').textContent = new Date().getFullYear();
+
+        const interactiveTerms = document.querySelectorAll('.interactive-term');
+        const tooltip = document.querySelector('.definition-tooltip');
+        if (tooltip) {
+            interactiveTerms.forEach(term => {
+                term.addEventListener('click', (e) => { 
+                    tooltip.textContent = term.dataset.definition;
+                    tooltip.style.display = 'block';
+                    const termRect = term.getBoundingClientRect();
+                    tooltip.style.top = `${termRect.bottom + window.scrollY + 8}px`;
+                    tooltip.style.left = `${termRect.left + window.scrollX}px`;
+                });
+            });
+            document.addEventListener('click', function(event) {
+                if (!event.target.classList.contains('interactive-term')) {
+                    tooltip.style.display = 'none';
+                }
+            });
+        }
+        
+        const knnClassifyCtx = document.getElementById('knnClassifyChart');
+        const knnClassifyExplanation = document.getElementById('knnClassifyExplanation');
+        const knnSelectorBtns = document.querySelectorAll('.selector-btn[data-knn-k]');
+
+        if (knnClassifyCtx && knnClassifyExplanation && knnSelectorBtns.length > 0) {
+            const classAData = [ {x: 2, y: 3}, {x: 3, y: 4}, {x: 1, y: 4}, {x: 3, y: 2}, {x: 4, y: 3.5} ];
+            const classBData = [ {x: 7, y: 8}, {x: 8, y: 9}, {x: 6, y: 7}, {x: 9, y: 8}, {x: 8, y: 6.5}, {x: 5.5, y: 7.5} ];
+            const allTrainingData = [...classAData, ...classBData];
+            const newPoint = {x: 5, y: 5.5};
+
+            const neighbors = allTrainingData
+                .map((p, i) => ({ ...p, class: i < classAData.length ? 'A' : 'B', dist: Math.sqrt(Math.pow(p.x - newPoint.x, 2) + Math.pow(p.y - newPoint.y, 2)) }))
+                .sort((a, b) => a.dist - b.dist);
+
+            const knnClassifyChart = new Chart(knnClassifyCtx, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        { label: 'Class A', data: classAData, backgroundColor: 'rgba(59, 130, 246, 0.7)' },
+                        { label: 'Class B', data: classBData, backgroundColor: 'rgba(239, 68, 68, 0.7)' },
+                        { label: 'New Point', data: [newPoint], backgroundColor: 'rgba(22, 163, 74, 1)', pointRadius: 8, pointStyle: 'star' },
+                        { label: 'Neighbors', data: [], borderColor: 'rgba(234, 179, 8, 1)', borderWidth: 3, pointRadius: 6, showLine: false, fill: false }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: "k-NN Classification Demo", font: {size: 16} }, legend: { position: 'bottom' } }, scales: { x: { min: 0, max: 10 }, y: { min: 0, max: 10 } } }
+            });
+
+            const updateKnnChart = (k) => {
+                const kNeighbors = neighbors.slice(0, k);
+                const classAVotes = kNeighbors.filter(n => n.class === 'A').length;
+                const classBVotes = kNeighbors.filter(n => n.class === 'B').length;
+                const predictedClass = classAVotes > classBVotes ? 'A' : 'B';
+                
+                knnClassifyChart.data.datasets[3].data = kNeighbors;
+                knnClassifyChart.update();
+                
+                knnClassifyExplanation.innerHTML = `With <strong>k=${k}</strong>, the nearest neighbors are: ${classAVotes} from Class A and ${classBVotes} from Class B.<br>The new point is classified as <strong>Class ${predictedClass}</strong>.`;
+            };
+
+            knnSelectorBtns.forEach(btn => btn.addEventListener('click', () => { knnSelectorBtns.forEach(b => b.classList.remove('active')); btn.classList.add('active'); updateKnnChart(parseInt(btn.dataset.knnK)); }));
+            knnSelectorBtns[1].click();
+        }
+
+        const bayesWordSelectors = document.getElementById('bayes-word-selectors');
+        const bayesCalculationDiv = document.getElementById('bayes-calculation');
+        
+        if (bayesWordSelectors && bayesCalculationDiv) {
+            const priors = { spam: 0.3, not_spam: 0.7 };
+            const likelihoods = { free: { spam: 0.30, not_spam: 0.01 }, meeting: { spam: 0.05, not_spam: 0.40 }, money: { spam: 0.25, not_spam: 0.02 }, report: { spam: 0.02, not_spam: 0.30 } };
+            const calculateBayes = () => {
+                const selectedWords = Array.from(bayesWordSelectors.querySelectorAll('input:checked')).map(cb => cb.dataset.word);
+                if (selectedWords.length === 0) { bayesCalculationDiv.innerHTML = "Select words to see the classification calculation..."; return; }
+                let posteriorSpam = priors.spam, posteriorNotSpam = priors.not_spam;
+                let spamDisplayCalc = `${priors.spam}`, notSpamDisplayCalc = `${priors.not_spam}`;
+                selectedWords.forEach(word => { posteriorSpam *= likelihoods[word].spam; spamDisplayCalc += ` * ${likelihoods[word].spam}`; posteriorNotSpam *= likelihoods[word].not_spam; notSpamDisplayCalc += ` * ${likelihoods[word].not_spam}`; });
+                const predictedClass = posteriorSpam > posteriorNotSpam ? 'Spam' : 'Not Spam';
+                const resultColor = predictedClass === 'Spam' ? 'text-red-600' : 'text-green-600';
+                bayesCalculationDiv.innerHTML = `<p><strong>Calculating for SPAM:</strong></p><p class="text-xs">P(Spam | words) ∝ ${spamDisplayCalc} = <strong>${posteriorSpam.toExponential(4)}</strong></p><p class="mt-2"><strong>Calculating for NOT SPAM:</strong></p><p class="text-xs">P(Not Spam | words) ∝ ${notSpamDisplayCalc} = <strong>${posteriorNotSpam.toExponential(4)}</strong></p><hr class="my-2"><p class="font-bold">Result: Since ${posteriorSpam.toExponential(4)} ${posteriorSpam > posteriorNotSpam ? '>' : '<'} ${posteriorNotSpam.toExponential(4)}, the predicted class is <span class="${resultColor} font-bold text-lg">${predictedClass}</span>.</p>`;
+            };
+            bayesWordSelectors.addEventListener('change', calculateBayes);
+            calculateBayes();
+        }
+
+        const dtSelectors = document.querySelectorAll('.dt-selector');
+        const dtExplanation = document.getElementById('dt-explanation');
+        if (dtSelectors.length > 0 && dtExplanation) {
+            const nodes = { outlook: document.getElementById('node-outlook'), humidity: document.getElementById('node-humidity'), wind: document.getElementById('node-wind'), no1: document.getElementById('leaf-no-1'), yes1: document.getElementById('leaf-yes-1'), yes2: document.getElementById('leaf-yes-2'), yes3: document.getElementById('leaf-yes-3'), no2: document.getElementById('leaf-no-2'), };
+            const updateDtPath = () => {
+                Object.values(nodes).forEach(node => node.classList.remove('highlight'));
+                const outlook = document.getElementById('outlook').value;
+                const humidity = document.getElementById('humidity').value;
+                const wind = document.getElementById('wind').value;
+                let path = 'Path: '; let prediction = '';
+                nodes.outlook.classList.add('highlight');
+                path += `Outlook is ${outlook} → `;
+                if (outlook === 'Sunny') {
+                    nodes.humidity.classList.add('highlight'); path += `Humidity is ${humidity} → `;
+                    if (humidity === 'High') { nodes.no1.classList.add('highlight'); prediction = 'Play Tennis: No'; } 
+                    else { nodes.yes1.classList.add('highlight'); prediction = 'Play Tennis: Yes'; }
+                } else if (outlook === 'Overcast') {
+                    nodes.yes2.classList.add('highlight'); prediction = 'Play Tennis: Yes';
+                } else {
+                    nodes.wind.classList.add('highlight'); path += `Wind is ${wind} → `;
+                    if (wind === 'Weak') { nodes.yes3.classList.add('highlight'); prediction = 'Play Tennis: Yes'; } 
+                    else { nodes.no2.classList.add('highlight'); prediction = 'Play Tennis: No'; }
+                }
+                dtExplanation.innerHTML = `${path} <strong>Prediction: ${prediction}</strong>`;
+            };
+            dtSelectors.forEach(selector => selector.addEventListener('change', updateDtPath));
+            updateDtPath();
+        }
+    </script>
+</body>
+</html>
