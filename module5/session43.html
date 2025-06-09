@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 43: Mini Project - Phase 6: Presentations & Evaluation - Module V</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: "Warm Neutral Harmony" -->
+    <!-- Application Structure Plan: Definitive single session project guide with 10+ tasks. Structure: Header, Export, Details, Objectives, Introduction, Detailed Key Tasks (Audience, Core Message, Presentation Structure, Slide Design with new Do/Don't visual, Narrative, Demo Prep, Rehearsal, Q&A with new interactive simulator, Final Checklist), Deliverables, Key Takeaways, Footer. Goal: A definitive, hands-on guide for final project presentations. -->
+    <!-- Visualization & Content Choices: 
+        - Detailed textual guidance for each key task.
+        - An interactive guide to structuring a presentation.
+        - A new visual comparison of good vs. bad slide design.
+        - A new interactive Q&A simulator to help students prepare for questions.
+        - All content presented in standard HTML.
+        - PDF Export: Print-specific CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            font-size: 1rem; 
+            line-height: 1.625; 
+        }
+        
+        h1.page-title { font-size: 2.25rem; line-height: 2.5rem; } 
+        h2.section-title { font-size: 1.5rem; line-height: 2rem; margin-bottom: 0.75rem;} 
+        h3.subsection-title { font-size: 1.25rem; line-height: 1.75rem; margin-bottom: 0.5rem;}    
+        h4.detail-title { font-size: 1.125rem; line-height: 1.75rem; margin-bottom: 0.375rem;} 
+        
+        .task-card {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-left-width: 4px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0.5rem;
+        }
+        .task-card-project { border-left-color: #f59e0b; }
+        
+        .selector-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .selector-btn.active {
+            transform: scale(1.05);
+            background-color: #1d4ed8; /* blue-700 */
+            color: white;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        
+        .design-card {
+            border: 2px solid;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        .design-card h5 { font-weight: 600; font-size: 1rem; }
+        .design-card ul { margin-top: 0.5rem; }
+        .design-do { border-color: #22c55e; background-color: #f0fdf4; }
+        .design-dont { border-color: #ef4444; background-color: #fee2e2; }
+
+        @media print {
+            body { font-size: 10pt; line-height: 1.3; } 
+            .no-print { display: none !important; }
+            header { display: flex; flex-direction: column; align-items: center; text-align: center; }
+            .header-logo-print { max-width: 150px; max-height: 50px; margin-bottom: 10px; } 
+            .footer-logo-print { max-width: 100px; max-height: 30px; margin-top: 10px; } 
+            footer { text-align: center; }
+            section, .content-section, .task-card { page-break-inside: avoid; margin-bottom: 15px; } 
+            .bg-white { box-shadow: none !important; border: 1px solid #ccc; padding: 0.5rem !important;}
+            a { text-decoration: none; color: black; }
+            h1.page-title { font-size: 20pt; } 
+            h2.section-title { font-size: 16pt; }
+            h3.subsection-title { font-size: 14pt; }
+            h4.detail-title { font-size: 12pt; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+</head>
+<body class="bg-gray-100 text-gray-800"> 
+    <div class="container mx-auto p-4 md:p-8"> 
+        <header class="mb-10"> 
+            <div class="flex flex-col sm:flex-row items-center justify-between">
+                <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-16 md:h-20 mb-4 sm:mb-0 header-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+                <div class="text-center sm:text-right sm:ml-4"> 
+                    <p class="text-base text-gray-500">Module V: Advanced Topics, Ethics, and Project Conclusion</p> 
+                    <h1 class="page-title text-3xl md:text-4xl font-bold text-gray-900 mt-1">Session 43: Mini Project - Phase 6: Presentations & Evaluation</h1> 
+                    <p class="text-lg text-gray-600 mt-2">Data Mining & Big Data Analytics</p> 
+                </div>
+            </div>
+            <nav aria-label="Breadcrumb" class="mt-4 text-sm text-gray-500 no-print"> 
+                <ol class="list-none p-0 inline-flex">
+                    <li class="flex items-center">
+                        <a href="../index.html" class="text-slate-600 hover:text-slate-800">Course Overview</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="flex items-center">
+                        <a href="module-5-index.html" class="text-slate-600 hover:text-slate-800">Module V</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="text-gray-700 font-semibold" aria-current="page">Session 43</li> 
+                </ol>
+            </nav>
+        </header>
+
+        <article class="bg-white p-6 md:p-8 rounded-lg shadow-lg"> 
+            
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Project Workflow: Key Tasks for Phase 6</h2>
+                
+                <div class="task-card task-card-project">
+                    <h3 class="subsection-title text-lg font-medium text-amber-700">Task 1 & 2: Audience Analysis and Core Message</h3>
+                    <p class="text-sm text-gray-700 leading-relaxed"><strong>Task 1 (Audience):</strong> Understand your audience (instructor, peers). They are technical but may not know the specifics of your dataset. Your goal is to convince them that your project is well-executed and your conclusions are valid.</p>
+                    <p class="text-sm text-gray-700 leading-relaxed mt-2"><strong>Task 2 (Core Message):</strong> What is the single most important takeaway from your project? Define this "thesis statement" first. Every part of your presentation should support this core message.</p>
+                </div>
+
+                <div class="task-card task-card-project">
+                    <h3 class="subsection-title text-lg font-medium text-amber-700">Task 3 & 4: Structuring Your Presentation and Designing Slides</h3>
+                    <p class="text-sm text-gray-700 leading-relaxed"><strong>Task 3 (Structure):</strong> A logical structure is key. Use the interactive guide below to plan the sections of your presentation.</p>
+                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-6 mt-4 no-print">
+                        <h4 class="detail-title font-semibold text-indigo-700 text-center mb-4">Interactive Guide: Anatomy of a Technical Presentation</h4>
+                        <div class="flex flex-wrap items-center justify-center gap-2 mb-4" id="presentation-nav">
+                             <button class="selector-btn bg-gray-200 text-gray-700 py-1 px-3 rounded-md text-sm" data-section="title">Title</button>
+                            <button class="selector-btn bg-gray-200 text-gray-700 py-1 px-3 rounded-md text-sm" data-section="problem">Problem</button>
+                            <button class="selector-btn bg-gray-200 text-gray-700 py-1 px-3 rounded-md text-sm" data-section="data">Data</button>
+                            <button class="selector-btn bg-gray-200 text-gray-700 py-1 px-3 rounded-md text-sm" data-section="method">Methodology</button>
+                            <button class="selector-btn bg-gray-200 text-gray-700 py-1 px-3 rounded-md text-sm" data-section="results">Results</button>
+                            <button class="selector-btn bg-gray-200 text-gray-700 py-1 px-3 rounded-md text-sm" data-section="conclusion">Conclusion</button>
+                        </div>
+                        <div id="presentation-explanation" class="text-sm p-4 border bg-white rounded min-h-[75px]">Select a section to see what to include.</div>
+                    </div>
+                     <p class="text-sm text-gray-700 leading-relaxed mt-4"><strong>Task 4 (Slide Design):</strong> Good design enhances clarity; bad design distracts. Follow these principles:</p>
+                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 no-print">
+                         <div class="design-card design-dont">
+                             <h5>👎 Bad Slide</h5>
+                             <img src="https://placehold.co/400x225/fee2e2/b91c1c?text=Wall+of+Text...+small+font... \n low+contrast...+multiple+ideas... \n ...unlabeled+chart...more+text" alt="A cluttered slide with too much text" class="w-full rounded border-2 border-red-300">
+                             <ul class="list-disc list-inside mt-2">
+                                 <li>Overloaded with long paragraphs.</li>
+                                 <li>Small, hard-to-read font.</li>
+                                 <li>Confusing, unlabeled visuals.</li>
+                             </ul>
+                         </div>
+                          <div class="design-card design-do">
+                             <h5>👍 Good Slide</h5>
+                              <img src="https://placehold.co/400x225/dcfce7/15803d?text=One+Clear+Point\n\nBig,+Readable+Visual\n(Chart,+Image)" alt="A clean slide with one idea and a large visual" class="w-full rounded border-2 border-green-300">
+                             <ul class="list-disc list-inside mt-2">
+                                 <li>One main idea per slide.</li>
+                                 <li>Large, clear, readable font.</li>
+                                 <li>High-contrast colors.</li>
+                                 <li>A single, powerful visual with clear labels.</li>
+                             </ul>
+                         </div>
+                     </div>
+                </div>
+
+                <div class="task-card task-card-project">
+                    <h3 class="subsection-title text-lg font-medium text-amber-700">Task 5 & 6: Crafting Your Narrative and Preparing for a Demo</h3>
+                    <p class="text-sm text-gray-700 leading-relaxed"><strong>Task 5 (Narrative):</strong> Don't just list facts. Tell a story: start with the problem, describe the journey of your analysis (the challenges and discoveries), and build towards your final, impactful conclusion.</p>
+                    <p class="text-sm text-gray-700 leading-relaxed mt-2"><strong>Task 6 (Live Demo Prep - Optional):</strong> If you plan a live demo, prepare meticulously. Have a backup plan (screenshots/video). Test it on the presentation machine if possible. Keep it short and focused on the most impressive part of your project.</p>
+                </div>
+
+                 <div class="task-card task-card-project">
+                    <h3 class="subsection-title text-lg font-medium text-amber-700">Task 7 & 8: Rehearsal and Handling Q&A</h3>
+                     <p class="text-sm text-gray-700 leading-relaxed"><strong>Task 7 (Rehearsal):</strong> Rehearse your presentation multiple times. Time yourself to ensure you fit within the allotted time. Practice builds confidence and smooths out your delivery.</p>
+                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-6 mt-4 no-print">
+                        <h4 class="detail-title font-semibold text-indigo-700 text-center mb-4">Interactive Q&A Simulator</h4>
+                        <p class="text-center text-sm text-gray-600 mb-4">Practice answering tough questions. Click a category to see example questions and how to approach them.</p>
+                        <div class="flex flex-wrap items-center justify-center gap-2 mb-4" id="qa-nav">
+                             <button class="selector-btn bg-gray-200 text-gray-700 py-1 px-3 rounded-md text-sm" data-q="technical">Technical</button>
+                            <button class="selector-btn bg-gray-200 text-gray-700 py-1 px-3 rounded-md text-sm" data-q="business">Business Impact</button>
+                            <button class="selector-btn bg-gray-200 text-gray-700 py-1 px-3 rounded-md text-sm" data-q="limitations">Limitations</button>
+                        </div>
+                        <div id="qa-explanation" class="text-sm p-4 border bg-white rounded min-h-[100px]">Select a category to see example questions and response tips.</div>
+                    </div>
+                     <p class="text-sm text-gray-700 leading-relaxed mt-4"><strong>Task 8 (Q&A Prep):</strong> Anticipate potential questions about your methodology, data limitations, and results. Prepare concise answers. It's okay to say, "That's an interesting point, I'd have to look into that further," if you don't know an answer.</p>
+                </div>
+
+                 <div class="task-card task-card-project">
+                    <h3 class="subsection-title text-lg font-medium text-amber-700">Task 9 & 10: Final Pre-Flight Checks</h3>
+                     <p class="text-sm text-gray-700 leading-relaxed"><strong>Task 9 (Technical Check):</strong> Ensure your presentation file works. If presenting online, test your microphone and camera. Have a backup of your presentation on a USB drive or cloud storage.</p>
+                    <p class="text-sm text-gray-700 leading-relaxed mt-2"><strong>Task 10 (Self-Care):</strong> Get a good night's sleep before your presentation. A well-rested mind performs better!</p>
+                </div>
+            </section>
+        </article>
+
+        <footer class="text-center mt-12 py-6 border-t border-gray-300"> 
+            <div class="mb-4"> 
+                 <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-10 mx-auto footer-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+            </div>
+            <p class="text-base text-gray-600">&copy; <span id="currentYearModule"></span> FACE Prep Campus (www.faceprep.in). All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('currentYearModule').textContent = new Date().getFullYear();
+        
+        const presentationNav = document.getElementById('presentation-nav');
+        const presentationExplanation = document.getElementById('presentation-explanation');
+        if(presentationNav && presentationExplanation) {
+            const explanations = {
+                title: "<strong>Title Slide:</strong> Your project title, your name(s), course name, and date. Keep it clean and professional.",
+                problem: "<strong>Problem Statement & Objectives:</strong> What problem did you solve? Why is it important? What were your specific goals? (1-2 slides)",
+                data: "<strong>Data Overview:</strong> Where did your data come from? What does it contain? Mention key features and any major data quality issues you faced. (1-2 slides)",
+                method: "<strong>Methodology:</strong> Briefly describe your preprocessing steps and the ML models you chose. Justify *why* you chose them. (2-3 slides)",
+                results: "<strong>Key Results & Analysis:</strong> This is the core. Show your final model's performance with clear charts and tables. Most importantly, explain what the results mean. What did you discover? (3-5 slides)",
+                demo: "<strong>Live Demo (Optional):</strong> A brief (2-3 minute) demonstration of your working code or a key result. Risky but can be very impressive if it works!",
+                conclusion: "<strong>Conclusion & Future Work:</strong> Summarize your key findings. Did you meet your objectives? What are the limitations? What would be the next steps if you continued this project? (1 slide)"
+            };
+            presentationNav.addEventListener('click', (e) => {
+                if(e.target.tagName === 'BUTTON') {
+                    const section = e.target.dataset.section;
+                    presentationExplanation.innerHTML = explanations[section];
+                    document.querySelectorAll('.presentation-section-btn').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                }
+            });
+            presentationNav.querySelector('button').click();
+        }
+
+        const qaNav = document.getElementById('qa-nav');
+        const qaExplanation = document.getElementById('qa-explanation');
+        if(qaNav && qaExplanation) {
+            const qaData = {
+                technical: "<strong>Example Question:</strong> 'Why did you choose a Decision Tree over a Logistic Regression model?'<br><strong>How to Answer:</strong> Start by acknowledging the validity of the other model. State your primary reason clearly (e.g., 'We prioritized interpretability, and the tree structure allowed us to easily see the most important decision rules.'). Then, briefly mention any other factors (e.g., 'It also handled the non-linear relationships in our data slightly better in our baseline tests.').",
+                business: "<strong>Example Question:</strong> 'What is the real-world business value of your findings?'<br><strong>How to Answer:</strong> Connect your results directly to a business outcome. Use numbers if possible (e.g., 'Our model's ability to identify high-risk customers with 85% recall could translate to preventing an estimated $50,000 in customer churn per quarter.'). Focus on actionability.",
+                limitations: "<strong>Example Question:</strong> 'Your dataset was from 2020. How would you ensure this model is still valid today?'<br><strong>How to Answer:</strong> Acknowledge the limitation directly and show you've thought about it. (e.g., 'That's a great point. The model is based on pre-pandemic data, so its performance could degrade.'). Propose a solution. (e.g., 'A key part of deploying this would be to set up continuous monitoring and a retraining pipeline that runs on new data every quarter to combat concept drift.')."
+            };
+             qaNav.addEventListener('click', (e) => {
+                if(e.target.tagName === 'BUTTON') {
+                    const section = e.target.dataset.q;
+                    qaExplanation.innerHTML = qaData[section];
+                    document.querySelectorAll('#qa-nav .selector-btn').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                }
+            });
+            qaNav.querySelector('button').click();
+        }
+    </script>
+</body>
+</html>

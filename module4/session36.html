@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 36: Blended Learning - Spark MLlib and Advanced Topics - Module IV</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: "Warm Neutral Harmony" -->
+    <!-- Application Structure Plan: Definitive single session detail page for blended learning. Structure: Header, Export, Session Details, Objectives, Introduction, Links to resources, Detailed Focus Areas (ML Pipelines Deep Dive with diagram, Advanced Feature Engineering, Model Persistence), Connecting to Mini-Project, Key Takeaways, Footer. Goal: A comprehensive self-study guide for advanced and practical Spark MLlib concepts. -->
+    <!-- Visualization & Content Choices: 
+        - Detailed textual explanations for all concepts, converted to standard HTML.
+        - Well-commented, illustrative code blocks for ML Pipelines, advanced transformers, and model persistence.
+        - A new conceptual diagram using HTML/CSS to visualize the ML Pipeline workflow.
+        - Interactive tooltips for technical terms.
+        - PDF Export: Print-specific CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            font-size: 1rem; 
+            line-height: 1.625; 
+        }
+        
+        .interactive-term { 
+            cursor: pointer;
+            font-weight: 600; 
+        }
+        .definition-tooltip {
+            display: none;
+            position: absolute;
+            background-color: #f9fafb; 
+            border: 1px solid #d1d5db; 
+            padding: 8px; 
+            border-radius: 4px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            z-index: 100;
+            font-size: 0.875rem; 
+            width: max-content;
+            max-width: 320px; 
+        }
+
+        h1.page-title { font-size: 2.25rem; line-height: 2.5rem; } 
+        h2.section-title { font-size: 1.5rem; line-height: 2rem; margin-bottom: 0.75rem;} 
+        h3.subsection-title { font-size: 1.25rem; line-height: 1.75rem; margin-bottom: 0.5rem;}    
+        h4.detail-title { font-size: 1.125rem; line-height: 1.75rem; margin-bottom: 0.375rem;} 
+        
+        .external-link-card {
+            background-color: #eff6ff; /* blue-50 */
+            border: 1px solid #93c5fd; /* blue-300 */
+            border-left-width: 4px;
+            border-left-color: #2563eb; /* blue-600 */
+            padding: 1.5rem;
+            margin-top: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0.5rem;
+        }
+        .code-block {
+            background-color: #1e293b; /* slate-800 */
+            color: #e2e8f0; /* slate-200 */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        .code-block .comment { color: #94a3b8; }
+        .code-block .keyword { color: #7dd3fc; }
+        .code-block .string { color: #a5b4fc; }
+        
+        .pipeline-diagram { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.5rem; }
+        .pipeline-box { background-color: #f3f4f6; border: 1px solid #d1d5db; padding: 0.5rem 1rem; border-radius: 0.25rem; text-align: center; font-size: 0.875rem; }
+        .pipeline-arrow { font-size: 1.5rem; color: #9ca3af; }
+
+
+        @media print {
+            body { font-size: 10pt; line-height: 1.3; } 
+            .no-print { display: none !important; }
+            header { display: flex; flex-direction: column; align-items: center; text-align: center; }
+            .header-logo-print { max-width: 150px; max-height: 50px; margin-bottom: 10px; } 
+            .footer-logo-print { max-width: 100px; max-height: 30px; margin-top: 10px; } 
+            footer { text-align: center; }
+            section, .content-section { page-break-inside: avoid; margin-bottom: 15px; } 
+            .bg-white { box-shadow: none !important; border: 1px solid #ccc; padding: 0.5rem !important;}
+            a { text-decoration: none; color: black; }
+            .external-link-card { border: 1px solid #ccc; padding: 0.5rem; }
+            .interactive-term { text-decoration: none; color: black; font-weight: bold; } 
+            .definition-tooltip { display: none !important; }
+            .code-block { background-color: #f3f4f6; color: #1f2937; border: 1px solid #ddd; white-space: pre-wrap; word-wrap: break-word; }
+            .pipeline-diagram { display: none; }
+            h1.page-title { font-size: 20pt; } 
+            h2.section-title { font-size: 16pt; }
+            h3.subsection-title { font-size: 14pt; }
+            h4.detail-title { font-size: 12pt; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+</head>
+<body class="bg-gray-100 text-gray-800"> 
+    <div class="container mx-auto p-4 md:p-8"> 
+        <header class="mb-10"> 
+            <div class="flex flex-col sm:flex-row items-center justify-between">
+                <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-16 md:h-20 mb-4 sm:mb-0 header-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+                <div class="text-center sm:text-right sm:ml-4"> 
+                    <p class="text-base text-gray-500">Module IV: Machine Learning for Big Data with Spark</p> 
+                    <h1 class="page-title text-3xl md:text-4xl font-bold text-gray-900 mt-1">Session 36: Blended Learning - Spark MLlib and Advanced Topics</h1> 
+                    <p class="text-lg text-gray-600 mt-2">Data Mining & Big Data Analytics</p> 
+                </div>
+            </div>
+            <nav aria-label="Breadcrumb" class="mt-4 text-sm text-gray-500 no-print"> 
+                <ol class="list-none p-0 inline-flex">
+                    <li class="flex items-center">
+                        <a href="../index.html" class="text-slate-600 hover:text-slate-800">Course Overview</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="flex items-center">
+                        <a href="module-4-index.html" class="text-slate-600 hover:text-slate-800">Module IV</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="text-gray-700 font-semibold" aria-current="page">Session 36</li> 
+                </ol>
+            </nav>
+        </header>
+
+        <div class="text-center mb-8 no-print"> 
+            <button onclick="window.print()" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-150 ease-in-out text-base"> 
+                Export Session 36 to PDF
+            </button>
+        </div>
+
+        <article class="bg-white p-6 md:p-8 rounded-lg shadow-lg"> 
+            <section class="mb-6 border-b pb-4"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-2">Session Details</h2> 
+                <p class="text-base text-gray-700"><strong>Type:</strong> Blended Learning 🌐</p>
+                <p class="text-base text-gray-700"><strong>Duration:</strong> 5 Hours (Self-paced study)</p>
+                <p class="text-base text-gray-700"><strong>Primary Resources:</strong> Coursera Content, Spark MLlib Official Documentation</p>
+            </section>
+
+            <section class="mb-8 content-section"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Session Objectives</h2> 
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1"> 
+                    <li>Develop a deep understanding of the Spark ML `Pipeline` API and its components (`Estimator`, `Transformer`).</li>
+                    <li>Explore advanced feature engineering techniques available in Spark MLlib.</li>
+                    <li>Learn the importance of model persistence and how to save and load trained MLlib models and pipelines.</li>
+                    <li>Synthesize these advanced concepts and apply them to your mini-project for a more robust and professional implementation.</li>
+                </ul>
+            </section>
+
+            <div class="definition-tooltip"></div>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Focus Area 1: ML Pipelines Deep Dive</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    In the previous labs, we applied feature transformers (`StringIndexer`, `VectorAssembler`) and model trainers (`DecisionTreeClassifier`) as separate steps. In a real-world project, this approach is error-prone and difficult to manage. Spark's `Pipeline` API solves this by allowing you to chain all your steps into a single, reproducible workflow.
+                </p>
+                <h3 class="subsection-title text-lg font-medium text-gray-700 mt-4 mb-2">Key Pipeline Components</h3>
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-3">
+                    <li>
+                        <strong>Transformer:</strong> An algorithm which can transform one DataFrame into another DataFrame. For example, a `StringIndexer` is a Transformer because it takes a DataFrame with a string column and returns a new DataFrame with an indexed numerical column. A trained model is also a Transformer because it takes a DataFrame with a `features` column and returns a new DataFrame with a `prediction` column.
+                    </li>
+                    <li>
+                        <strong>Estimator:</strong> An algorithm which can be `fit()` on a DataFrame to produce a Transformer. For example, `DecisionTreeClassifier` is an Estimator. When you call `.fit()` on it with your training data, it learns from the data and produces a `DecisionTreeClassificationModel`, which is a Transformer.
+                    </li>
+                    <li>
+                        <strong>Pipeline:</strong> Chains multiple Transformers and Estimators together to specify an ML workflow. When you call `.fit()` on a Pipeline, it fits each Estimator in order on the training data, producing a `PipelineModel` (which is itself a Transformer).
+                    </li>
+                </ul>
+                <div class="pipeline-diagram no-print border border-gray-200 p-4 rounded-lg mt-4">
+                    <div class="flow-diagram">
+                        <div class="flow-box bg-yellow-100 border-yellow-300">StringIndexer<br>(Estimator)</div>
+                        <div class="flow-arrow">+</div>
+                        <div class="flow-box bg-yellow-100 border-yellow-300">VectorAssembler<br>(Transformer)</div>
+                        <div class="flow-arrow">+</div>
+                        <div class="flow-box bg-yellow-100 border-yellow-300">LogisticRegression<br>(Estimator)</div>
+                    </div>
+                    <div class="text-center my-2 text-2xl font-thin text-gray-500">↓ .fit(trainingData)</div>
+                     <div class="flow-diagram">
+                        <div class="flow-box bg-green-100 border-green-300">PipelineModel<br>(A single, trained Transformer)</div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Focus Area 2: Advanced Feature Engineering</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    Beyond simple indexing and assembly, MLlib provides many powerful feature transformers.
+                </p>
+                <h3 class="subsection-title text-lg font-medium text-gray-700 mt-4 mb-2">A. Binning and Discretization</h3>
+                 <p class="text-sm text-gray-700 leading-relaxed mb-2">Converting continuous numerical features into discrete categorical bins can sometimes improve model performance, especially for tree-based models.</p>
+                <div class="code-block">
+                    <pre><code><span class="keyword">from</span> pyspark.ml.feature <span class="keyword">import</span> Bucketizer
+
+<span class="comment"># Splits define the boundaries for the bins. [-inf, 0, 10, 100, inf] creates 4 bins.</span>
+splits = [-float(<span class="string">'inf'</span>), 0.0, 10.0, 100.0, float(<span class="string">'inf'</span>)]
+bucketizer = Bucketizer(splits=splits, inputCol=<span class="string">"numerical_feature"</span>, outputCol=<span class="string">"binned_feature"</span>)
+</code></pre>
+                </div>
+
+                 <h3 class="subsection-title text-lg font-medium text-gray-700 mt-6 mb-2">B. Scaling Numerical Features</h3>
+                 <p class="text-sm text-gray-700 leading-relaxed mb-2">As we've seen, scaling is crucial for distance-based or gradient-based algorithms.</p>
+                <div class="code-block">
+                    <pre><code><span class="keyword">from</span> pyspark.ml.feature <span class="keyword">import</span> StandardScaler, MinMaxScaler
+
+<span class="comment"># StandardScaler: Scales data to have a mean of 0 and standard deviation of 1.</span>
+scaler = StandardScaler(inputCol=<span class="string">"features"</span>, outputCol=<span class="string">"scaledFeatures"</span>)
+
+<span class="comment"># MinMaxScaler: Scales data to a specified range [min, max], usually [0, 1].</span>
+min_max_scaler = MinMaxScaler(inputCol=<span class="string">"features"</span>, outputCol=<span class="string">"minmax_scaled"</span>)
+</code></pre>
+                </div>
+            </section>
+
+             <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Focus Area 3: Model Persistence (Saving & Loading)</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    Training a machine learning model, especially on Big Data, can be very time-consuming. You don't want to have to retrain your model every time you need to make a prediction. Spark allows you to save your trained models (and entire pipelines) to persistent storage (like HDFS or a local file system) and load them back later for inference.
+                </p>
+                <div class="code-block">
+                    <pre><code><span class="keyword">from</span> pyspark.ml <span class="keyword">import</span> PipelineModel
+
+<span class="comment"># Assume 'pipeline_model' is the trained PipelineModel from the previous lab</span>
+<span class="comment"># pipeline_model = pipeline.fit(trainingData)</span>
+
+<span class="comment"># --- SAVING ---</span>
+<span class="comment"># Define a path to save the model</span>
+model_path = <span class="string">"./my_spark_model"</span>
+
+<span class="comment"># Save the entire pipeline model</span>
+<span class="comment"># pipeline_model.write().overwrite().save(model_path)</span>
+<span class="keyword">print</span>(f<span class="string">"Model would be saved to: {model_path}"</span>)
+
+
+<span class="comment"># --- LOADING ---</span>
+<span class="comment"># In a different application or script, you can load the saved model</span>
+<span class="comment"># loaded_model = PipelineModel.load(model_path)</span>
+<span class="keyword">print</span>(<span class="string">"\nModel could be loaded back from the same path."</span>)
+
+<span class="comment"># Now, you can use loaded_model.transform(new_data_df) to make predictions</span>
+<span class="comment"># without needing to retrain anything.</span>
+</code></pre>
+                </div>
+            </section>
+
+             <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Connecting to Your Mini-Project</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    As you proceed with your mini-project implementation, strongly consider refactoring your code to use the `Pipeline` API.
+                </p>
+                 <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-2">
+                    <li><strong>Action Item 1:</strong> Define all your feature preparation steps (`StringIndexer`, `VectorAssembler`, `StandardScaler`, etc.) as stages.</li>
+                    <li><strong>Action Item 2:</strong> Define your chosen model (`DecisionTreeClassifier`, `LogisticRegression`, etc.) as the final stage.</li>
+                    <li><strong>Action Item 3:</strong> Chain them all together in a single `Pipeline`. This will make your model training, evaluation, and especially hyperparameter tuning (`CrossValidator` works directly with pipelines) much cleaner and more robust.</li>
+                 </ul>
+            </section>
+
+        </article>
+
+        <footer class="text-center mt-12 py-6 border-t border-gray-300"> 
+            <div class="mb-4"> 
+                 <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-10 mx-auto footer-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+            </div>
+            <p class="text-base text-gray-600">&copy; <span id="currentYearModule"></span> FACE Prep Campus (www.faceprep.in). All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('currentYearModule').textContent = new Date().getFullYear();
+
+        const interactiveTerms = document.querySelectorAll('.interactive-term');
+        const tooltip = document.querySelector('.definition-tooltip');
+        if (tooltip) {
+            interactiveTerms.forEach(term => {
+                term.addEventListener('click', (e) => { 
+                    tooltip.textContent = term.dataset.definition;
+                    tooltip.style.display = 'block';
+                    const termRect = term.getBoundingClientRect();
+                    tooltip.style.top = `${termRect.bottom + window.scrollY + 8}px`;
+                    tooltip.style.left = `${termRect.left + window.scrollX}px`;
+                });
+            });
+            document.addEventListener('click', function(event) {
+                if (!event.target.classList.contains('interactive-term')) {
+                    tooltip.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

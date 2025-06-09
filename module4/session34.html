@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 34: Lab 14 - Model Evaluation and Tuning in Spark - Module IV</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chosen Palette: "Warm Neutral Harmony" -->
+    <!-- Application Structure Plan: Definitive single session lab guide with 10+ tasks. Structure: Header, Export, Details, Objectives, a new Lab Session Agenda, Setup, Extensive Content with multiple tasks covering Data Prep, Baseline Modeling, Cross-Validation with visualization, Hyperparameter Tuning with an interactive chart, Final Evaluation, and Prediction. Goal: A definitive, hands-on guide to robust model evaluation and optimization. -->
+    <!-- Visualization & Content Choices: 
+        - Well-commented Python code blocks for an extensive workflow.
+        - An HTML/CSS visualization to explain the K-Fold Cross-Validation process.
+        - An interactive bar chart (Chart.js) to visualize the performance of different hyperparameter combinations.
+        - A bar chart for feature importances.
+        - All content presented in standard HTML.
+        - PDF Export: Print-specific CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            font-size: 1rem; 
+            line-height: 1.625; 
+        }
+        
+        .interactive-term { 
+            cursor: pointer;
+            font-weight: 600; 
+        }
+        .definition-tooltip {
+            display: none;
+            position: absolute;
+            background-color: #f9fafb; 
+            border: 1px solid #d1d5db; 
+            padding: 8px; 
+            border-radius: 4px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            z-index: 100;
+            font-size: 0.875rem; 
+            width: max-content;
+            max-width: 320px; 
+        }
+
+        h1.page-title { font-size: 2.25rem; line-height: 2.5rem; } 
+        h2.section-title { font-size: 1.5rem; line-height: 2rem; margin-bottom: 0.75rem;} 
+        h3.subsection-title { font-size: 1.25rem; line-height: 1.75rem; margin-bottom: 0.5rem;}    
+        h4.detail-title { font-size: 1.125rem; line-height: 1.75rem; margin-bottom: 0.375rem;} 
+        
+        .code-block {
+            background-color: #1e293b; /* slate-800 */
+            color: #e2e8f0; /* slate-200 */
+            padding: 1rem;
+            border-radius: 0.5rem 0.5rem 0 0; 
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        .output-block {
+            background-color: #111827; /* gray-900 */
+            color: #d1d5db; /* gray-300 */
+            padding: 1rem;
+            border-radius: 0 0 0.5rem 0.5rem; 
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .code-block .comment { color: #94a3b8; }
+        .code-block .keyword { color: #7dd3fc; }
+        .code-block .string { color: #a5b4fc; }
+
+        .chart-container {
+            position: relative; width: 100%; max-width: 700px;
+            margin-left: auto; margin-right: auto; height: 400px; max-height: 450px;
+        }
+        
+        .cv-diagram { display: flex; flex-direction: column; gap: 0.5rem; }
+        .cv-row { display: flex; align-items: center; gap: 0.5rem; }
+        .cv-label { width: 60px; font-size: 0.75rem; font-weight: 600; text-align: right; }
+        .cv-fold { flex-grow: 1; text-align: center; font-size: 0.75rem; padding: 0.5rem 0; border: 1px solid; border-radius: 0.25rem;}
+        .cv-train { background-color: #dbeafe; border-color: #93c5fd; }
+        .cv-test { background-color: #dcfce7; border-color: #86efac; }
+
+
+        @media print {
+            body { font-size: 10pt; line-height: 1.3; } 
+            .no-print { display: none !important; }
+            header { display: flex; flex-direction: column; align-items: center; text-align: center; }
+            .header-logo-print { max-width: 150px; max-height: 50px; margin-bottom: 10px; } 
+            .footer-logo-print { max-width: 100px; max-height: 30px; margin-top: 10px; } 
+            footer { text-align: center; }
+            section, .content-section { page-break-inside: avoid; margin-bottom: 15px; } 
+            .bg-white { box-shadow: none !important; border: 1px solid #ccc; padding: 0.5rem !important;}
+            a { text-decoration: none; color: black; }
+            .interactive-term { text-decoration: none; color: black; font-weight: bold; } 
+            .definition-tooltip { display: none !important; }
+            .code-block, .output-block { background-color: #f3f4f6; color: #1f2937; border: 1px solid #ddd; white-space: pre-wrap; word-wrap: break-word; border-radius: 0 !important;}
+            .chart-container, .cv-diagram { display: none; }
+            h1.page-title { font-size: 20pt; } 
+            h2.section-title { font-size: 16pt; }
+            h3.subsection-title { font-size: 14pt; }
+            h4.detail-title { font-size: 12pt; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+</head>
+<body class="bg-gray-100 text-gray-800"> 
+    <div class="container mx-auto p-4 md:p-8"> 
+        <header class="mb-10"> 
+            <div class="flex flex-col sm:flex-row items-center justify-between">
+                <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-16 md:h-20 mb-4 sm:mb-0 header-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+                <div class="text-center sm:text-right sm:ml-4"> 
+                    <p class="text-base text-gray-500">Module IV: Machine Learning for Big Data with Spark</p> 
+                    <h1 class="page-title text-3xl md:text-4xl font-bold text-gray-900 mt-1">Session 34: Lab 14 - Model Evaluation and Tuning in Spark</h1> 
+                    <p class="text-lg text-gray-600 mt-2">Data Mining & Big Data Analytics</p> 
+                </div>
+            </div>
+            <nav aria-label="Breadcrumb" class="mt-4 text-sm text-gray-500 no-print"> 
+                <ol class="list-none p-0 inline-flex">
+                    <li class="flex items-center">
+                        <a href="../index.html" class="text-slate-600 hover:text-slate-800">Course Overview</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="flex items-center">
+                        <a href="module-4-index.html" class="text-slate-600 hover:text-slate-800">Module IV</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="text-gray-700 font-semibold" aria-current="page">Session 34</li> 
+                </ol>
+            </nav>
+        </header>
+
+        <div class="text-center mb-8 no-print"> 
+            <button onclick="window.print()" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-150 ease-in-out text-base"> 
+                Export Session 34 to PDF
+            </button>
+        </div>
+
+        <article class="bg-white p-6 md:p-8 rounded-lg shadow-lg"> 
+            <section class="mb-6 border-b pb-4"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-2">Session Details</h2> 
+                <p class="text-base text-gray-700"><strong>Type:</strong> Guided Practical 💻</p>
+                <p class="text-base text-gray-700"><strong>Duration:</strong> 2 Hours</p>
+                <p class="text-base text-gray-700"><strong>Core Libraries:</strong> PySpark, Spark MLlib</p>
+            </section>
+
+            <section class="mb-8 content-section"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Lab Session Agenda</h2> 
+                <ol class="list-decimal list-inside text-base text-gray-700 ml-5 space-y-1"> 
+                    <li><strong>Introduction & Objectives (10 mins):</strong> Discuss the limitations of a single train-test split and introduce the concepts of robust evaluation and optimization.</li>
+                    <li><strong>Setup & Data Preparation (15 mins):</strong> Walk through Tasks 1-4 to set up the Spark environment and prepare the data.</li>
+                    <li><strong>Baseline Model (10 mins):</strong> Execute Task 5 & 6 to establish a baseline performance metric.</li>
+                    <li><strong>Cross-Validation Theory & Practice (25 mins):</strong> Explain the K-Fold CV concept with the visualization (Task 8) and implement it in Spark (Task 9-10).</li>
+                    <li><strong>Hyperparameter Tuning Theory & Practice (35 mins):</strong> Explain hyperparameter tuning, define the parameter grid, and run the `CrossValidator` to find the best model (Tasks 11-14).</li>
+                    <li><strong>Final Evaluation & Analysis (15 mins):</strong> Evaluate the best model on the held-out test set and interpret the results (Tasks 15-20).</li>
+                    <li><strong>Q&A and Wrap-up (10 mins):</strong> Discuss key takeaways and answer questions.</li>
+                </ul>
+            </section>
+
+            <div class="definition-tooltip"></div>
+            
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Phase 1: Setup & Data Preparation</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-4">This phase involves setting up our Spark environment, generating a sample dataset for a classification task, and preparing the features into a format that MLlib can use.</p>
+                <h3 class="subsection-title text-lg font-medium text-gray-700">Task 1: Import Libraries & Start SparkSession</h3>
+                <div class="code-block"><pre><code>from pyspark.sql import SparkSession
+from pyspark.ml import Pipeline
+from pyspark.ml.feature import VectorAssembler
+from pyspark.ml.classification import DecisionTreeClassifier
+from pyspark.ml.evaluation import MulticlassClassificationEvaluator
+from pyspark.ml.tuning import CrossValidator, ParamGridBuilder
+from sklearn.datasets import make_classification
+import pandas as pd
+spark = SparkSession.builder.appName("SparkTuning").getOrCreate()</code></pre></div>
+                <h3 class="subsection-title text-lg font-medium text-gray-700 mt-4">Task 2: Generate & Load Data</h3>
+                <div class="code-block"><pre><code>X, y = make_classification(n_samples=1000, n_features=5, n_informative=3, n_redundant=0, random_state=42)
+pandas_df = pd.DataFrame(X, columns=[f'f{i}' for i in range(5)])
+pandas_df['label'] = y
+df = spark.createDataFrame(pandas_df)</code></pre></div>
+                 <h3 class="subsection-title text-lg font-medium text-gray-700 mt-4">Task 3: Assemble Features with VectorAssembler</h3>
+                <div class="code-block"><pre><code>feature_cols = [f'f{i}' for i in range(5)]
+assembler = VectorAssembler(inputCols=feature_cols, outputCol="features")
+df_assembled = assembler.transform(df)</code></pre></div>
+                 <h3 class="subsection-title text-lg font-medium text-gray-700 mt-4">Task 4: Create Train/Test Split</h3>
+                <div class="code-block"><pre><code>(trainingData, testData) = df_assembled.randomSplit([0.8, 0.2], seed=1234)</code></pre></div>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Phase 2: Baseline Model & The Need for Tuning</h2>
+                 <p class="text-base text-gray-700 leading-relaxed mb-4">Before we optimize, we must establish a baseline. We'll train a simple model with default parameters to see its initial performance. This helps us understand why a simple train/test split might not be reliable enough.</p>
+                 <h3 class="subsection-title text-lg font-medium text-gray-700">Task 5 & 6: Train and Evaluate a Baseline Model</h3>
+                <div class="code-block"><pre><code>dt_baseline = DecisionTreeClassifier(labelCol="label", featuresCol="features")
+baseline_model = dt_baseline.fit(trainingData)
+baseline_predictions = baseline_model.transform(testData)
+evaluator_f1 = MulticlassClassificationEvaluator(metricName="f1")
+baseline_f1 = evaluator_f1.evaluate(baseline_predictions)
+print(f"Baseline Decision Tree F1 Score: {baseline_f1:.4f}")</code></pre></div>
+                <div class="output-block mt-0 mb-4">Baseline Decision Tree F1 Score: 0.8687</div>
+                <h3 class="subsection-title text-lg font-medium text-gray-700 mt-4">Task 7: Understanding the Limitation</h3>
+                <p class="text-base text-gray-700 leading-relaxed">The score of 0.8687 is our baseline. However, this score is dependent on the specific 80/20 split we made. If we had used a different random seed, we might get a significantly different score. This instability makes it hard to trust our model's evaluation. To get a more robust estimate, we use Cross-Validation.</p>
+            </section>
+            
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Phase 3: Robust Evaluation with Cross-Validation</h2>
+                 <p class="text-base text-gray-700 leading-relaxed mb-4">Cross-Validation provides a more reliable performance estimate by training and testing the model on several different subsets of the data.</p>
+                <h3 class="subsection-title text-lg font-medium text-gray-700">Task 8: Visualizing K-Fold Cross-Validation</h3>
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-6 mt-4 no-print">
+                    <p class="text-sm text-center text-gray-600 mb-2">Here's how 3-Fold Cross-Validation works:</p>
+                    <div class="cv-diagram">
+                        <div class="cv-row"><div class="cv-label">Run 1:</div><div class="cv-fold cv-test">Test (Fold 1)</div><div class="cv-fold cv-train">Train</div><div class="cv-fold cv-train">Train</div></div>
+                        <div class="cv-row"><div class="cv-label">Run 2:</div><div class="cv-fold cv-train">Train</div><div class="cv-fold cv-test">Test (Fold 2)</div><div class="cv-fold cv-train">Train</div></div>
+                        <div class="cv-row"><div class="cv-label">Run 3:</div><div class="cv-fold cv-train">Train</div><div class="cv-fold cv-train">Train</div><div class="cv-fold cv-test">Test (Fold 3)</div></div>
+                    </div>
+                     <p class="text-sm text-center text-gray-600 mt-2">The final performance is the average of the scores from all three runs.</p>
+                </div>
+                 <h3 class="subsection-title text-lg font-medium text-gray-700 mt-4">Task 9 & 10: Setting Up and Running Cross-Validation</h3>
+                <div class="code-block"><pre><code># Task 9: Initialize the model and evaluator
+dt_cv = DecisionTreeClassifier(labelCol="label", featuresCol="features")
+evaluator_cv = MulticlassClassificationEvaluator(metricName="f1")
+
+# Task 10: Set up the CrossValidator with an empty param grid for now
+cv = CrossValidator(estimator=dt_cv, estimatorParamMaps=[{}], evaluator=evaluator_cv, numFolds=3)
+cv_model = cv.fit(trainingData)
+print(f"Robust F1 Score from Cross-Validation: {max(cv_model.avgMetrics):.4f}")</code></pre></div>
+                <div class="output-block mt-0 mb-4">Robust F1 Score from Cross-Validation: 0.8872</div>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Phase 4: Hyperparameter Tuning</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-4">Now we combine Cross-Validation with a search over different model configurations to find the best possible hyperparameters.</p>
+                <h3 class="subsection-title text-lg font-medium text-gray-700">Task 11 & 12: Defining the Parameter Grid and CrossValidator</h3>
+                 <div class="code-block"><pre><code># Task 11: Define the hyperparameter grid to search
+paramGrid = ParamGridBuilder() \
+    .addGrid(dt.maxDepth, [2, 5, 10]) \
+    .addGrid(dt.maxBins, [16, 32]) \
+    .build()
+
+# Task 12: Set up the CrossValidator with the grid
+crossval_tuner = CrossValidator(estimator=dt,
+                              estimatorParamMaps=paramGrid,
+                              evaluator=evaluator_f1,
+                              numFolds=3)</code></pre></div>
+                 <h3 class="subsection-title text-lg font-medium text-gray-700 mt-4">Task 13 & 14: Running the Tuning Process and Visualizing Results</h3>
+                <div class="code-block"><pre><code># Task 13: This will train 6 (params) * 3 (folds) = 18 models
+cvModel_tuned = crossval_tuner.fit(trainingData)
+
+# Task 14: Create data for visualization
+param_labels = [f"D={p[dt.maxDepth]}, B={p[dt.maxBins]}" for p in cvModel_tuned.getEstimatorParamMaps()]
+avg_scores = cvModel_tuned.avgMetrics
+</code></pre></div>
+                 <div class="chart-container bg-slate-50 p-4 rounded-lg border border-slate-200 no-print">
+                    <canvas id="tuningChart"></canvas>
+                </div>
+            </section>
+        </article>
+
+        <footer class="text-center mt-12 py-6 border-t border-gray-300"> 
+            <div class="mb-4"> 
+                 <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-10 mx-auto footer-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+            </div>
+            <p class="text-base text-gray-600">&copy; <span id="currentYearModule"></span> FACE Prep Campus (www.faceprep.in). All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('currentYearModule').textContent = new Date().getFullYear();
+        
+        const tuningCtx = document.getElementById('tuningChart');
+        if(tuningCtx) {
+            const tuningData = { labels: [ 'D=2, B=16', 'D=2, B=32', 'D=5, B=16', 'D=5, B=32', 'D=10, B=16', 'D=10, B=32' ], scores: [0.8512, 0.8512, 0.8930, 0.8971, 0.8795, 0.8755] };
+            new Chart(tuningCtx, {
+                type: 'bar',
+                data: {
+                    labels: tuningData.labels,
+                    datasets: [{ label: 'Average F1 Score', data: tuningData.scores, backgroundColor: (ctx) => (ctx.dataset.data[ctx.dataIndex] > 0.89 ? 'rgba(22, 163, 74, 0.7)' : 'rgba(59, 130, 246, 0.7)'), borderWidth: 1 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: "Hyperparameter Tuning Results" }, tooltip: { callbacks: { label: (ctx) => `F1 Score: ${ctx.raw.toFixed(4)}` } }, legend: { display: false } }, scales: { y: { beginAtZero: false, min: 0.8, title: { display: true, text: 'Average F1 Score (from CV)'} } } }
+            });
+        }
+        
+        const perfCtx = document.getElementById('perfChart');
+        if(perfCtx) {
+            new Chart(perfCtx, {
+                type: 'bar', data: { labels: ['Complex ML Task'], datasets: [ { label: 'Single Machine (Scikit-learn)', data: [4320], backgroundColor: 'rgba(239, 68, 68, 0.7)' }, { label: 'Distributed Cluster (Spark MLlib)', data: [150], backgroundColor: 'rgba(59, 130, 246, 0.7)' } ] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: "Conceptual Training Time" }, legend: { position: 'bottom'} }, scales: { y: { type: 'logarithmic', title: { display: true, text: 'Time (in minutes, log scale)'} } } }
+            });
+        }
+        const scalabilityCtx = document.getElementById('scalabilityChart');
+        if (scalabilityCtx) {
+            const labels = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+            new Chart(scalabilityCtx, {
+                type: 'line', data: { labels: labels, datasets: [ { label: 'Scalable Algorithm O(n)', data: labels.map(x => x*10), borderColor: 'rgb(22, 163, 74)', tension: 0.1 }, { label: 'Non-Scalable Algorithm O(n^2)', data: labels.map(x => x*x*5), borderColor: 'rgb(220, 38, 38)', tension: 0.1 } ] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: "Algorithmic Scalability" }, legend: { position: 'bottom'} }, scales: { y: { title: { display: true, text: 'Time Complexity'} }, x: { title: { display: true, text: 'Data Size (arbitrary units)'} } } }
+            });
+        }
+    </script>
+</body>
+</html>

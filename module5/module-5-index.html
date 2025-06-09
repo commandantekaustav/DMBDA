@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module V: Advanced Topics, Ethics, and Project Conclusion - Index</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: "Warm Neutral Harmony" -->
+    <!-- Application Structure Plan: This is an index page for Module 5. Structure: 1) Header with logo, module title, back link to main course overview. 2) Export button. 3) Module Focus/Summary. 4) A list/grid of all sessions within Module 5, each with its title, a brief description, and a link to the detailed session HTML page. 5) Footer. Goal: Provide clear navigation within Module 5. -->
+    <!-- Visualization & Content Choices: 
+        - List or card-based layout for session links.
+        - Each session entry will show session number (from the 90-hour plan), title, and a very brief focus/type.
+        - Direct links to sessionX.html files (e.g., session37.html, session38.html).
+        - All content presented in standard HTML.
+        - PDF Export: Print-specific CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            font-size: 1rem; 
+            line-height: 1.625; 
+        }
+        
+        h1.page-title { font-size: 2.25rem; line-height: 2.5rem; } 
+        h2.section-title { font-size: 1.5rem; line-height: 2rem; margin-bottom: 0.75rem;} 
+        h3.subsection-title { font-size: 1.25rem; line-height: 1.75rem; margin-bottom: 0.5rem;}    
+        
+        .session-link-card {
+            display: block;
+            background-color: #f9fafb; /* gray-50 */
+            border: 1px solid #e5e7eb; /* gray-200 */
+            border-left-width: 4px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 0.5rem;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .session-link-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.07);
+        }
+        .session-link-card .session-type-icon {
+            margin-right: 0.5rem;
+        }
+
+
+        @media print {
+            body { font-size: 10pt; line-height: 1.3; } 
+            .no-print { display: none !important; }
+            header { display: flex; flex-direction: column; align-items: center; text-align: center; }
+            .header-logo-print { max-width: 150px; max-height: 50px; margin-bottom: 10px; } 
+            .footer-logo-print { max-width: 100px; max-height: 30px; margin-top: 10px; } 
+            footer { text-align: center; }
+            section, .content-section, .session-link-card { page-break-inside: avoid; margin-bottom: 15px; } 
+            .bg-white { box-shadow: none !important; border: 1px solid #ccc; padding: 0.5rem !important;}
+            a { text-decoration: none; color: black; }
+            .session-link-card { border: 1px solid #eee; padding: 0.5rem; }
+            h1.page-title { font-size: 20pt; } 
+            h2.section-title { font-size: 16pt; }
+            h3.subsection-title { font-size: 14pt; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+</head>
+<body class="bg-gray-100 text-gray-800"> 
+    <div class="container mx-auto p-4 md:p-8"> 
+        <header class="mb-10"> 
+            <div class="flex flex-col sm:flex-row items-center justify-between">
+                <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-16 md:h-20 mb-4 sm:mb-0 header-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+                <div class="text-center sm:text-right sm:ml-4"> 
+                    <p class="text-base text-gray-500">Data Mining & Big Data Analytics</p> 
+                    <h1 class="page-title text-3xl md:text-4xl font-bold text-gray-900 mt-1">Module V: Advanced Topics, Ethics, and Project Conclusion - Index</h1> 
+                </div>
+            </div>
+            <nav aria-label="Breadcrumb" class="mt-4 text-sm text-gray-500 no-print"> 
+                <ol class="list-none p-0 inline-flex">
+                    <li class="flex items-center">
+                        <a href="../index.html" class="text-slate-600 hover:text-slate-800">Course Overview</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="text-gray-700 font-semibold" aria-current="page">Module V Index</li> 
+                </ol>
+            </nav>
+        </header>
+
+        <div class="text-center mb-8 no-print"> 
+            <button onclick="window.print()" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-150 ease-in-out text-base"> 
+                Export Module Index to PDF
+            </button>
+        </div>
+
+        <article class="bg-white p-6 md:p-8 rounded-lg shadow-lg"> 
+            <section class="mb-8 content-section"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Module V Focus: Advanced Topics, Ethics, and Project Conclusion</h2> 
+                <p class="text-base text-gray-700 leading-relaxed">
+                    This final module brings the course to a close by exploring forward-looking trends in Big Data analytics, such as the integration of AI, IoT, and Cloud technologies. A critical component of this module is the discussion on data ethics and privacy, equipping you with the framework for responsible data practice. The majority of the time in this module is dedicated to the final phases of your mini-project, including completing your implementation, writing your final report, and preparing your technical presentation. This is where you will synthesize all the knowledge and skills gained throughout the course into a comprehensive, finished product.
+                </p>
+            </section>
+
+            <section class="content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-4">Module V Sessions:</h2>
+                <div id="session-links-container" class="space-y-3">
+                    <!-- Session links will be dynamically inserted here -->
+                </div>
+            </section>
+        </article>
+
+        <footer class="text-center mt-12 py-6 border-t border-gray-300"> 
+            <div class="mb-4"> 
+                 <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-10 mx-auto footer-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+            </div>
+            <p class="text-base text-gray-600">&copy; <span id="currentYearModule"></span> FACE Prep Campus (www.faceprep.in). All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('currentYearModule').textContent = new Date().getFullYear();
+
+        const module5SessionsIndex = [
+            { file: "session37.html", title: "Session 37: Trends in Big Data Analytics - AI Integration", type: "Theory 📖", focus: "Exploring the role of AI and deep learning in big data pipelines." },
+            { file: "session38.html", title: "Session 38: Trends - IoT and Cloud Integration in Big Data", type: "Theory 📖", focus: "Understanding real-world IoT and cloud examples in big data." },
+            { file: "session39.html", title: "Session 39: Ethics in Big Data and Data Privacy", type: "Theory 📖", focus: "Discussing responsible data handling, bias, and privacy regulations." },
+            { file: "session40.html", title: "Session 40: Lab 15 - Advanced Case Studies & Ethical Dilemmas", type: "Guided Practical 💻", focus: "Analyzing complex cases with a focus on architecture and ethics." },
+            { file: "session41.html", title: "Session 41: Lab 16 - Emerging Tech Exploration & Project Refinement", type: "Guided Practical 💻", focus: "Researching new trends and final Q&A for mini-project." },
+            { file: "session42.html", title: "Session 42: Mini Project - Phase 5: Finalization, Report Writing & Review", type: "Mini Project 🔬", focus: "Completing project implementation, analysis, and report writing." },
+            { file: "session43.html", title: "Session 43: Mini Project - Phase 6: Presentations & Evaluation", type: "Mini Project 🔬", focus: "Students present their mini-projects for final assessment." },
+            { file: "session44.html", title: "Session 44: Blended Learning - Capstone Review / Advanced Case Studies", type: "Blended Learning 🌐", focus: "Reviewing advanced case studies or supplementary materials." }
+        ];
+
+        const sessionsContainer = document.getElementById('session-links-container');
+
+        if (sessionsContainer) {
+            module5SessionsIndex.forEach(session => {
+                const card = document.createElement('a');
+                card.href = session.file;
+                card.className = 'session-link-card border-cyan-500 hover:border-cyan-600'; // Changed border color for Module 5
+                
+                let sessionTypeColor = 'text-gray-500';
+                if (session.type.includes('Theory')) {
+                    sessionTypeColor = 'text-blue-600';
+                } else if (session.type.includes('Practical')) {
+                    sessionTypeColor = 'text-emerald-600';
+                } else if (session.type.includes('Project')) {
+                    sessionTypeColor = 'text-amber-600';
+                } else if (session.type.includes('Blended')) {
+                    sessionTypeColor = 'text-purple-600';
+                }
+
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <h3 class="subsection-title text-lg font-medium text-slate-700 hover:text-cyan-600">${session.title}</h3>
+                        <span class="text-cyan-500 hover:text-cyan-700 no-print font-semibold text-sm">&rarr;</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mt-1"><span class="session-type-icon font-semibold ${sessionTypeColor}">${session.type}</span> - ${session.focus}</p>
+                `;
+                sessionsContainer.appendChild(card);
+            });
+        }
+
+    </script>
+</body>
+</html>

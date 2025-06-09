@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 44: Blended Learning - Capstone Review & Advanced Case Studies - Module V</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: "Warm Neutral Harmony" -->
+    <!-- Application Structure Plan: Definitive single session blended learning guide with extensive tasks. Structure: Header, Export, Details, Objectives, Introduction, Task 1 (Coursera Review), Task 2 (New, extensive Smart City Case Study with visualization), Task 3 (Mini-Project Self-Review Checklist), Task 4 (Future Learning Path), Key Takeaways, Footer. Goal: A definitive self-study guide to synthesize course knowledge and explore advanced applications. -->
+    <!-- Visualization & Content Choices: 
+        - Detailed textual explanations for all concepts, converted to standard HTML.
+        - A new, detailed conceptual diagram using HTML/CSS to visualize the data flows in the Smart City case study.
+        - A structured checklist for the final project self-review.
+        - All content presented in standard HTML.
+        - PDF Export: Print-specific CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            font-size: 1rem; 
+            line-height: 1.625; 
+        }
+        
+        h1.page-title { font-size: 2.25rem; line-height: 2.5rem; } 
+        h2.section-title { font-size: 1.5rem; line-height: 2rem; margin-bottom: 0.75rem;} 
+        h3.subsection-title { font-size: 1.25rem; line-height: 1.75rem; margin-bottom: 0.5rem;}    
+        h4.detail-title { font-size: 1.125rem; line-height: 1.75rem; margin-bottom: 0.375rem;} 
+        
+        .task-card {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-left-width: 4px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0.5rem;
+        }
+        .task-card-learning { border-left-color: #8b5cf6; }
+        
+        .external-link-card {
+            background-color: #eff6ff;
+            border: 1px solid #93c5fd;
+            border-left-width: 4px;
+            border-left-color: #2563eb;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0.5rem;
+        }
+
+        .flow-diagram {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .flow-box {
+            background-color: #f3f4f6;
+            border: 1px solid #d1d5db;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            text-align: center;
+            font-size: 0.875rem;
+        }
+        .flow-arrow {
+            font-size: 1.5rem;
+            color: #9ca3af;
+        }
+
+        @media print {
+            body { font-size: 10pt; line-height: 1.3; } 
+            .no-print { display: none !important; }
+            header { display: flex; flex-direction: column; align-items: center; text-align: center; }
+            .header-logo-print { max-width: 150px; max-height: 50px; margin-bottom: 10px; } 
+            .footer-logo-print { max-width: 100px; max-height: 30px; margin-top: 10px; } 
+            footer { text-align: center; }
+            section, .content-section, .task-card { page-break-inside: avoid; margin-bottom: 15px; } 
+            .bg-white { box-shadow: none !important; border: 1px solid #ccc; padding: 0.5rem !important;}
+            a { text-decoration: none; color: black; }
+            .flow-diagram { display: none; }
+            h1.page-title { font-size: 20pt; } 
+            h2.section-title { font-size: 16pt; }
+            h3.subsection-title { font-size: 14pt; }
+            h4.detail-title { font-size: 12pt; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+</head>
+<body class="bg-gray-100 text-gray-800"> 
+    <div class="container mx-auto p-4 md:p-8"> 
+        <header class="mb-10"> 
+            <div class="flex flex-col sm:flex-row items-center justify-between">
+                <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-16 md:h-20 mb-4 sm:mb-0 header-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+                <div class="text-center sm:text-right sm:ml-4"> 
+                    <p class="text-base text-gray-500">Module V: Advanced Topics, Ethics, and Project Conclusion</p> 
+                    <h1 class="page-title text-3xl md:text-4xl font-bold text-gray-900 mt-1">Session 44: Blended Learning - Capstone Review & Advanced Case Studies</h1> 
+                    <p class="text-lg text-gray-600 mt-2">Data Mining & Big Data Analytics</p> 
+                </div>
+            </div>
+            <nav aria-label="Breadcrumb" class="mt-4 text-sm text-gray-500 no-print"> 
+                <ol class="list-none p-0 inline-flex">
+                    <li class="flex items-center">
+                        <a href="../index.html" class="text-slate-600 hover:text-slate-800">Course Overview</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="flex items-center">
+                        <a href="module-5-index.html" class="text-slate-600 hover:text-slate-800">Module V</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="text-gray-700 font-semibold" aria-current="page">Session 44</li> 
+                </ol>
+            </nav>
+        </header>
+
+        <div class="text-center mb-8 no-print"> 
+            <button onclick="window.print()" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-150 ease-in-out text-base"> 
+                Export Session 44 to PDF
+            </button>
+        </div>
+
+        <article class="bg-white p-6 md:p-8 rounded-lg shadow-lg"> 
+            <section class="mb-6 border-b pb-4"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-2">Session Details</h2> 
+                <p class="text-base text-gray-700"><strong>Type:</strong> Blended Learning 🌐</p>
+                <p class="text-base text-gray-700"><strong>Duration:</strong> 3 Hours (Self-paced study)</p>
+            </section>
+
+            <section class="mb-8 content-section"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Session Objectives</h2> 
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1"> 
+                    <li>Synthesize the core concepts of the Hadoop and Spark ecosystems covered in the course.</li>
+                    <li>Analyze a complex, multi-faceted case study that integrates multiple Big Data technologies.</li>
+                    <li>Conduct a final self-review of the mini-project to ensure completeness and quality.</li>
+                    <li>Reflect on the broader data analytics landscape and consider future learning paths.</li>
+                </ul>
+            </section>
+            
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 1: Coursera Capstone Review</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    Begin this session by revisiting the Coursera course content, focusing on the later modules and any capstone projects or summary materials provided. The goal is to consolidate your understanding of how the various components of the Big Data ecosystem fit together.
+                </p>
+                <div class="external-link-card">
+                    <h3 class="subsection-title text-lg font-medium text-blue-700">Hadoop Platform and Application Framework</h3>
+                    <p class="text-base text-gray-700 mb-3">
+                        Review the final modules of the course, particularly those that summarize the entire Hadoop and Spark ecosystems or provide end-to-end case studies.
+                    </p>
+                    <a href="https://www.coursera.org/learn/hadoop" target="_blank" rel="noopener noreferrer" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md shadow-md transition duration-150 ease-in-out no-print">
+                        Go to Coursera Course ➔
+                    </a>
+                </div>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 2: Advanced Case Study - Smart City Traffic Management</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    Analyze the following advanced case study, which combines IoT, streaming data, and machine learning to solve a complex urban problem.
+                </p>
+                <div class="task-card task-card-learning border-l-purple-500">
+                    <h3 class="subsection-title text-lg font-medium text-purple-700">Case Study: Real-Time Traffic Flow Optimization</h3>
+                    <p class="text-base text-gray-700 leading-relaxed mb-3">
+                        <strong>Business Problem:</strong> A major city is plagued by traffic congestion, leading to increased pollution, longer commute times, and economic losses. The city's transportation authority wants to create a system that can dynamically adjust traffic signal timings in real-time to optimize traffic flow and reduce congestion.
+                    </p>
+                    <p class="text-base text-gray-700 leading-relaxed mb-3">
+                        <strong>Data Sources & Technology:</strong>
+                    </p>
+                     <ul class="list-disc list-inside text-sm text-gray-600 ml-5 space-y-2">
+                         <li><strong>IoT Data:</strong> A network of thousands of road sensors and smart traffic cameras generates real-time data on vehicle counts, speed, and queue lengths at intersections (High Velocity, High Volume).</li>
+                         <li><strong>GPS Data:</strong> Anonymized GPS data from public transport and ride-sharing services provides insights into broader traffic patterns across the city.</li>
+                         <li><strong>External Data:</strong> Real-time weather data and a calendar of special events (concerts, sports games) that could impact traffic.</li>
+                         <li><strong>Architecture:</strong> Data is ingested via a message queue like Kafka. A Spark Streaming application processes this data in near real-time. A trained Reinforcement Learning (RL) model, hosted on a cloud platform, receives the real-time traffic state and decides on the optimal signal timing adjustments. These commands are then sent back to the city's traffic light control system.</li>
+                     </ul>
+                     <div class="flow-diagram no-print border border-gray-200 p-4 rounded-lg mt-4">
+                        <div class="flow-box bg-red-100 border-red-300">IoT Sensors & GPS Data</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-box bg-yellow-100 border-yellow-300">Spark Streaming<br><small>(Real-time Aggregation)</small></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-box bg-blue-100 border-blue-300">AI/RL Model<br><small>(Decision Making)</small></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-box bg-green-100 border-green-300">Traffic Light Control System</div>
+                    </div>
+                     <h4 class="detail-title font-semibold text-gray-700 mt-4">Business Insights & Impact:</h4>
+                     <p class="text-base text-gray-700 leading-relaxed">The system resulted in an average 18% reduction in commute times during peak hours and a 12% decrease in vehicle idling, leading to lower carbon emissions. The key insight was that fixed-timing traffic lights are highly inefficient. By reacting dynamically to real-time conditions, the system could prevent gridlock before it formed, such as by extending green light durations along a major artery when a sports event ends.</p>
+                </div>
+            </section>
+            
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 3: Final Mini-Project Self-Review</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-4">
+                    Before you finalize your project for submission, perform one last critical self-review. Use this checklist to ensure you have met all requirements and produced a high-quality result.
+                </p>
+                 <div class="task-card task-card-project">
+                    <h3 class="subsection-title text-lg font-medium text-amber-700 mb-2">Final Project Checklist:</h3>
+                     <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-2">
+                        <li><strong>Problem Statement:</strong> Does your final report and presentation clearly state the problem you solved? Is it consistent with your initial proposal?</li>
+                        <li><strong>Data Lifecycle:</strong> Have you clearly documented every step of your process, from data acquisition and cleaning to feature engineering?</li>
+                        <li><strong>Code Quality:</strong> Is your code well-commented, organized, and reproducible?</li>
+                        <li><strong>Model Evaluation:</strong> Did you use appropriate metrics to evaluate your model? Did you justify why those metrics were chosen?</li>
+                        <li><strong>Analysis & Insights:</strong> Does your conclusion directly address your problem statement? Have you extracted meaningful, actionable insights from your results, or did you just report the numbers?</li>
+                        <li><strong>Limitations:</strong> Have you honestly discussed the limitations of your project (e.g., data quality issues, model assumptions, scope constraints)?</li>
+                        <li><strong>Deliverables:</strong> Have you prepared all required deliverables (report, code, presentation slides) according to the specified guidelines?</li>
+                    </ul>
+                </div>
+            </section>
+            
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 4: Thinking About "What's Next?"</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    This course is a significant step in your data journey, but it's just the beginning. Use this time to reflect on what areas you enjoyed most and consider future learning paths.
+                </p>
+                 <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1">
+                    <li>Did you enjoy the data engineering aspect (Pipelines, Spark)? Consider learning more about cloud platforms, MLOps, and data architecture.</li>
+                    <li>Did you enjoy the machine learning aspect? Consider diving deeper into specific areas like Deep Learning, Natural Language Processing, or Reinforcement Learning.</li>
+                    <li>Did you enjoy the analysis and insight generation? Consider focusing on roles in Business Intelligence, Data Visualization, and Product Analytics.</li>
+                 </ul>
+            </section>
+        </article>
+
+        <footer class="text-center mt-12 py-6 border-t border-gray-300"> 
+            <div class="mb-4"> 
+                 <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-10 mx-auto footer-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+            </div>
+            <p class="text-base text-gray-600">&copy; <span id="currentYearModule"></span> FACE Prep Campus (www.faceprep.in). All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>

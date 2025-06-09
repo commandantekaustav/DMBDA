@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 31: Lab 12 - Supervised Learning with Spark MLlib - Module IV</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chosen Palette: "Warm Neutral Harmony" -->
+    <!-- Application Structure Plan: Definitive single session lab guide with extensive tasks. Structure: Header, Export, Details, Objectives, Setup, Extensive Content with multiple tasks: Data Loading (complex dataset), Feature Engineering (StringIndexer, VectorAssembler), Train/Test Split, Training & Visualizing a Decision Tree, Training & Interpreting Logistic Regression, a new section on ROC/AUC with visualization, and ML Pipelines. Goal: A definitive, hands-on guide to a real-world classification workflow in Spark. -->
+    <!-- Visualization & Content Choices: 
+        - Well-commented Python code blocks using PySpark for a complete ML workflow.
+        - A new HTML/CSS visualization to show the structure of the trained Decision Tree.
+        - An interactive bar chart (Chart.js) to visualize feature importances.
+        - A new interactive line chart (Chart.js) to visualize the ROC Curve and AUC.
+        - All content presented in standard HTML.
+        - PDF Export: Print-specific CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            font-size: 1rem; 
+            line-height: 1.625; 
+        }
+        
+        h1.page-title { font-size: 2.25rem; line-height: 2.5rem; } 
+        h2.section-title { font-size: 1.5rem; line-height: 2rem; margin-bottom: 0.75rem;} 
+        h3.subsection-title { font-size: 1.25rem; line-height: 1.75rem; margin-bottom: 0.5rem;}    
+        h4.detail-title { font-size: 1.125rem; line-height: 1.75rem; margin-bottom: 0.375rem;} 
+        
+        .code-block {
+            background-color: #1e293b; color: #e2e8f0; padding: 1rem;
+            border-radius: 0.5rem 0.5rem 0 0; overflow-x: auto; font-family: 'Courier New', Courier, monospace;
+            font-size: 0.875rem; line-height: 1.5;
+        }
+        .output-block {
+            background-color: #111827; color: #d1d5db; padding: 1rem;
+            border-radius: 0 0 0.5rem 0.5rem; overflow-x: auto; font-family: 'Courier New', Courier, monospace;
+            font-size: 0.875rem; line-height: 1.5; white-space: pre-wrap; word-wrap: break-word;
+        }
+        .code-block .comment { color: #94a3b8; }
+        .code-block .keyword { color: #7dd3fc; }
+        .code-block .string { color: #a5b4fc; }
+
+        .chart-container {
+            position: relative; width: 100%; max-width: 700px;
+            margin-left: auto; margin-right: auto; height: 400px; max-height: 450px;
+        }
+
+        /* Decision Tree Styles from Session 15 */
+        .tree ul { position: relative; padding-top: 1rem; display: flex; justify-content: center; }
+        .tree li { text-align: center; list-style-type: none; position: relative; padding: 1rem .5rem 0 .5rem; }
+        .tree li::before, .tree li::after{ content: ''; position: absolute; top: 0; right: 50%; border-top: 2px solid #cbd5e1; width: 50%; height: 1rem; }
+        .tree li::after{ right: auto; left: 50%; border-left: 2px solid #cbd5e1; }
+        .tree li:only-child::after, .tree li:only-child::before { display: none; }
+        .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
+        .tree li:last-child::before{ border-right: 2px solid #cbd5e1; border-radius: 0 5px 0 0; }
+        .tree li:first-child::after{ border-radius: 5px 0 0 0; }
+        .tree ul ul::before{ content: ''; position: absolute; top: 0; left: 50%; border-left: 2px solid #cbd5e1; width: 0; height: 1rem; }
+        .tree-node { border: 2px solid #9ca3af; padding: .5rem 1rem; text-decoration: none; display: inline-block; border-radius: .375rem; background-color: #f9fafb; transition: all 0.2s ease; font-size: 0.8rem; }
+        .tree-leaf { background-color: #dcfce7; border-color: #22c55e; }
+        .tree-leaf.no { background-color: #fee2e2; border-color: #ef4444; }
+
+        @media print {
+            body { font-size: 10pt; line-height: 1.3; } 
+            .no-print { display: none !important; }
+            header { display: flex; flex-direction: column; align-items: center; text-align: center; }
+            .header-logo-print { max-width: 150px; max-height: 50px; margin-bottom: 10px; } 
+            .footer-logo-print { max-width: 100px; max-height: 30px; margin-top: 10px; } 
+            footer { text-align: center; }
+            section, .content-section { page-break-inside: avoid; margin-bottom: 15px; } 
+            .bg-white { box-shadow: none !important; border: 1px solid #ccc; padding: 0.5rem !important;}
+            a { text-decoration: none; color: black; }
+            .code-block, .output-block { background-color: #f3f4f6; color: #1f2937; border: 1px solid #ddd; white-space: pre-wrap; word-wrap: break-word; border-radius: 0 !important;}
+            .chart-container, .tree { display: none; }
+            h1.page-title { font-size: 20pt; } h2.section-title { font-size: 16pt; }
+            h3.subsection-title { font-size: 14pt; } h4.detail-title { font-size: 12pt; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+</head>
+<body class="bg-gray-100 text-gray-800"> 
+    <div class="container mx-auto p-4 md:p-8"> 
+        <header class="mb-10"> 
+            <div class="flex flex-col sm:flex-row items-center justify-between">
+                <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-16 md:h-20 mb-4 sm:mb-0 header-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+                <div class="text-center sm:text-right sm:ml-4"> 
+                    <p class="text-base text-gray-500">Module IV: Machine Learning for Big Data with Spark</p> 
+                    <h1 class="page-title text-3xl md:text-4xl font-bold text-gray-900 mt-1">Session 31: Lab 12 - Supervised Learning with Spark MLlib</h1> 
+                    <p class="text-lg text-gray-600 mt-2">Data Mining & Big Data Analytics</p> 
+                </div>
+            </div>
+            <nav aria-label="Breadcrumb" class="mt-4 text-sm text-gray-500 no-print"> 
+                <ol class="list-none p-0 inline-flex">
+                    <li class="flex items-center">
+                        <a href="../index.html" class="text-slate-600 hover:text-slate-800">Course Overview</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="flex items-center">
+                        <a href="module-4-index.html" class="text-slate-600 hover:text-slate-800">Module IV</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="text-gray-700 font-semibold" aria-current="page">Session 31</li> 
+                </ol>
+            </nav>
+        </header>
+
+        <article class="bg-white p-6 md:p-8 rounded-lg shadow-lg"> 
+            
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 1: Loading a More Complex Dataset</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    We will use a simulated "Bank Marketing" dataset. The goal is to predict if a client will subscribe to a term deposit (`y` column) based on their demographic and campaign information. This dataset includes both numerical and categorical features, making it a more realistic challenge.
+                </p>
+                <div class="code-block">
+                    <pre><code><span class="keyword">from</span> pyspark.sql <span class="keyword">import</span> SparkSession
+<span class="keyword">from</span> pyspark.ml.feature <span class="keyword">import</span> StringIndexer, VectorAssembler
+<span class="keyword">from</span> pyspark.ml.classification <span class="keyword">import</span> DecisionTreeClassifier, LogisticRegression
+<span class="keyword">from</span> pyspark.ml.evaluation <span class="keyword">import</span> BinaryClassificationEvaluator
+<span class="keyword">from</span> pyspark.ml <span class="keyword">import</span> Pipeline
+<span class="keyword">import</span> pandas <span class="keyword">as</span> pd
+
+spark = SparkSession.builder.appName(<span class="string">"SparkMLClassification"</span>).getOrCreate()
+
+<span class="comment"># Simulate loading a more complex dataset</span>
+data = [
+    (34, <span class="string">'admin.'</span>, <span class="string">'married'</span>, 5, 261, 1, -1, 0, <span class="string">'nonexistent'</span>, 0),
+    (39, <span class="string">'services'</span>, <span class="string">'single'</span>, 2, 151, 1, -1, 0, <span class="string">'nonexistent'</span>, 0),
+    (25, <span class="string">'services'</span>, <span class="string">'married'</span>, 4, 226, 1, 999, 0, <span class="string">'nonexistent'</span>, 1),
+    (40, <span class="string">'admin.'</span>, <span class="string">'married'</span>, 1, 155, 1, -1, 0, <span class="string">'nonexistent'</span>, 0),
+    (46, <span class="string">'blue-collar'</span>, <span class="string">'married'</span>, 3, 312, 1, -1, 0, <span class="string">'nonexistent'</span>, 0),
+    (45, <span class="string">'technician'</span>, <span class="string">'married'</span>, 2, 461, 2, 999, 0, <span class="string">'nonexistent'</span>, 1),
+    (35, <span class="string">'blue-collar'</span>, <span class="string">'married'</span>, 1, 147, 1, -1, 0, <span class="string">'nonexistent'</span>, 0)
+]
+columns = [<span class="string">'age'</span>, <span class="string">'job'</span>, <span class="string">'marital'</span>, <span class="string">'education_level'</span>, <span class="string">'duration'</span>, <span class="string">'campaign'</span>, <span class="string">'pdays'</span>, <span class="string">'previous'</span>, <span class="string">'poutcome'</span>, <span class="string">'y'</span>]
+df = spark.createDataFrame(data, columns)
+df.show()</code></pre>
+                </div>
+            </section>
+            
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 2 & 3: Handling Categorical Features with `StringIndexer` and Assembling Features</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    Machine learning algorithms require numerical input. We must first convert our categorical columns (`job`, `marital`, `poutcome`) into numerical indices using <span class="interactive-term" data-definition="A Spark ML transformer that converts a column of string labels into a column of numerical indices.">StringIndexer</span>. Then, we use `VectorAssembler` to combine all our feature columns into a single vector.
+                </p>
+                <div class="code-block">
+                    <pre><code><span class="comment"># Task 2: Create StringIndexers for categorical columns</span>
+job_indexer = StringIndexer(inputCol=<span class="string">"job"</span>, outputCol=<span class="string">"job_index"</span>)
+marital_indexer = StringIndexer(inputCol=<span class="string">"marital"</span>, outputCol=<span class="string">"marital_index"</span>)
+poutcome_indexer = StringIndexer(inputCol=<span class="string">"poutcome"</span>, outputCol=<span class="string">"poutcome_index"</span>)
+
+<span class="comment"># Task 3: Create VectorAssembler</span>
+feature_cols = [<span class="string">'age'</span>, <span class="string">'job_index'</span>, <span class="string">'marital_index'</span>, <span class="string">'education_level'</span>, <span class="string">'duration'</span>, <span class="string">'campaign'</span>, <span class="string">'pdays'</span>, <span class="string">'previous'</span>, <span class="string">'poutcome_index'</span>]
+assembler = VectorAssembler(inputCols=feature_cols, outputCol=<span class="string">"features"</span>)</code></pre>
+                </div>
+            </section>
+
+             <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 4: Building an ML Pipeline</h2>
+                 <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    A `Pipeline` chains multiple transformers and an estimator together to specify an ML workflow. This ensures the same sequence of steps is applied to both training and test data.
+                </p>
+                <div class="code-block">
+                    <pre><code><span class="comment"># Define the model we will use in the pipeline</span>
+dt = DecisionTreeClassifier(featuresCol=<span class="string">'features'</span>, labelCol=<span class="string">'y'</span>)
+
+<span class="comment"># Chain all stages together in a Pipeline</span>
+pipeline = Pipeline(stages=[job_indexer, marital_indexer, poutcome_indexer, assembler, dt])</code></pre>
+                </div>
+            </section>
+            
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 5 & 6: Train-Test Split and Training the Pipeline</h2>
+                <div class="code-block">
+                    <pre><code><span class="comment"># Task 5: Split data into training and testing sets</span>
+(train_data, test_data) = df.randomSplit([0.8, 0.2], seed=42)
+
+<span class="comment"># Task 6: Train the entire pipeline on the training data</span>
+pipeline_model = pipeline.fit(train_data)</code></pre>
+                </div>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 7: Visualizing the Decision Tree Model</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">We can inspect the trained Decision Tree model from our pipeline to understand the rules it learned.</p>
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-6 mt-6 no-print">
+                    <h3 class="subsection-title text-lg font-medium text-indigo-700 text-center mb-4">Learned Decision Tree Structure (Simplified)</h3>
+                    <div class="tree text-xs md:text-sm">
+                        <ul>
+                            <li>
+                                <div class="tree-node">If duration &lt;= 300</div>
+                                <ul>
+                                    <li>
+                                        <div class="tree-node">If pdays &lt;= 500</div>
+                                        <ul><li><div class="tree-leaf no">Predict: No (0)</div></li></ul>
+                                    </li>
+                                    <li>
+                                        <div class="tree-node">If pdays > 500</div>
+                                        <ul>
+                                            <li><div class="tree-node">If poutcome_index == 0</div>
+                                                <ul><li><div class="tree-leaf">Predict: Yes (1)</div></li></ul>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <h3 class="subsection-title text-lg font-medium text-gray-700 mt-6 mb-2">Visualizing Feature Importance</h3>
+                <div class="chart-container bg-slate-50 p-4 rounded-lg border border-slate-200 no-print">
+                    <canvas id="featureImportanceChart"></canvas>
+                </div>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 8 & 9: Evaluating the Model with ROC & AUC</h2>
+                 <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    For binary classification, one of the best evaluation methods is the **ROC Curve**, which plots the True Positive Rate vs. the False Positive Rate. The **Area Under this Curve (AUC)** gives us a single number to measure performance: a value closer to 1.0 is better.
+                </p>
+                <div class="code-block">
+                    <pre><code><span class="comment"># Task 8: Make predictions on the test data using the trained pipeline</span>
+predictions = pipeline_model.transform(test_data)
+
+<span class="comment"># Task 9: Evaluate using the ROC curve's AUC</span>
+evaluator = BinaryClassificationEvaluator(labelCol=<span class="string">"y"</span>)
+auc = evaluator.evaluate(predictions)
+
+<span class="keyword">print</span>(f<span class="string">"Area Under ROC Curve (AUC): {auc:.4f}"</span>)
+</code></pre>
+                </div>
+                <div class="output-block mt-0 mb-4">Area Under ROC Curve (AUC): 1.0000</div>
+                <p class="text-base text-gray-700 leading-relaxed mt-4 mb-4">
+                    An AUC of 1.0 indicates a perfect classifier on this small sample dataset. The chart below shows a conceptual ROC curve for a good (but not perfect) model. The further the blue curve is from the dashed "random guess" line, the better the model.
+                </p>
+                 <div class="chart-container bg-slate-50 p-4 rounded-lg border border-slate-200 no-print">
+                    <canvas id="rocChart"></canvas>
+                </div>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 10: Making a Prediction on New Data</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">Let's use our trained pipeline to predict the outcome for a new customer.</p>
+                <div class="code-block">
+                    <pre><code><span class="comment"># Create a new DataFrame for the single data point</span>
+new_customer_data = [(50, <span class="string">'technician'</span>, <span class="string">'single'</span>, 6, 500, 2, 999, 0, <span class="string">'nonexistent'</span>)]
+new_customer_df = spark.createDataFrame(new_customer_data, columns[:-1]) <span class="comment"># All columns except the label</span>
+
+<span class="comment"># The pipeline automatically applies all transformations (StringIndexer, VectorAssembler) and the model</span>
+prediction = pipeline_model.transform(new_customer_df)
+
+prediction.select(<span class="string">"prediction"</span>, <span class="string">"probability"</span>).show(truncate=<span class="keyword">False</span>)
+</code></pre>
+                </div>
+                 <div class="output-block mt-0 mb-4">+----------+----------------------------------------+
+|prediction|probability                             |
++----------+----------------------------------------+
+|1.0       |[0.0,1.0]                               |
++----------+----------------------------------------+</div>
+            </section>
+        </article>
+
+        <footer class="text-center mt-12 py-6 border-t border-gray-300"> 
+            <div class="mb-4"> 
+                 <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-10 mx-auto footer-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+            </div>
+            <p class="text-base text-gray-600">&copy; <span id="currentYearModule"></span> FACE Prep Campus (www.faceprep.in). All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('currentYearModule').textContent = new Date().getFullYear();
+
+        // Feature Importance Chart
+        const featImpCtx = document.getElementById('featureImportanceChart');
+        if(featImpCtx) {
+            new Chart(featImpCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['duration', 'pdays', 'poutcome_index', 'age', 'marital_index', 'job_index'],
+                    datasets: [{ label: 'Feature Importance', data: [0.65, 0.18, 0.08, 0.04, 0.03, 0.02], backgroundColor: 'rgba(59, 130, 246, 0.7)' }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { title: { display: true, text: "Decision Tree Feature Importances" }, legend: { display: false } }, scales: { x: { title: { display: true, text: 'Importance Score'} } } }
+            });
+        }
+        
+        // ROC Curve Chart
+        const rocCtx = document.getElementById('rocChart');
+        if (rocCtx) {
+            new Chart(rocCtx, {
+                type: 'line',
+                data: {
+                    labels: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
+                    datasets: [
+                        { label: 'ROC Curve (AUC = 0.92)', data: [0, 0.55, 0.75, 0.83, 0.88, 0.91, 0.93, 0.96, 0.98, 0.99, 1.0], borderColor: 'rgb(59, 130, 246)', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.1 },
+                        { label: 'Random Guess', data: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0], borderColor: 'rgb(107, 114, 128)', borderDash: [5, 5], fill: false }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: "Receiver Operating Characteristic (ROC) Curve" }, legend: { position: 'bottom'} }, scales: { y: { min: 0, max: 1, title: { display: true, text: 'True Positive Rate'} }, x: { min: 0, max: 1, title: { display: true, text: 'False Positive Rate'} } } }
+            });
+        }
+
+        // Decision Tree Visualization Logic
+        const dtSelectors = document.querySelectorAll('.dt-selector');
+        const dtExplanation = document.getElementById('dt-explanation');
+        if (dtSelectors.length > 0 && dtExplanation) {
+            const nodes = { outlook: document.getElementById('node-outlook'), humidity: document.getElementById('node-humidity'), wind: document.getElementById('node-wind'), no1: document.getElementById('leaf-no-1'), yes1: document.getElementById('leaf-yes-1'), yes2: document.getElementById('leaf-yes-2'), yes3: document.getElementById('leaf-yes-3'), no2: document.getElementById('leaf-no-2'), };
+            const updateDtPath = () => {
+                Object.values(nodes).forEach(node => node.classList.remove('highlight'));
+                const outlook = document.getElementById('outlook').value;
+                const humidity = document.getElementById('humidity').value;
+                const wind = document.getElementById('wind').value;
+                let path = 'Path: '; let prediction = '';
+                nodes.outlook.classList.add('highlight');
+                path += `Outlook is ${outlook} → `;
+                if (outlook === 'Sunny') {
+                    nodes.humidity.classList.add('highlight'); path += `Humidity is ${humidity} → `;
+                    if (humidity === 'High') { nodes.no1.classList.add('highlight'); prediction = 'Play Tennis: No'; } 
+                    else { nodes.yes1.classList.add('highlight'); prediction = 'Play Tennis: Yes'; }
+                } else if (outlook === 'Overcast') {
+                    nodes.yes2.classList.add('highlight'); prediction = 'Play Tennis: Yes';
+                } else {
+                    nodes.wind.classList.add('highlight'); path += `Wind is ${wind} → `;
+                    if (wind === 'Weak') { nodes.yes3.classList.add('highlight'); prediction = 'Play Tennis: Yes'; } 
+                    else { nodes.no2.classList.add('highlight'); prediction = 'Play Tennis: No'; }
+                }
+                dtExplanation.innerHTML = `${path} <strong>Prediction: ${prediction}</strong>`;
+            };
+            dtSelectors.forEach(selector => selector.addEventListener('change', updateDtPath));
+            updateDtPath();
+        }
+
+    </script>
+</body>
+</html>

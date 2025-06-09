@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 32: Unsupervised Learning Concepts for Big Data - Module IV</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            font-size: 1rem; 
+            line-height: 1.625; 
+        }
+        
+        .interactive-term { 
+            cursor: pointer;
+            font-weight: 600; 
+        }
+        .definition-tooltip {
+            display: none;
+            position: absolute;
+            background-color: #f9fafb; 
+            border: 1px solid #d1d5db; 
+            padding: 8px; 
+            border-radius: 4px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            z-index: 100;
+            font-size: 0.875rem; 
+            width: max-content;
+            max-width: 320px; 
+        }
+
+        h1.page-title { font-size: 2.25rem; line-height: 2.5rem; } 
+        h2.section-title { font-size: 1.5rem; line-height: 2rem; margin-bottom: 0.75rem;} 
+        h3.subsection-title { font-size: 1.25rem; line-height: 1.75rem; margin-bottom: 0.5rem;}    
+        h4.detail-title { font-size: 1.125rem; line-height: 1.75rem; margin-bottom: 0.375rem;} 
+        
+        .info-card {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-left-width: 4px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .info-card-content {
+            flex-grow: 1;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 450px;
+            margin: 1.5rem auto 0 auto;
+            height: 250px;
+        }
+        .parallelism-diagram {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: #f8fafc;
+            border-radius: 0.375rem;
+        }
+        .parallelism-diagram .node {
+            padding: 0.5rem;
+            border: 1px solid #9ca3af;
+            border-radius: 0.25rem;
+            background-color: #f3f4f6;
+            font-size: 0.8rem;
+            text-align: center;
+        }
+        .parallelism-diagram .data-slice {
+            background-color: #dbeafe;
+            border-color: #93c5fd;
+        }
+
+        @media print {
+            body { font-size: 10pt; line-height: 1.3; } 
+            .no-print { display: none !important; }
+            header { display: flex; flex-direction: column; align-items: center; text-align: center; }
+            .header-logo-print { max-width: 150px; max-height: 50px; margin-bottom: 10px; } 
+            .footer-logo-print { max-width: 100px; max-height: 30px; margin-top: 10px; } 
+            footer { text-align: center; }
+            section, .content-section, .info-card { page-break-inside: avoid; margin-bottom: 15px; } 
+            .bg-white { box-shadow: none !important; border: 1px solid #ccc; padding: 0.5rem !important;}
+            a { text-decoration: none; color: black; }
+            .interactive-term { text-decoration: none; color: black; font-weight: bold; } 
+            .definition-tooltip { display: none !important; }
+            .chart-container, .parallelism-diagram { display: none; }
+            h1.page-title { font-size: 20pt; } 
+            h2.section-title { font-size: 16pt; }
+            h3.subsection-title { font-size: 14pt; }
+            h4.detail-title { font-size: 12pt; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+</head>
+<body class="bg-gray-100 text-gray-800"> 
+    <div class="container mx-auto p-4 md:p-8"> 
+        <header class="mb-10"> 
+            <div class="flex flex-col sm:flex-row items-center justify-between">
+                <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-16 md:h-20 mb-4 sm:mb-0 header-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+                <div class="text-center sm:text-right sm:ml-4"> 
+                    <p class="text-base text-gray-500">Module IV: Machine Learning for Big Data with Spark</p> 
+                    <h1 class="page-title text-3xl md:text-4xl font-bold text-gray-900 mt-1">Session 32: Unsupervised Learning Concepts for Big Data</h1> 
+                    <p class="text-lg text-gray-600 mt-2">Data Mining & Big Data Analytics</p> 
+                </div>
+            </div>
+            <nav aria-label="Breadcrumb" class="mt-4 text-sm text-gray-500 no-print"> 
+                <ol class="list-none p-0 inline-flex">
+                    <li class="flex items-center">
+                        <a href="../index.html" class="text-slate-600 hover:text-slate-800">Course Overview</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="flex items-center">
+                        <a href="module-4-index.html" class="text-slate-600 hover:text-slate-800">Module IV</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="text-gray-700 font-semibold" aria-current="page">Session 32</li> 
+                </ol>
+            </nav>
+        </header>
+
+        <div class="text-center mb-8 no-print"> 
+            <button onclick="window.print()" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-150 ease-in-out text-base"> 
+                Export Session 32 to PDF
+            </button>
+        </div>
+
+        <article class="bg-white p-6 md:p-8 rounded-lg shadow-lg"> 
+            <section class="mb-6 border-b pb-4"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-2">Session Details</h2> 
+                <p class="text-base text-gray-700"><strong>Type:</strong> Theory 📖</p>
+                <p class="text-base text-gray-700"><strong>Duration:</strong> 1 Hour</p>
+                <p class="text-base text-gray-700"><strong>Textbook References:</strong> Han et al.: Ch. 10, 11</p>
+            </section>
+
+            <div class="definition-tooltip"></div>
+            
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">The Challenges of Clustering at Scale</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                    <div class="info-card border-l-red-500">
+                        <div class="info-card-content">
+                            <h4 class="detail-title font-semibold text-red-700">1. Computational Complexity</h4>
+                            <p class="text-sm text-gray-600 leading-relaxed">
+                                Many clustering algorithms rely on calculating distances between all pairs of points. As the number of data points (`n`) grows, the number of calculations can explode, making them infeasible for large datasets.
+                            </p>
+                        </div>
+                        <div class="chart-container no-print">
+                             <canvas id="complexityChart"></canvas>
+                        </div>
+                    </div>
+                     <div class="info-card border-l-yellow-500">
+                        <div class="info-card-content">
+                            <h4 class="detail-title font-semibold text-yellow-700">2. The Curse of Dimensionality</h4>
+                            <p class="text-sm text-gray-600 leading-relaxed">
+                                As the number of features (dimensions) increases, the data becomes increasingly sparse. The distance between any two points in a high-dimensional space tends to become uniform, making the concept of "nearest" neighbors less meaningful and clustering difficult.
+                            </p>
+                        </div>
+                        <div class="chart-container no-print">
+                             <canvas id="dimensionalityChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Distributed Clustering with Spark MLlib</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    Spark MLlib overcomes these challenges by implementing parallelized versions of clustering algorithms, primarily using a <strong>Data Parallelism</strong> approach.
+                </p>
+                 <div class="info-card border-l-indigo-500">
+                    <h4 class="detail-title font-semibold text-indigo-700">Distributed K-Means: A Conceptual View</h4>
+                    <div class="parallelism-diagram no-print">
+                        <div class="node bg-purple-100 border-purple-300"><strong>Driver:</strong> Holds current Centroids C1, C2, C3</div>
+                        <div class="text-2xl">↓ broadcast ↓</div>
+                        <div class="flex gap-2 w-full justify-around">
+                            <div class="node w-1/4"><strong>Worker 1</strong><br>[Data Slice A]<br>[Centroids C1, C2, C3]</div>
+                            <div class="node w-1/4"><strong>Worker 2</strong><br>[Data Slice B]<br>[Centroids C1, C2, C3]</div>
+                            <div class="node w-1/4"><strong>Worker 3</strong><br>[Data Slice C]<br>[Centroids C1, C2, C3]</div>
+                        </div>
+                        <p class="text-sm text-center font-semibold mt-2">1. Assignment Step (Parallel): Each worker calculates distances for its local data and assigns points to the nearest centroid.</p>
+                        <div class="text-2xl">↓ partial sums ↓</div>
+                         <div class="node bg-purple-100 border-purple-300"><strong>Driver:</strong> Aggregates sums & counts to compute new Centroids</div>
+                         <p class="text-sm text-center font-semibold mt-2">2. Update Step (Centralized): The driver collects partial sums and counts from all workers, calculates the new global centroids, and broadcasts them back for the next iteration.</p>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Other Scalable Clustering Algorithms in MLlib</h2>
+                 <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    Beyond the standard K-Means, Spark MLlib offers other scalable algorithms designed to handle different types of data structures and challenges.
+                </p>
+
+                <div class="info-card border-l-green-500 mt-6">
+                    <h3 class="subsection-title text-lg font-medium text-green-700">1. Bisecting K-Means</h3>
+                    <p class="text-base text-gray-700 leading-relaxed mb-3">
+                        <strong>Intuition:</strong> Think of this as a top-down, hierarchical approach. Instead of guessing 'k' at the start, it begins with all data in a single cluster and recursively splits the "worst" cluster into two new clusters using K-Means (with k=2). This process repeats until the desired number of clusters is reached.
+                    </p>
+                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-6 mt-4 no-print">
+                         <h4 class="detail-title font-semibold text-gray-700 text-center mb-4">Interactive Demo: Bisecting K-Means</h4>
+                         <p class="text-center text-sm text-gray-600 mb-4">Click the button to see how the largest cluster is repeatedly bisected.</p>
+                        <div class="flex justify-center mb-4">
+                            <button id="bisect-btn" class="bg-green-600 text-white font-semibold py-2 px-6 rounded-lg shadow">Split Cluster</button>
+                             <button id="bisect-reset-btn" class="bg-gray-500 text-white font-semibold py-2 px-4 rounded-lg shadow ml-4">Reset</button>
+                        </div>
+                        <div class="chart-container" style="height:300px;">
+                            <canvas id="bisectChart"></canvas>
+                        </div>
+                        <div id="bisect-explanation" class="text-center text-gray-700 mt-4 p-3 bg-gray-100 rounded-md text-sm">
+                            Current Clusters: 1
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card border-l-rose-500 mt-6">
+                    <h3 class="subsection-title text-lg font-medium text-rose-700">2. Gaussian Mixture Models (GMM)</h3>
+                    <p class="text-base text-gray-700 leading-relaxed mb-3">
+                        <strong>Intuition:</strong> K-Means performs a "hard assignment"—every point belongs to exactly one cluster. GMM performs "soft clustering." It assumes the data points are generated from a mixture of several Gaussian distributions (bell curves) with unknown parameters. Instead of assigning a point to a single cluster, GMM assigns it a probability of belonging to *each* cluster.
+                    </p>
+                    <p class="text-base text-gray-700 leading-relaxed mb-3">
+                        This makes it excellent for handling clusters that are overlapping or have non-spherical (elliptical) shapes.
+                    </p>
+                    <div class="chart-container no-print bg-slate-50 p-4 rounded-lg border border-slate-200">
+                        <canvas id="gmmChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="info-card border-l-cyan-500 mt-6">
+                    <h3 class="subsection-title text-lg font-medium text-cyan-700">3. Density-Based Spatial Clustering (DBSCAN)</h3>
+                    <p class="text-base text-gray-700 leading-relaxed mb-3">
+                        <strong>Intuition:</strong> While not fully implemented in Spark's MLlib in the same way as K-Means, the DBSCAN concept is critical. It defines clusters as dense regions of data points separated by areas of lower point density. Its key advantages are that it does not require you to specify the number of clusters beforehand and it can find arbitrarily shaped clusters and identify noise points (outliers).
+                    </p>
+                     <div class="chart-container no-print bg-slate-50 p-4 rounded-lg border border-slate-200">
+                        <canvas id="dbscanChart"></canvas>
+                    </div>
+                </div>
+            </section>
+        </article>
+
+        <footer class="text-center mt-12 py-6 border-t border-gray-300"> 
+            <div class="mb-4"> 
+                 <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-10 mx-auto footer-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+            </div>
+            <p class="text-base text-gray-600">&copy; <span id="currentYearModule"></span> FACE Prep Campus (www.faceprep.in). All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('currentYearModule').textContent = new Date().getFullYear();
+
+        // Tooltip logic
+        const interactiveTerms = document.querySelectorAll('.interactive-term');
+        const tooltip = document.querySelector('.definition-tooltip');
+        if (tooltip) {
+            interactiveTerms.forEach(term => {
+                term.addEventListener('click', (e) => { 
+                    tooltip.textContent = term.dataset.definition;
+                    tooltip.style.display = 'block';
+                    const termRect = term.getBoundingClientRect();
+                    tooltip.style.top = `${termRect.bottom + window.scrollY + 8}px`;
+                    tooltip.style.left = `${termRect.left + window.scrollX}px`;
+                });
+            });
+            document.addEventListener('click', function(event) {
+                if (!event.target.classList.contains('interactive-term')) {
+                    tooltip.style.display = 'none';
+                }
+            });
+        }
+
+        // Charts
+        const complexityCtx = document.getElementById('complexityChart');
+        if (complexityCtx) {
+            new Chart(complexityCtx, { type: 'line', data: { labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], datasets: [ { label: 'Scalable K-Means O(n)', data: [15,30,45,60,75,90,105,120,135,150], borderColor: 'rgb(22, 163, 74)', tension: 0.1 }, { label: 'Non-Scalable Hierarchical O(n^2)', data: [10,40,90,160,250,360,490,640,810,1000], borderColor: 'rgb(220, 38, 38)', tension: 0.1 } ] }, options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: "Computational Complexity" }, legend: { position: 'bottom'} }, scales: { y: { title: { display: true, text: 'Time Complexity'} }, x: { title: { display: true, text: 'Data Size'} } } } });
+        }
+        
+        const dimensionalityCtx = document.getElementById('dimensionalityChart');
+        if (dimensionalityCtx) {
+            new Chart(dimensionalityCtx, { type: 'bar', data: { labels: ['2 dims', '10 dims', '100 dims', '1000 dims'], datasets: [ { label: 'Avg Distance', data: [10, 45, 150, 400], backgroundColor: 'rgba(234, 179, 8, 0.7)' }, { label: 'Min Distance', data: [2, 35, 140, 390], backgroundColor: 'rgba(234, 179, 8, 0.4)'} ] }, options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: "Curse of Dimensionality" }, legend: { position: 'bottom'} }, scales: { y: { title: { display: true, text: 'Distance between points'} } } } });
+        }
+
+        // Bisecting K-Means Chart
+        const bisectCtx = document.getElementById('bisectChart');
+        const bisectBtn = document.getElementById('bisect-btn');
+        const bisectResetBtn = document.getElementById('bisect-reset-btn');
+        const bisectExplanation = document.getElementById('bisect-explanation');
+        if (bisectCtx) {
+            let bisectChart;
+            let clusters = [];
+            const colors = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'];
+            const initialData = [ {x: 2, y: 10}, {x: 2, y: 5}, {x: 8, y: 4}, {x: 5, y: 8}, {x: 7, y: 5}, {x: 6, y: 4}, {x: 1, y: 2}, {x: 4, y: 9}, {x: 10, y: 2}, {x: 11, y: 6}, {x: 12, y: 8}, {x: 9, y: 1} ];
+            
+            const initializeBisectChart = () => {
+                if (bisectChart) bisectChart.destroy();
+                clusters = [initialData.map(p => ({...p}))];
+                bisectExplanation.textContent = 'Current Clusters: 1';
+                bisectBtn.disabled = false;
+                renderBisectChart();
+            };
+
+            const renderBisectChart = () => {
+                if (bisectChart) bisectChart.destroy();
+                bisectChart = new Chart(bisectCtx, {
+                    type: 'scatter',
+                    data: {
+                        datasets: clusters.map((cluster, i) => ({
+                            label: `Cluster ${i}`,
+                            data: cluster,
+                            backgroundColor: colors[i % colors.length]
+                        }))
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: 'Bisecting K-Means Steps'} }, scales: { x: { min: 0, max: 13 }, y: { min: 0, max: 11 } } }
+                });
+            };
+            
+            bisectBtn.addEventListener('click', () => {
+                if (clusters.length >= 4) {
+                    bisectExplanation.textContent = 'Reached desired k=4 clusters.';
+                    bisectBtn.disabled = true;
+                    return;
+                }
+                // Find the largest cluster to split
+                let largestClusterIndex = -1; let maxSSE = -1;
+                clusters.forEach((c, i) => {
+                    const meanX = c.reduce((s,p) => s+p.x, 0) / c.length;
+                    const meanY = c.reduce((s,p) => s+p.y, 0) / c.length;
+                    const sse = c.reduce((s,p) => s + Math.pow(p.x-meanX,2) + Math.pow(p.y-meanY,2), 0);
+                    if(sse > maxSSE) { maxSSE = sse; largestClusterIndex = i; }
+                });
+                
+                const clusterToSplit = clusters.splice(largestClusterIndex, 1)[0];
+                const meanX = clusterToSplit.reduce((s,p) => s+p.x, 0) / clusterToSplit.length;
+                // Simple split for visualization
+                const newCluster1 = clusterToSplit.filter(p => p.x <= meanX);
+                const newCluster2 = clusterToSplit.filter(p => p.x > meanX);
+                clusters.push(newCluster1, newCluster2);
+                
+                renderBisectChart();
+                bisectExplanation.textContent = `Current Clusters: ${clusters.length}`;
+            });
+
+            bisectResetBtn.addEventListener('click', initializeBisectChart);
+            initializeBisectChart();
+        }
+
+        // GMM Chart
+        const gmmCtx = document.getElementById('gmmChart');
+        if (gmmCtx) {
+             new Chart(gmmCtx, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        { label: 'Cluster 1', data: [{x:3,y:4},{x:4,y:5},{x:5,y:4.5},{x:3.5,y:3}], backgroundColor: 'rgba(59, 130, 246, 0.5)'},
+                        { label: 'Cluster 2', data: [{x:6,y:6},{x:7,y:5},{x:5.5,y:7},{x:7.5,y:6.5}], backgroundColor: 'rgba(22, 163, 74, 0.5)'},
+                        { label: 'Overlapping Point', data: [{x:5.1,y:5.2}], backgroundColor: 'rgba(124, 58, 237, 0.8)', pointStyle: 'rectRot', radius: 6}
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { 
+                        title: { display: true, text: 'GMM for Overlapping Clusters' }, 
+                        legend: { position: 'bottom' },
+                        annotation: {
+                            annotations: {
+                                ellipse1: { type: 'ellipse', xMin: 2, xMax: 6, yMin: 2.5, yMax: 6, backgroundColor: 'rgba(59, 130, 246, 0.1)', borderColor: 'rgba(59, 130, 246, 0.5)', borderWidth: 1},
+                                ellipse2: { type: 'ellipse', xMin: 5, xMax: 9, yMin: 4.5, yMax: 8, backgroundColor: 'rgba(22, 163, 74, 0.1)', borderColor: 'rgba(22, 163, 74, 0.5)', borderWidth: 1}
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // DBSCAN Chart
+        const dbscanCtx = document.getElementById('dbscanChart');
+        if (dbscanCtx) {
+            const cluster1 = Array.from({length: 30}, (_,i) => ({x: 3 + 2*Math.cos(i/5), y: 5+2*Math.sin(i/5)}));
+            const cluster2 = Array.from({length: 30}, (_,i) => ({x: 8 + 2*Math.cos(i/5), y: 5+2*Math.sin(i/5)}));
+            const noise = [{x: 5, y: 1}, {x:1, y:8}];
+            new Chart(dbscanCtx, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        { label: 'Cluster 1', data: cluster1, backgroundColor: 'rgba(59, 130, 246, 0.7)' },
+                        { label: 'Cluster 2', data: cluster2, backgroundColor: 'rgba(22, 163, 74, 0.7)' },
+                        { label: 'Noise', data: noise, backgroundColor: 'rgba(107, 114, 128, 0.7)', pointStyle: 'crossRot', radius: 6 }
+                    ]
+                },
+                 options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'DBSCAN for Non-Spherical Clusters & Noise' }, legend: { position: 'bottom' } } }
+            });
+        }
+    </script>
+</body>
+</html>

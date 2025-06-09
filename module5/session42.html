@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 42: Mini Project - Phase 5: Finalization, Report Writing & Review - Module V</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: "Warm Neutral Harmony" -->
+    <!-- Application Structure Plan: Definitive single session project guide with 10+ tasks. Structure: Header, Export, Details, Objectives, Introduction, Detailed Key Tasks (Code Finalization, Result Generation, Report Writing, Peer Review), an interactive guide to report structure, an interactive peer review checklist, and final submission guidelines. Goal: A definitive, hands-on guide for the project finalization phase. -->
+    <!-- Visualization & Content Choices: 
+        - Well-commented Python code examples for creating final outputs (tables, plots).
+        - A new interactive diagram using HTML/CSS/JS to guide students through the structure of a technical report.
+        - A new interactive checklist for the peer review process.
+        - All content presented in standard HTML.
+        - PDF Export: Print-specific CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            font-size: 1rem; 
+            line-height: 1.625; 
+        }
+        
+        h1.page-title { font-size: 2.25rem; line-height: 2.5rem; } 
+        h2.section-title { font-size: 1.5rem; line-height: 2rem; margin-bottom: 0.75rem;} 
+        h3.subsection-title { font-size: 1.25rem; line-height: 1.75rem; margin-bottom: 0.5rem;}    
+        h4.detail-title { font-size: 1.125rem; line-height: 1.75rem; margin-bottom: 0.375rem;} 
+        
+        .task-card {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-left-width: 4px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0.5rem;
+        }
+        .task-card-project { border-left-color: #f59e0b; }
+        
+        .code-block {
+            background-color: #1e293b; color: #e2e8f0; padding: 1rem;
+            border-radius: 0.5rem; overflow-x: auto; font-family: 'Courier New', Courier, monospace;
+            font-size: 0.875rem; line-height: 1.5;
+        }
+        .code-block .comment { color: #94a3b8; }
+        .code-block .keyword { color: #7dd3fc; }
+        .code-block .string { color: #a5b4fc; }
+        
+        .report-section-btn {
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+        .report-section-btn.active {
+            background-color: #1d4ed8; /* blue-700 */
+            color: white;
+            transform: scale(1.05);
+        }
+        
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.375rem;
+            background-color: white;
+            transition: background-color 0.2s;
+        }
+        .checklist-item.completed {
+            background-color: #f0fdf4; /* green-50 */
+        }
+        .checklist-item input {
+            height: 1.25rem;
+            width: 1.25rem;
+            margin-right: 0.75rem;
+        }
+
+        @media print {
+            body { font-size: 10pt; line-height: 1.3; } 
+            .no-print { display: none !important; }
+            header { display: flex; flex-direction: column; align-items: center; text-align: center; }
+            .header-logo-print { max-width: 150px; max-height: 50px; margin-bottom: 10px; } 
+            .footer-logo-print { max-width: 100px; max-height: 30px; margin-top: 10px; } 
+            footer { text-align: center; }
+            section, .content-section, .task-card { page-break-inside: avoid; margin-bottom: 15px; } 
+            .bg-white { box-shadow: none !important; border: 1px solid #ccc; padding: 0.5rem !important;}
+            a { text-decoration: none; color: black; }
+            .code-block { background-color: #f3f4f6; color: #1f2937; border: 1px solid #ddd; white-space: pre-wrap; word-wrap: break-word; border-radius: 0 !important;}
+            h1.page-title { font-size: 20pt; } 
+            h2.section-title { font-size: 16pt; }
+            h3.subsection-title { font-size: 14pt; }
+            h4.detail-title { font-size: 12pt; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+</head>
+<body class="bg-gray-100 text-gray-800"> 
+    <div class="container mx-auto p-4 md:p-8"> 
+        <header class="mb-10"> 
+            <div class="flex flex-col sm:flex-row items-center justify-between">
+                <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-16 md:h-20 mb-4 sm:mb-0 header-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+                <div class="text-center sm:text-right sm:ml-4"> 
+                    <p class="text-base text-gray-500">Module V: Advanced Topics, Ethics, and Project Conclusion</p> 
+                    <h1 class="page-title text-3xl md:text-4xl font-bold text-gray-900 mt-1">Session 42: Mini Project - Phase 5: Finalization, Report Writing & Review</h1> 
+                    <p class="text-lg text-gray-600 mt-2">Data Mining & Big Data Analytics</p> 
+                </div>
+            </div>
+            <nav aria-label="Breadcrumb" class="mt-4 text-sm text-gray-500 no-print"> 
+                <ol class="list-none p-0 inline-flex">
+                    <li class="flex items-center">
+                        <a href="../index.html" class="text-slate-600 hover:text-slate-800">Course Overview</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="flex items-center">
+                        <a href="module-5-index.html" class="text-slate-600 hover:text-slate-800">Module V</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="text-gray-700 font-semibold" aria-current="page">Session 42</li> 
+                </ol>
+            </nav>
+        </header>
+
+        <div class="text-center mb-8 no-print"> 
+            <button onclick="window.print()" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-150 ease-in-out text-base"> 
+                Export Session 42 to PDF
+            </button>
+        </div>
+
+        <article class="bg-white p-6 md:p-8 rounded-lg shadow-lg"> 
+            <section class="mb-6 border-b pb-4"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-2">Session Details</h2> 
+                <p class="text-base text-gray-700"><strong>Type:</strong> Mini Project 🔬</p>
+                <p class="text-base text-gray-700"><strong>Duration:</strong> 7 Hours</p>
+                <p class="text-base text-gray-700"><strong>Core Concepts:</strong> Code Finalization, Result Generation, Technical Writing, Peer Review.</p>
+            </section>
+
+            <section class="mb-8 content-section"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Phase 5 Objectives</h2> 
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1"> 
+                    <li>Finalize all project code, ensuring it is clean, commented, and reproducible.</li>
+                    <li>Generate all necessary results, tables, and visualizations for the final report.</li>
+                    <li>Structure and write a comprehensive technical report detailing the entire project lifecycle.</li>
+                    <li>Participate in a peer review process to give and receive constructive feedback.</li>
+                    <li>Prepare all final deliverables for submission and presentation.</li>
+                </ul>
+            </section>
+            
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Project Workflow: Key Tasks for Phase 5</h2>
+                
+                <div class="task-card task-card-project">
+                    <h3 class="subsection-title text-lg font-medium text-amber-700">Task 1 & 2: Code Refactoring and Final Execution</h3>
+                    <p class="text-sm text-gray-700 leading-relaxed"><strong>Task 1 (Refactoring):</strong> Clean up your project notebooks or scripts. Add comments explaining complex logic, remove dead code, and ensure a logical flow from data loading to final evaluation.</p>
+                    <p class="text-sm text-gray-700 leading-relaxed mt-2"><strong>Task 2 (Final Run):</strong> Run your entire pipeline from start to finish one last time to generate the final, definitive results. Save your trained model and any important output data (e.g., a CSV with predictions). </p>
+                </div>
+
+                <div class="task-card task-card-project">
+                    <h3 class="subsection-title text-lg font-medium text-amber-700">Task 3 & 4: Result Generation for the Report</h3>
+                    <p class="text-sm text-gray-700 leading-relaxed"><strong>Task 3 (Tables):</strong> Generate and format key tables for your report. This includes your model comparison table, confusion matrix, and final evaluation metrics.</p>
+                    <p class="text-sm text-gray-700 leading-relaxed mt-2"><strong>Task 4 (Visualizations):</strong> Generate and save high-quality versions of your most important visualizations, such as the feature importance plot, ROC curve, or cluster plots. Ensure they have clear titles, labels, and legends.</p>
+                    <div class="code-block"><pre><code><span class="comment"># Example using matplotlib to save a plot</span>
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+<span class="comment"># ... (code to generate your plot) ...</span>
+plt.title(<span class="string">'Final Model: Feature Importances'</span>)
+plt.xlabel(<span class="string">'Importance'</span>)
+plt.ylabel(<span class="string">'Feature'</span>)
+plt.tight_layout()
+plt.savefig(<span class="string">'feature_importance.png'</span>, dpi=300) <span class="comment"># Save with high resolution</span>
+<span class="keyword">print</span>(<span class="string">"Feature importance plot saved to feature_importance.png"</span>)</code></pre></div>
+                </div>
+
+                <div class="task-card task-card-project">
+                    <h3 class="subsection-title text-lg font-medium text-amber-700">Task 5 & 6: Structuring and Writing the Technical Report</h3>
+                    <p class="text-sm text-gray-700 leading-relaxed"><strong>Task 5 (Structure):</strong> Use the interactive guide below to structure your report. A clear structure is essential for communicating your work effectively.</p>
+                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-6 mt-4 no-print">
+                        <h4 class="detail-title font-semibold text-indigo-700 text-center mb-4">Interactive Guide: Anatomy of a Technical Report</h4>
+                        <div class="flex flex-wrap items-center justify-center gap-2 mb-4" id="report-nav">
+                            <button class="report-section-btn bg-gray-200 text-gray-700 py-1 px-3 rounded-md text-sm" data-section="abstract">Abstract</button>
+                            <button class="report-section-btn bg-gray-200 text-gray-700 py-1 px-3 rounded-md text-sm" data-section="intro">Introduction</button>
+                            <button class="report-section-btn bg-gray-200 text-gray-700 py-1 px-3 rounded-md text-sm" data-section="data">Data</button>
+                            <button class="report-section-btn bg-gray-200 text-gray-700 py-1 px-3 rounded-md text-sm" data-section="method">Methodology</button>
+                            <button class="report-section-btn bg-gray-200 text-gray-700 py-1 px-3 rounded-md text-sm" data-section="results">Results</button>
+                            <button class="report-section-btn bg-gray-200 text-gray-700 py-1 px-3 rounded-md text-sm" data-section="conclusion">Conclusion</button>
+                        </div>
+                        <div id="report-explanation" class="text-sm p-4 border bg-white rounded min-h-[100px]">Select a section to see what to include.</div>
+                    </div>
+                    <p class="text-sm text-gray-700 leading-relaxed mt-4"><strong>Task 6 (Writing):</strong> Dedicate focused time to writing each section of the report. Be clear, concise, and professional. Explain not just *what* you did, but *why* you did it.</p>
+                </div>
+
+                 <div class="task-card task-card-project">
+                    <h3 class="subsection-title text-lg font-medium text-amber-700">Task 7 & 8: Peer Review and Revision</h3>
+                    <p class="text-sm text-gray-700 leading-relaxed"><strong>Task 7 (Peer Review):</strong> Exchange your draft report and code with another team or individual. Use the interactive checklist below to provide structured, constructive feedback.</p>
+                     <p class="text-sm text-gray-700 leading-relaxed mt-2"><strong>Task 8 (Revision):</strong> Carefully consider the feedback you receive. Use it to improve your report, clarify confusing sections, and fix any errors before final submission.</p>
+                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-6 mt-4 no-print">
+                         <h4 class="detail-title font-semibold text-indigo-700 mb-4">Interactive Peer Review Checklist</h4>
+                         <div id="peer-review-checklist" class="space-y-3"></div>
+                    </div>
+                </div>
+
+                <div class="task-card task-card-project">
+                    <h3 class="subsection-title text-lg font-medium text-amber-700">Task 9 & 10: Finalizing Deliverables and Preparing for Presentation</h3>
+                    <p class="text-sm text-gray-700 leading-relaxed"><strong>Task 9 (Final Deliverables):</strong> Assemble all final project components for submission: the final report (PDF), the commented code (notebook/script), and any supplementary files (e.g., saved models, data dictionary).</p>
+                    <p class="text-sm text-gray-700 leading-relaxed mt-2"><strong>Task 10 (Presentation Prep):</strong> Start creating your presentation slides. Summarize the key points from your report into a compelling narrative for your final presentation in Session 43.</p>
+                </div>
+            </section>
+        </article>
+
+        <footer class="text-center mt-12 py-6 border-t border-gray-300"> 
+            <div class="mb-4"> 
+                 <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-10 mx-auto footer-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+            </div>
+            <p class="text-base text-gray-600">&copy; <span id="currentYearModule"></span> FACE Prep Campus (www.faceprep.in). All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('currentYearModule').textContent = new Date().getFullYear();
+
+        // Report Structure Interactive Guide
+        const reportNav = document.getElementById('report-nav');
+        const reportExplanation = document.getElementById('report-explanation');
+        if(reportNav && reportExplanation) {
+            const explanations = {
+                abstract: "<strong>Abstract:</strong> A brief, self-contained summary of the entire project. State the problem, the main approach, key results, and the primary conclusion. (Approx. 150-250 words).",
+                intro: "<strong>Introduction:</strong> Set the context. Clearly state your problem statement and objectives. Briefly outline the structure of the rest of the report.",
+                data: "<strong>Data Understanding & Preparation:</strong> Describe your data source(s). Include your data dictionary and quality assessment findings. Detail every preprocessing step you took and justify your decisions.",
+                method: "<strong>Methodology:</strong> Explain the machine learning models you chose to implement and why they are appropriate for your problem. Describe your evaluation strategy (e.g., train-test split, cross-validation, chosen metrics).",
+                results: "<strong>Results & Analysis:</strong> Present the performance of your models using tables and visualizations. This is where you include your confusion matrices, feature importance charts, etc. Analyze and interpret these results objectively.",
+                conclusion: "<strong>Conclusion & Future Work:</strong> Summarize your key findings and insights. Did you meet your objectives? What are the limitations of your work? Suggest potential future steps or improvements."
+            };
+            reportNav.addEventListener('click', (e) => {
+                if(e.target.tagName === 'BUTTON') {
+                    const section = e.target.dataset.section;
+                    reportExplanation.innerHTML = explanations[section];
+                    document.querySelectorAll('.report-section-btn').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                }
+            });
+            reportNav.querySelector('button').click();
+        }
+
+        // Peer Review Checklist
+        const checklistContainer = document.getElementById('peer-review-checklist');
+        if (checklistContainer) {
+            const checklistItems = [
+                "Is the problem statement clear and well-defined?",
+                "Are the data sources and preprocessing steps thoroughly documented?",
+                "Is the code clean, commented, and easy to follow?",
+                "Is the choice of machine learning models well-justified?",
+                "Are the evaluation metrics appropriate for the problem?",
+                "Are the results presented clearly using tables and visualizations?",
+                "Is the interpretation of results insightful and connected back to the problem?",
+                "Does the report have a logical structure and professional tone?",
+                "Are the conclusions and limitations of the project clearly stated?"
+            ];
+            checklistContainer.innerHTML = checklistItems.map((item, i) => `
+                <label for="check-${i}" class="checklist-item">
+                    <input type="checkbox" id="check-${i}">
+                    <span class="flex-1">${item}</span>
+                </label>
+            `).join('');
+            checklistContainer.addEventListener('change', (e) => {
+                if(e.target.type === 'checkbox') {
+                    e.target.closest('.checklist-item').classList.toggle('completed', e.target.checked);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
