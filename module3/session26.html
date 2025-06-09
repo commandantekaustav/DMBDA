@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 24: Lab 9 - Intro to Apache Spark (Core & SQL) - Module III</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chosen Palette: "Warm Neutral Harmony" -->
+    <!-- Application Structure Plan: Definitive single session lab guide with 10+ tasks. Structure: Header, Export, Details, Objectives, Setup, Extensive Content with multiple tasks: SparkSession, RDDs, Loading CSV, DataFrame Creation, Advanced DataFrame Ops, SQL Simulator, Performance Simulation, UDFs, Saving Data, and Caching. Goal: A definitive, hands-on guide to starting with PySpark. -->
+    <!-- Visualization & Content Choices: 
+        - Well-commented Python code blocks for an extensive workflow.
+        - An interactive SQL Query Simulator.
+        - A new interactive bar chart to simulate the performance difference between RDDs and DataFrames.
+        - Detailed textual explanations for each step, all in HTML.
+        - PDF Export: Print-specific CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            font-size: 1rem; 
+            line-height: 1.625; 
+        }
+        
+        .interactive-term { 
+            cursor: pointer;
+            font-weight: 600; 
+        }
+        .definition-tooltip {
+            display: none;
+            position: absolute;
+            background-color: #f9fafb; 
+            border: 1px solid #d1d5db; 
+            padding: 8px; 
+            border-radius: 4px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            z-index: 100;
+            font-size: 0.875rem; 
+            width: max-content;
+            max-width: 320px; 
+        }
+
+        h1.page-title { font-size: 2.25rem; line-height: 2.5rem; } 
+        h2.section-title { font-size: 1.5rem; line-height: 2rem; margin-bottom: 0.75rem;} 
+        h3.subsection-title { font-size: 1.25rem; line-height: 1.75rem; margin-bottom: 0.5rem;}    
+        h4.detail-title { font-size: 1.125rem; line-height: 1.75rem; margin-bottom: 0.375rem;} 
+        
+        .code-block {
+            background-color: #1e293b; /* slate-800 */
+            color: #e2e8f0; /* slate-200 */
+            padding: 1rem;
+            border-radius: 0.5rem 0.5rem 0 0; 
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        .output-block {
+            background-color: #111827; /* gray-900 */
+            color: #d1d5db; /* gray-300 */
+            padding: 1rem;
+            border-radius: 0 0 0.5rem 0.5rem; 
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .code-block .comment { color: #94a3b8; }
+        .code-block .keyword { color: #7dd3fc; }
+        .code-block .string { color: #a5b4fc; }
+        
+        #sql-query-input {
+            width: 100%; height: 100px; font-family: 'Courier New', Courier, monospace;
+            font-size: 0.875rem; background-color: #f8fafc; border: 1px solid #e2e8f0;
+            border-radius: 0.25rem; padding: 0.5rem;
+        }
+        #sql-output-table table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+        #sql-output-table th, #sql-output-table td { border: 1px solid #d1d5db; padding: 0.5rem; text-align: left; }
+        #sql-output-table th { background-color: #f1f5f9; }
+
+        .chart-container {
+            position: relative; width: 100%; max-width: 600px;
+            margin-left: auto; margin-right: auto; height: 350px; max-height: 400px;
+        }
+
+        @media print {
+            body { font-size: 10pt; line-height: 1.3; } 
+            .no-print { display: none !important; }
+            header { display: flex; flex-direction: column; align-items: center; text-align: center; }
+            .header-logo-print { max-width: 150px; max-height: 50px; margin-bottom: 10px; } 
+            .footer-logo-print { max-width: 100px; max-height: 30px; margin-top: 10px; } 
+            footer { text-align: center; }
+            section, .content-section { page-break-inside: avoid; margin-bottom: 15px; } 
+            .bg-white { box-shadow: none !important; border: 1px solid #ccc; padding: 0.5rem !important;}
+            a { text-decoration: none; color: black; }
+            .interactive-term { text-decoration: none; color: black; font-weight: bold; } 
+            .definition-tooltip { display: none !important; }
+            .code-block, .output-block { background-color: #f3f4f6; color: #1f2937; border: 1px solid #ddd; white-space: pre-wrap; word-wrap: break-word; border-radius: 0 !important;}
+            .chart-container { display: none; }
+            h1.page-title { font-size: 20pt; } h2.section-title { font-size: 16pt; }
+            h3.subsection-title { font-size: 14pt; } h4.detail-title { font-size: 12pt; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+</head>
+<body class="bg-gray-100 text-gray-800"> 
+    <div class="container mx-auto p-4 md:p-8"> 
+        <header class="mb-10"> 
+            <div class="flex flex-col sm:flex-row items-center justify-between">
+                <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-16 md:h-20 mb-4 sm:mb-0 header-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+                <div class="text-center sm:text-right sm:ml-4"> 
+                    <p class="text-base text-gray-500">Module III: Big Data Platforms - Hadoop & Spark</p> 
+                    <h1 class="page-title text-3xl md:text-4xl font-bold text-gray-900 mt-1">Session 24: Lab 9 - Introduction to Apache Spark (Core & SQL)</h1> 
+                    <p class="text-lg text-gray-600 mt-2">Data Mining & Big Data Analytics</p> 
+                </div>
+            </div>
+            <nav aria-label="Breadcrumb" class="mt-4 text-sm text-gray-500 no-print"> 
+                <ol class="list-none p-0 inline-flex">
+                    <li class="flex items-center">
+                        <a href="../index.html" class="text-slate-600 hover:text-slate-800">Course Overview</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="flex items-center">
+                        <a href="module-3-index.html" class="text-slate-600 hover:text-slate-800">Module III</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="text-gray-700 font-semibold" aria-current="page">Session 24</li> 
+                </ol>
+            </nav>
+        </header>
+
+        <div class="text-center mb-8 no-print"> 
+            <button onclick="window.print()" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-150 ease-in-out text-base"> 
+                Export Session 24 to PDF
+            </button>
+        </div>
+
+        <article class="bg-white p-6 md:p-8 rounded-lg shadow-lg"> 
+            <section class="mb-6 border-b pb-4"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-2">Session Details</h2> 
+                <p class="text-base text-gray-700"><strong>Type:</strong> Guided Practical 💻</p>
+                <p class="text-base text-gray-700"><strong>Duration:</strong> 2 Hours</p>
+                <p class="text-base text-gray-700"><strong>Core Libraries:</strong> PySpark</p>
+            </section>
+
+            <div class="definition-tooltip"></div>
+            
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 1: Creating a SparkSession</h2>
+                <div class="code-block">
+                    <pre><code><span class="keyword">from</span> pyspark.sql <span class="keyword">import</span> SparkSession
+spark = SparkSession.builder.appName(<span class="string">"IntroToSpark"</span>).getOrCreate()</code></pre>
+                </div>
+            </section>
+            
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 2: Working with RDDs</h2>
+                <div class="code-block">
+                    <pre><code>lines = [<span class="string">"hello world"</span>, <span class="string">"hello spark"</span>, <span class="string">"spark is fast"</span>]
+rdd = spark.sparkContext.parallelize(lines)
+word_counts_rdd = rdd.flatMap(<span class="keyword">lambda</span> l: l.split(<span class="string">" "</span>)).map(<span class="keyword">lambda</span> w: (w, 1)).reduceByKey(<span class="keyword">lambda</span> a, b: a + b)
+results = word_counts_rdd.collect()
+<span class="keyword">print</span>(f<span class="string">"Word Count Results: {results}"</span>)</code></pre>
+                </div>
+                <div class="output-block mt-0 mb-4">Word Count Results: [('hello', 2), ('world', 1), ('spark', 2), ('is', 1), ('fast', 1)]</div>
+            </section>
+
+             <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 3: Loading External Data</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">A common task is loading data from a CSV file. We assume you have a file `employees.csv` with the same data as our previous list.</p>
+                <div class="code-block">
+                    <pre><code><span class="comment"># In a real environment, you would have an 'employees.csv' file.</span>
+<span class="comment"># For this lab, we'll continue creating the DataFrame from an in-memory list.</span>
+employee_data = [ ("James", "Sales", 3000), ("Michael", "Sales", 4600), ("Robert", "Sales", 4100), ("Maria", "Finance", 3000), ("Raman", "Finance", 3000), ("Jen", "Finance", 3900), ("Scott", "Marketing", 3400), ("Kumar", "Marketing", 2000), ("Saif", "Sales", 4100) ]
+columns = [<span class="string">"employee_name"</span>, <span class="string">"department"</span>, <span class="string">"salary"</span>]
+df = spark.createDataFrame(employee_data, schema=columns)
+
+<span class="comment"># The code to read a real CSV would be:</span>
+<span class="comment"># df_from_csv = spark.read.csv("employees.csv", header=True, inferSchema=True)</span>
+df.show(5)</code></pre>
+                </div>
+                 <div class="output-block mt-0 mb-4">+-------------+----------+------+
+|employee_name|department|salary|
++-------------+----------+------+
+|        James|     Sales|  3000|
+|      Michael|     Sales|  4600|
+|       Robert|     Sales|  4100|
+|        Maria|   Finance|  3000|
+|        Raman|   Finance|  3000|
++-------------+----------+------+
+only showing top 5 rows</div>
+            </section>
+
+             <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 4: Basic DataFrame Operations</h2>
+                 <div class="code-block">
+                    <pre><code><span class="keyword">from</span> pyspark.sql.functions <span class="keyword">import</span> avg
+<span class="keyword">print</span>(<span class="string">"Average salary by department:"</span>)
+df.groupBy(<span class="string">"department"</span>).agg(avg(<span class="string">"salary"</span>).alias(<span class="string">"avg_salary"</span>)).show()</code></pre>
+                </div>
+                 <div class="output-block mt-0 mb-4">+----------+------------------+
+|department|        avg_salary|
++----------+------------------+
+|     Sales|            3950.0|
+|   Finance|            3300.0|
+| Marketing|            2700.0|
++----------+------------------+</div>
+            </section>
+            
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 5: Advanced DataFrame Operations (Joins)</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">Let's create a second DataFrame and perform a join.</p>
+                <div class="code-block">
+                    <pre><code>dept_data = [("Sales", "New York"), ("Finance", "London"), ("Marketing", "Tokyo"), ("HR", "Paris")]
+dept_columns = ["department", "location"]
+dept_df = spark.createDataFrame(dept_data, dept_columns)
+
+<span class="keyword">print</span>(<span class="string">"Joining employee and department data:"</span>)
+df.join(dept_df, on="department", how="inner").show()</code></pre>
+                </div>
+                 <div class="output-block mt-0 mb-4">+----------+-------------+------+--------+
+|department|employee_name|salary|location|
++----------+-------------+------+--------+
+|     Sales|        James|  3000|New York|
+|     Sales|      Michael|  4600|New York|
+...
++----------+-------------+------+--------+</div>
+            </section>
+
+             <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 6: Interactive Spark SQL Simulator</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    Use the simulator below to run SQL queries on our `employees` table.
+                </p>
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-6 mt-6 no-print">
+                    <h3 class="subsection-title text-lg font-medium text-indigo-700 mb-4">Spark SQL Query Simulator</h3>
+                    <div>
+                        <label for="sql-query-input" class="block text-sm font-medium text-gray-700 mb-1">Enter your SQL query:</label>
+                        <textarea id="sql-query-input"></textarea>
+                    </div>
+                     <div class="flex flex-wrap gap-2 my-4">
+                        <button id="run-query-btn" class="bg-blue-600 text-white py-2 px-4 rounded-md font-semibold">Run Query</button>
+                        <button class="sql-example-btn bg-gray-200 text-gray-700 py-1 px-3 rounded-md text-sm" data-query="SELECT * FROM employees">Example: Select All</button>
+                        <button class="sql-example-btn bg-gray-200 text-gray-700 py-1 px-3 rounded-md text-sm" data-query="SELECT employee_name, salary FROM employees WHERE salary > 4000 ORDER BY salary DESC">Example: Where Clause</button>
+                        <button class="sql-example-btn bg-gray-200 text-gray-700 py-1 px-3 rounded-md text-sm" data-query="SELECT department, ROUND(AVG(salary), 2) as avg_salary, COUNT(*) as count FROM employees GROUP BY department">Example: Group By</button>
+                    </div>
+                    <div>
+                        <h4 class="detail-title font-semibold text-gray-700 mb-2">Query Result:</h4>
+                        <div id="sql-output-table" class="overflow-x-auto"></div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 7: RDD vs. DataFrame Performance Simulation</h2>
+                 <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    A key reason to use DataFrames is performance. Spark's **Catalyst Optimizer** creates a highly efficient physical execution plan for DataFrame operations. RDDs, being more low-level, do not get these optimizations. This chart conceptually shows the time difference for a complex aggregation task.
+                </p>
+                <div class="chart-container bg-slate-50 p-4 rounded-lg border border-slate-200">
+                    <canvas id="perfChart"></canvas>
+                </div>
+            </section>
+
+             <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 8: User-Defined Functions (UDFs)</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">UDFs allow you to apply custom Python logic to DataFrame columns. Let's create a UDF to categorize salaries.</p>
+                <div class="code-block">
+                    <pre><code><span class="keyword">from</span> pyspark.sql.functions <span class="keyword">import</span> udf
+<span class="keyword">from</span> pyspark.sql.types <span class="keyword">import</span> StringType
+
+<span class="comment"># Define a Python function</span>
+<span class="keyword">def</span> salary_category(salary):
+    <span class="keyword">if</span> salary < 3500:
+        <span class="keyword">return</span> <span class="string">"Low"</span>
+    <span class="keyword">elif</span> salary < 4500:
+        <span class="keyword">return</span> <span class="string">"Medium"</span>
+    <span class="keyword">else</span>:
+        <span class="keyword">return</span> <span class="string">"High"</span>
+
+<span class="comment"># Register the function as a UDF</span>
+salary_udf = udf(salary_category, StringType())
+
+<span class="comment"># Create a new column using the UDF</span>
+df_with_category = df.withColumn(<span class="string">"salary_category"</span>, salary_udf(df[<span class="string">"salary"</span>]))
+df_with_category.show()
+</code></pre>
+                </div>
+                 <div class="output-block mt-0 mb-4">+-------------+----------+------+---------------+
+|employee_name|department|salary|salary_category|
++-------------+----------+------+---------------+
+|        James|     Sales|  3000|            Low|
+|      Michael|     Sales|  4600|           High|
+...
++-------------+----------+------+---------------+</div>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 9: Saving Data</h2>
+                 <p class="text-base text-gray-700 leading-relaxed mb-3">After processing, you often need to save your results. Parquet is a popular, efficient columnar storage format in the Big Data world.</p>
+                <div class="code-block">
+                    <pre><code><span class="comment"># Save the DataFrame as a Parquet file (partitioned by department)</span>
+<span class="comment"># In a real environment, this would create a directory structure.</span>
+<span class="comment"># df_with_category.write.partitionBy("department").parquet("employee_data.parquet")</span>
+
+<span class="keyword">print</span>(<span class="string">"DataFrame would be saved to 'employee_data.parquet'"</span>)</code></pre>
+                </div>
+            </section>
+            
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 10: Caching / Persistence</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">If you plan to use a DataFrame multiple times in an iterative algorithm, you can cache it in memory to avoid re-computation. This is a key optimization technique.</p>
+                 <div class="code-block">
+                    <pre><code><span class="comment"># Cache the DataFrame to keep it in memory for faster access</span>
+df_with_category.cache()
+
+<span class="comment"># The first action after .cache() will trigger the computation and caching</span>
+cached_count = df_with_category.count()
+
+<span class="keyword">print</span>(f<span class="string">"DataFrame is now cached. Count: {cached_count}"</span>)
+<span class="keyword">print</span>(<span class="string">"Subsequent actions on this DataFrame will be much faster."</span>)
+
+<span class="comment"># To remove from cache when done</span>
+<span class="comment"># df_with_category.unpersist()</span></code></pre>
+                </div>
+            </section>
+        </article>
+
+        <footer class="text-center mt-12 py-6 border-t border-gray-300"> 
+            <div class="mb-4"> 
+                 <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-10 mx-auto footer-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+            </div>
+            <p class="text-base text-gray-600">&copy; <span id="currentYearModule"></span> FACE Prep Campus (www.faceprep.in). All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('currentYearModule').textContent = new Date().getFullYear();
+
+        const interactiveTerms = document.querySelectorAll('.interactive-term');
+        const tooltip = document.querySelector('.definition-tooltip');
+        if (tooltip) {
+            interactiveTerms.forEach(term => {
+                term.addEventListener('click', (e) => { 
+                    tooltip.textContent = term.dataset.definition;
+                    tooltip.style.display = 'block';
+                    const termRect = term.getBoundingClientRect();
+                    tooltip.style.top = `${termRect.bottom + window.scrollY + 8}px`;
+                    tooltip.style.left = `${termRect.left + window.scrollX}px`;
+                });
+            });
+            document.addEventListener('click', function(event) {
+                if (!event.target.classList.contains('interactive-term')) {
+                    tooltip.style.display = 'none';
+                }
+            });
+        }
+        
+        const queryInput = document.getElementById('sql-query-input');
+        const runQueryBtn = document.getElementById('run-query-btn');
+        const outputTableDiv = document.getElementById('sql-output-table');
+        const exampleBtns = document.querySelectorAll('.sql-example-btn');
+
+        if (queryInput && runQueryBtn && outputTableDiv && exampleBtns.length > 0) {
+            const data = [ {employee_name: "James", department: "Sales", salary: 3000}, {employee_name: "Michael", department: "Sales", salary: 4600}, {employee_name: "Robert", department: "Sales", salary: 4100}, {employee_name: "Maria", department: "Finance", salary: 3000}, {employee_name: "Raman", department: "Finance", salary: 3000}, {employee_name: "Jen", department: "Finance", salary: 3900}, {employee_name: "Scott", department: "Marketing", salary: 3400}, {employee_name: "Kumar", department: "Marketing", salary: 2000}, {employee_name: "Saif", department: "Sales", salary: 4100} ];
+            const runSimulation = () => {
+                const query = queryInput.value.toLowerCase().trim();
+                let result = []; let headers = [];
+                try {
+                    if (query.includes('group by department')) {
+                        headers = ['department', 'avg_salary', 'count'];
+                        const groups = {};
+                        data.forEach(row => {
+                            if (!groups[row.department]) groups[row.department] = { sum: 0, count: 0 };
+                            groups[row.department].sum += row.salary;
+                            groups[row.department].count++;
+                        });
+                        result = Object.keys(groups).map(dept => ({ department: dept, avg_salary: (groups[dept].sum / groups[dept].count).toFixed(2), count: groups[dept].count }));
+                    } else if (query.includes('where salary >')) {
+                        const threshold = parseInt(query.split('>')[1].trim());
+                        headers = query.split(' from ')[0].replace('select ', '').split(',').map(s => s.trim());
+                        result = data.filter(row => row.salary > threshold).map(r => { let newRow = {}; headers.forEach(h => newRow[h] = r[h]); return newRow; });
+                        if(query.includes('order by salary desc')) result.sort((a,b) => b.salary - a.salary);
+                    } else if (query.includes('select *')) {
+                        headers = ['employee_name', 'department', 'salary'];
+                        result = data;
+                    } else {
+                         outputTableDiv.innerHTML = `<p class="text-red-500">Simplified simulator supports specific patterns. Please try an example query.</p>`;
+                         return;
+                    }
+                    renderTable(headers, result);
+                } catch (e) {
+                     outputTableDiv.innerHTML = `<p class="text-red-500">Error parsing query.</p>`;
+                }
+            };
+            const renderTable = (headers, data) => {
+                 if (data.length === 0) { outputTableDiv.innerHTML = `<p>Query returned no results.</p>`; return; }
+                let tableHTML = '<table><thead><tr>';
+                headers.forEach(h => tableHTML += `<th>${h}</th>`);
+                tableHTML += '</tr></thead><tbody>';
+                data.forEach(row => { tableHTML += '<tr>'; headers.forEach(h => tableHTML += `<td>${row[h]}</td>`); tableHTML += '</tr>'; });
+                tableHTML += '</tbody></table>';
+                outputTableDiv.innerHTML = tableHTML;
+            }
+            runQueryBtn.addEventListener('click', runSimulation);
+            exampleBtns.forEach(btn => btn.addEventListener('click', () => { queryInput.value = btn.dataset.query; runSimulation(); }));
+            exampleBtns[2].click();
+        }
+
+        const perfCtx = document.getElementById('perfChart');
+        if (perfCtx) {
+            new Chart(perfCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Complex Aggregation Task'],
+                    datasets: [
+                        { label: 'RDD Execution Time (ms)', data: [1250], backgroundColor: 'rgba(239, 68, 68, 0.7)', borderWidth: 1 },
+                        { label: 'DataFrame Execution Time (ms)', data: [150], backgroundColor: 'rgba(59, 130, 246, 0.7)', borderWidth: 1 }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { title: { display: true, text: "Conceptual Performance: RDD vs. DataFrame", font: { size: 16 } }, legend: { position: 'bottom' } }, scales: { x: { title: { display: true, text: 'Execution Time (ms)' } } } }
+            });
+        }
+    </script>
+</body>
+</html>

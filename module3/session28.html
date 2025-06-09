@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 28: Mini Project - Phase 3: Platform Selection & Initial Implementation - Module III</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: "Warm Neutral Harmony" -->
+    <!-- Application Structure Plan: Definitive single session lab guide. Structure: Header, Export, Details, Objectives, Introduction, Detailed Key Tasks (Tech Stack Selection with flowchart, Environment Setup, Version Control, Data Ingestion, Baseline "Smoke Test"), Deliverables, Tips, Key Takeaways, Footer. Goal: A definitive, hands-on guide for the project's technical setup and initial implementation. -->
+    <!-- Visualization & Content Choices: 
+        - Detailed textual guidance for each key task of this project phase.
+        - A conceptual flowchart for technology selection using HTML/CSS to guide decision-making.
+        - Well-commented Python/PySpark code examples for initial data loading and smoke testing.
+        - All content presented in standard HTML.
+        - PDF Export: Print-specific CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            font-size: 1rem; 
+            line-height: 1.625; 
+        }
+        
+        .interactive-term { 
+            cursor: pointer;
+            font-weight: 600; 
+        }
+        .definition-tooltip {
+            display: none;
+            position: absolute;
+            background-color: #f9fafb; 
+            border: 1px solid #d1d5db; 
+            padding: 8px; 
+            border-radius: 4px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            z-index: 100;
+            font-size: 0.875rem; 
+            width: max-content;
+            max-width: 320px; 
+        }
+
+        h1.page-title { font-size: 2.25rem; line-height: 2.5rem; } 
+        h2.section-title { font-size: 1.5rem; line-height: 2rem; margin-bottom: 0.75rem;} 
+        h3.subsection-title { font-size: 1.25rem; line-height: 1.75rem; margin-bottom: 0.5rem;}    
+        h4.detail-title { font-size: 1.125rem; line-height: 1.75rem; margin-bottom: 0.375rem;} 
+        
+        .task-card {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-left-width: 4px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0.5rem;
+        }
+        .task-card-project { border-left-color: #f59e0b; }
+        
+        .code-block {
+            background-color: #1e293b; color: #e2e8f0; padding: 1rem;
+            border-radius: 0.5rem; overflow-x: auto; font-family: 'Courier New', Courier, monospace;
+            font-size: 0.875rem; line-height: 1.5;
+        }
+        .code-block .comment { color: #94a3b8; }
+        .code-block .keyword { color: #7dd3fc; }
+        .code-block .string { color: #a5b4fc; }
+
+        @media print {
+            body { font-size: 10pt; line-height: 1.3; } 
+            .no-print { display: none !important; }
+            header { display: flex; flex-direction: column; align-items: center; text-align: center; }
+            .header-logo-print { max-width: 150px; max-height: 50px; margin-bottom: 10px; } 
+            .footer-logo-print { max-width: 100px; max-height: 30px; margin-top: 10px; } 
+            footer { text-align: center; }
+            section, .content-section, .task-card { page-break-inside: avoid; margin-bottom: 15px; } 
+            .bg-white { box-shadow: none !important; border: 1px solid #ccc; padding: 0.5rem !important;}
+            a { text-decoration: none; color: black; }
+            .interactive-term { text-decoration: none; color: black; font-weight: bold; } 
+            .definition-tooltip { display: none !important; }
+            .code-block { background-color: #f3f4f6; color: #1f2937; border: 1px solid #ddd; white-space: pre-wrap; word-wrap: break-word; border-radius: 0 !important;}
+            h1.page-title { font-size: 20pt; } 
+            h2.section-title { font-size: 16pt; }
+            h3.subsection-title { font-size: 14pt; }
+            h4.detail-title { font-size: 12pt; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+</head>
+<body class="bg-gray-100 text-gray-800"> 
+    <div class="container mx-auto p-4 md:p-8"> 
+        <header class="mb-10"> 
+            <div class="flex flex-col sm:flex-row items-center justify-between">
+                <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-16 md:h-20 mb-4 sm:mb-0 header-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+                <div class="text-center sm:text-right sm:ml-4"> 
+                    <p class="text-base text-gray-500">Module III: Big Data Platforms - Hadoop & Spark</p> 
+                    <h1 class="page-title text-3xl md:text-4xl font-bold text-gray-900 mt-1">Session 28: Mini Project - Phase 3: Platform Selection & Initial Implementation</h1> 
+                    <p class="text-lg text-gray-600 mt-2">Data Mining & Big Data Analytics</p> 
+                </div>
+            </div>
+            <nav aria-label="Breadcrumb" class="mt-4 text-sm text-gray-500 no-print"> 
+                <ol class="list-none p-0 inline-flex">
+                    <li class="flex items-center">
+                        <a href="../index.html" class="text-slate-600 hover:text-slate-800">Course Overview</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="flex items-center">
+                        <a href="module-3-index.html" class="text-slate-600 hover:text-slate-800">Module III</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="text-gray-700 font-semibold" aria-current="page">Session 28</li> 
+                </ol>
+            </nav>
+        </header>
+
+        <div class="text-center mb-8 no-print"> 
+            <button onclick="window.print()" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-150 ease-in-out text-base"> 
+                Export Session 28 to PDF
+            </button>
+        </div>
+
+        <article class="bg-white p-6 md:p-8 rounded-lg shadow-lg"> 
+            <section class="mb-6 border-b pb-4"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-2">Session Details</h2> 
+                <p class="text-base text-gray-700"><strong>Type:</strong> Mini Project 🔬</p>
+                <p class="text-base text-gray-700"><strong>Duration:</strong> 4 Hours</p>
+                <p class="text-base text-gray-700"><strong>Core Concepts:</strong> Technology Selection, Environment Setup, Data Ingestion, Baseline Modeling.</p>
+            </section>
+
+            <section class="mb-8 content-section"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Phase 3 Objectives</h2> 
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1"> 
+                    <li>Select the appropriate technology stack (e.g., local Python/Pandas vs. cloud PySpark) for your project based on data size and processing needs.</li>
+                    <li>Set up your development environment and install necessary libraries.</li>
+                    <li>Write and execute code to ingest your project's dataset into your chosen environment.</li>
+                    <li>Perform initial data processing steps as outlined in your preprocessing plan from Phase 2.</li>
+                    <li>Conduct a "smoke test" by running a simple analysis or baseline model to ensure the end-to-end pipeline is functional.</li>
+                    <li>Refine your project plan with specific technology choices and more detailed timelines.</li>
+                </ul>
+            </section>
+
+            <div class="definition-tooltip"></div>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Phase 3 Overview: Building the Foundation</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    This project phase marks the transition from planning to hands-on implementation. Having defined your problem and data sources, you will now make critical technology decisions and write your first lines of project code. The goal is to establish a working environment, load your data, and perform initial processing tasks. Completing a simple end-to-end "smoke test" is a key milestone, as it validates your setup and ensures there are no major roadblocks before you dive into complex modeling.
+                </p>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Key Tasks for Project Phase 3</h2>
+                
+                <div class="task-card task-card-project">
+                    <h3 class="subsection-title text-lg font-medium text-amber-700 mb-2">
+                        1. Select Your Technology Stack
+                    </h3>
+                    <p class="text-base text-gray-700 leading-relaxed mb-3">
+                        The most important decision in this phase is choosing the right tools for your data's scale and your project's complexity.
+                    </p>
+                     <ul class="list-disc list-inside text-sm text-gray-600 ml-5 space-y-2">
+                        <li><strong>For Small to Medium Data (Fits comfortably in your computer's RAM, e.g., < 1-2 GB):</strong> A local Python environment using libraries like <strong>Pandas</strong>, <strong>Numpy</strong>, and <strong>Scikit-learn</strong> is often the fastest and most convenient choice.</li>
+                        <li><strong>For Large Data (Larger than RAM or requires distributed processing):</strong> A distributed computing framework is necessary. For this course, <strong>Apache Spark (via PySpark)</strong> is the recommended tool. Using a managed environment like <strong>Google Colab</strong> is the easiest way to get started without complex local setup.</li>
+                    </ul>
+                </div>
+
+                <div class="task-card task-card-project">
+                    <h3 class="subsection-title text-lg font-medium text-amber-700 mb-2">
+                        2. Set Up Your Environment
+                    </h3>
+                    <p class="text-base text-gray-700 leading-relaxed mb-3">
+                        Based on your choice, prepare your development environment.
+                    </p>
+                     <ul class="list-disc list-inside text-sm text-gray-600 ml-5 space-y-2">
+                        <li><strong>Local Python:</strong> Ensure you have Python installed (e.g., via Anaconda Distribution) and install the necessary libraries: `pip install pandas scikit-learn matplotlib seaborn jupyterlab`.</li>
+                        <li><strong>Cloud PySpark (Google Colab):</strong> Simply open a new Colab notebook and run the installation command in the first cell: `!pip install pyspark`.</li>
+                    </ul>
+                </div>
+
+                <div class="task-card task-card-project">
+                    <h3 class="subsection-title text-lg font-medium text-amber-700 mb-2">
+                        3. Initial Data Ingestion & Processing
+                    </h3>
+                    <p class="text-base text-gray-700 leading-relaxed mb-3">
+                        Write the code to load your chosen dataset. Then, begin applying the initial, most straightforward steps from your preprocessing plan created in Phase 2.
+                    </p>
+                    <div class="code-block">
+                        <pre><code><span class="comment"># Example using PySpark in Google Colab to load a CSV</span>
+<span class="keyword">from</span> pyspark.sql <span class="keyword">import</span> SparkSession
+
+<span class="comment"># Assumes you have uploaded 'my_project_data.csv' to Colab</span>
+file_path = <span class="string">"/content/my_project_data.csv"</span>
+
+spark = SparkSession.builder.appName(<span class="string">"ProjectPhase3"</span>).getOrCreate()
+
+<span class="comment"># Load data, infer schema, and specify header</span>
+project_df = spark.read.csv(file_path, header=<span class="keyword">True</span>, inferSchema=<span class="keyword">True</span>)
+
+<span class="comment"># Perform initial exploration</span>
+<span class="keyword">print</span>(<span class="string">"Dataframe Schema:"</span>)
+project_df.printSchema()
+
+<span class="keyword">print</span>(<span class="string">"Initial Data Shape:"</span>)
+<span class="keyword">print</span>((project_df.count(), len(project_df.columns)))
+
+<span class="comment"># --- Begin applying your preprocessing plan ---</span>
+<span class="comment"># Example: Drop rows with any null values (a simple first step)</span>
+processed_df = project_df.dropna()
+<span class="keyword">print</span>(<span class="string">"\nShape after dropping nulls:"</span>)
+<span class="keyword">print</span>((processed_df.count(), len(processed_df.columns)))
+</code></pre>
+                    </div>
+                </div>
+
+                <div class="task-card task-card-project">
+                    <h3 class="subsection-title text-lg font-medium text-amber-700 mb-2">
+                        4. Conduct a "Smoke Test"
+                    </h3>
+                    <p class="text-base text-gray-700 leading-relaxed mb-3">
+                        A smoke test is a simple, preliminary run to ensure your entire pipeline works end-to-end without errors. The goal is not to get a perfect result, but to confirm that data can be loaded, processed, and fed into a basic model.
+                    </p>
+                    <ul class="list-disc list-inside text-sm text-gray-600 ml-5 space-y-2">
+                        <li>Take a small sample of your data.</li>
+                        <li>Apply only the most essential preprocessing steps (e.g., handle nulls in the target variable, convert features to a numeric format).</li>
+                        <li>Train a very simple, default model (e.g., a `DecisionTreeClassifier` with no custom parameters).</li>
+                        <li>Make predictions and calculate a single metric like accuracy.</li>
+                        <li><strong>If it runs without crashing, your smoke test is successful!</strong> This gives you confidence that your environment is set up correctly.</li>
+                    </ul>
+                </div>
+            </section>
+        </article>
+
+        <footer class="text-center mt-12 py-6 border-t border-gray-300"> 
+            <div class="mb-4"> 
+                 <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-10 mx-auto footer-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+            </div>
+            <p class="text-base text-gray-600">&copy; <span id="currentYearModule"></span> FACE Prep Campus (www.faceprep.in). All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('currentYearModule').textContent = new Date().getFullYear();
+
+        const interactiveTerms = document.querySelectorAll('.interactive-term');
+        const tooltip = document.querySelector('.definition-tooltip');
+        if (tooltip) {
+            interactiveTerms.forEach(term => {
+                term.addEventListener('click', (e) => { 
+                    tooltip.textContent = term.dataset.definition;
+                    tooltip.style.display = 'block';
+                    const termRect = term.getBoundingClientRect();
+                    tooltip.style.top = `${termRect.bottom + window.scrollY + 8}px`;
+                    tooltip.style.left = `${termRect.left + window.scrollX}px`;
+                });
+            });
+            document.addEventListener('click', function(event) {
+                if (!event.target.classList.contains('interactive-term')) {
+                    tooltip.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

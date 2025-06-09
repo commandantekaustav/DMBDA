@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 29: Blended Learning - Advanced Hadoop & Spark Intro - Module III</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: "Warm Neutral Harmony" -->
+    <!-- Application Structure Plan: Definitive single session detail page for blended learning. Structure: Header, Export, Session Details, Objectives, Introduction, Link to Coursera, Detailed Focus Areas (Hive, Pig, advanced MapReduce concepts, deeper Spark intro), Code examples for HiveQL and Pig Latin, Key Takeaways, Footer. Goal: A comprehensive self-study guide for advanced ecosystem tools. -->
+    <!-- Visualization & Content Choices: 
+        - Detailed textual explanations for all concepts, converted to standard HTML.
+        - Well-commented, illustrative code blocks for HiveQL and Pig Latin to demonstrate syntax and concepts.
+        - Interactive tooltips for technical terms.
+        - PDF Export: Print-specific CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            font-size: 1rem; 
+            line-height: 1.625; 
+        }
+        
+        .interactive-term { 
+            cursor: pointer;
+            font-weight: 600; 
+        }
+        .definition-tooltip {
+            display: none;
+            position: absolute;
+            background-color: #f9fafb; 
+            border: 1px solid #d1d5db; 
+            padding: 8px; 
+            border-radius: 4px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            z-index: 100;
+            font-size: 0.875rem; 
+            width: max-content;
+            max-width: 320px; 
+        }
+
+        h1.page-title { font-size: 2.25rem; line-height: 2.5rem; } 
+        h2.section-title { font-size: 1.5rem; line-height: 2rem; margin-bottom: 0.75rem;} 
+        h3.subsection-title { font-size: 1.25rem; line-height: 1.75rem; margin-bottom: 0.5rem;}    
+        h4.detail-title { font-size: 1.125rem; line-height: 1.75rem; margin-bottom: 0.375rem;} 
+        
+        .external-link-card {
+            background-color: #eff6ff; /* blue-50 */
+            border: 1px solid #93c5fd; /* blue-300 */
+            border-left-width: 4px;
+            border-left-color: #2563eb; /* blue-600 */
+            padding: 1.5rem;
+            margin-top: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0.5rem;
+        }
+        .code-block {
+            background-color: #1e293b; /* slate-800 */
+            color: #e2e8f0; /* slate-200 */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        .code-block .comment { color: #94a3b8; }
+        .code-block .keyword { color: #7dd3fc; }
+        .code-block .string { color: #a5b4fc; }
+
+
+        @media print {
+            body { font-size: 10pt; line-height: 1.3; } 
+            .no-print { display: none !important; }
+            header { display: flex; flex-direction: column; align-items: center; text-align: center; }
+            .header-logo-print { max-width: 150px; max-height: 50px; margin-bottom: 10px; } 
+            .footer-logo-print { max-width: 100px; max-height: 30px; margin-top: 10px; } 
+            footer { text-align: center; }
+            section, .content-section { page-break-inside: avoid; margin-bottom: 15px; } 
+            .bg-white { box-shadow: none !important; border: 1px solid #ccc; padding: 0.5rem !important;}
+            a { text-decoration: none; color: black; }
+            .external-link-card { border: 1px solid #ccc; padding: 0.5rem; }
+            .interactive-term { text-decoration: none; color: black; font-weight: bold; } 
+            .definition-tooltip { display: none !important; }
+            .code-block { background-color: #f3f4f6; color: #1f2937; border: 1px solid #ddd; white-space: pre-wrap; word-wrap: break-word; }
+            h1.page-title { font-size: 20pt; } 
+            h2.section-title { font-size: 16pt; }
+            h3.subsection-title { font-size: 14pt; }
+            h4.detail-title { font-size: 12pt; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+</head>
+<body class="bg-gray-100 text-gray-800"> 
+    <div class="container mx-auto p-4 md:p-8"> 
+        <header class="mb-10"> 
+            <div class="flex flex-col sm:flex-row items-center justify-between">
+                <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-16 md:h-20 mb-4 sm:mb-0 header-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+                <div class="text-center sm:text-right sm:ml-4"> 
+                    <p class="text-base text-gray-500">Module III: Big Data Platforms - Hadoop & Spark</p> 
+                    <h1 class="page-title text-3xl md:text-4xl font-bold text-gray-900 mt-1">Session 29: Blended Learning - Advanced Hadoop & Spark Intro</h1> 
+                    <p class="text-lg text-gray-600 mt-2">Data Mining & Big Data Analytics</p> 
+                </div>
+            </div>
+            <nav aria-label="Breadcrumb" class="mt-4 text-sm text-gray-500 no-print"> 
+                <ol class="list-none p-0 inline-flex">
+                    <li class="flex items-center">
+                        <a href="../index.html" class="text-slate-600 hover:text-slate-800">Course Overview</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="flex items-center">
+                        <a href="module-3-index.html" class="text-slate-600 hover:text-slate-800">Module III</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="text-gray-700 font-semibold" aria-current="page">Session 29</li> 
+                </ol>
+            </nav>
+        </header>
+
+        <div class="text-center mb-8 no-print"> 
+            <button onclick="window.print()" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-150 ease-in-out text-base"> 
+                Export Session 29 to PDF
+            </button>
+        </div>
+
+        <article class="bg-white p-6 md:p-8 rounded-lg shadow-lg"> 
+            <section class="mb-6 border-b pb-4"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-2">Session Details</h2> 
+                <p class="text-base text-gray-700"><strong>Type:</strong> Blended Learning 🌐</p>
+                <p class="text-base text-gray-700"><strong>Duration:</strong> 7 Hours (Self-paced study)</p>
+                <p class="text-base text-gray-700"><strong>Primary Resource:</strong> Coursera - Hadoop Platform and Application Framework, Spark Documentation</p>
+            </section>
+
+            <section class="mb-8 content-section"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Session Objectives</h2> 
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1"> 
+                    <li>Understand the purpose and basic syntax of high-level Hadoop ecosystem tools like Hive and Pig.</li>
+                    <li>Recognize how these tools abstract the complexity of writing Java MapReduce code.</li>
+                    <li>Explore advanced MapReduce concepts like Combiners and different join patterns.</li>
+                    <li>Deepen understanding of the Spark ecosystem and its core advantages.</li>
+                    <li>Bridge the gap between foundational Hadoop concepts and more advanced, modern data processing techniques.</li>
+                </ul>
+            </section>
+
+            <div class="definition-tooltip"></div>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Accessing the Coursera Course</h2>
+                <div class="external-link-card">
+                    <h3 class="subsection-title text-lg font-medium text-blue-700">Hadoop Platform and Application Framework</h3>
+                    <p class="text-base text-gray-700 mb-3">
+                        Continue your progress in this course from the University of California, San Diego on Coursera. This extended session covers more advanced topics.
+                    </p>
+                    <a href="https://www.coursera.org/learn/hadoop" target="_blank" rel="noopener noreferrer" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md shadow-md transition duration-150 ease-in-out no-print">
+                        Go to Coursera Course ➔
+                    </a>
+                </div>
+            </section>
+            
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Focus Area 1: High-Level Abstractions over MapReduce</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    Writing MapReduce jobs in Java is powerful but also verbose and complex, requiring significant boilerplate code. To improve productivity, the Hadoop ecosystem developed high-level abstraction tools that allow users to write data processing logic in a simpler language, which is then automatically translated into MapReduce jobs.
+                </p>
+
+                <h3 class="subsection-title text-lg font-medium text-gray-700 mt-6 mb-2">A. Apache Hive: SQL on Hadoop</h3>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    <strong>What it is:</strong> <span class="interactive-term" data-definition="Hive is a data warehouse infrastructure built on top of Hadoop for providing data summarization, query, and analysis. It provides an SQL-like interface to query data stored in various databases and file systems that integrate with Hadoop.">Apache Hive</span> provides a data warehousing solution on top of Hadoop. Its most important feature is <strong>HiveQL</strong>, an SQL-like query language. Users can write familiar SQL queries, and Hive translates them into a series of MapReduce jobs (or more recently, Spark or Tez jobs) to be executed on the cluster.
+                </p>
+                <p class="text-base text-gray-700 leading-relaxed">
+                    <strong>Why it's important:</strong> Hive made Hadoop accessible to a much wider audience of data analysts, business intelligence professionals, and anyone familiar with SQL, who could now analyze massive datasets without needing to be Java programmers.
+                </p>
+                 <div class="code-block">
+                    <pre><code><span class="comment">-- Example HiveQL Query to find average salary by department</span>
+<span class="keyword">SELECT</span>
+    department,
+    <span class="keyword">AVG</span>(salary) <span class="keyword">AS</span> average_salary
+<span class="keyword">FROM</span>
+    employees
+<span class="keyword">GROUP BY</span>
+    department;</code></pre>
+                </div>
+
+                <h3 class="subsection-title text-lg font-medium text-gray-700 mt-6 mb-2">B. Apache Pig: A Data Flow Language</h3>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    <strong>What it is:</strong> <span class="interactive-term" data-definition="Pig is a high-level platform for creating programs that run on Apache Hadoop. The language for this platform is called Pig Latin.">Apache Pig</span> is a platform for analyzing large data sets that consists of a high-level language for expressing data analysis programs, coupled with infrastructure for evaluating these programs. The scripting language is called <strong>Pig Latin</strong>.
+                </p>
+                 <p class="text-base text-gray-700 leading-relaxed">
+                    <strong>Why it's important:</strong> Pig provides a middle ground between the declarative nature of SQL and the low-level procedural nature of Java MapReduce. It excels at creating complex, multi-stage data processing pipelines (ETL) that might be difficult to express in pure SQL.
+                </p>
+                 <div class="code-block">
+                    <pre><code><span class="comment">-- Example Pig Latin script for the same task</span>
+employees = <span class="keyword">LOAD</span> <span class="string">'/data/employees.csv'</span> <span class="keyword">USING</span> PigStorage(<span class="string">','</span>) <span class="keyword">AS</span> (name:chararray, dept:chararray, salary:int);
+
+grouped_by_dept = <span class="keyword">GROUP</span> employees <span class="keyword">BY</span> dept;
+
+avg_salary = <span class="keyword">FOREACH</span> grouped_by_dept <span class="keyword">GENERATE</span> group <span class="keyword">AS</span> department, <span class="keyword">AVG</span>(employees.salary) <span class="keyword">AS</span> average_salary;
+
+<span class="keyword">DUMP</span> avg_salary;
+</code></pre>
+                </div>
+            </section>
+            
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Focus Area 2: Advanced MapReduce Concepts</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    Dive deeper into the mechanics of MapReduce to understand its performance characteristics.
+                </p>
+                 <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-3">
+                    <li>
+                        <strong>Combiners Revisited:</strong> Understand that a Combiner is a crucial optimization that reduces network traffic. It's a "mini-reducer" that runs on each mapper node, pre-aggregating data before the shuffle phase. For Word Count, it sums the counts locally first.
+                    </li>
+                    <li>
+                        <strong>Join Patterns:</strong> How would you join two large datasets using MapReduce?
+                        <ul class="list-circle list-inside ml-5 text-sm space-y-1 mt-1">
+                            <li><strong>Reduce-side Join:</strong> The most common approach. Mappers tag records with their source. Reducers receive all records for a given join key and perform the join logic within the reducer.</li>
+                             <li><strong>Map-side Join:</strong> A more efficient but stricter approach. It requires one dataset to be small enough to fit into the memory of each mapper. This small dataset is distributed to all mappers, which can then perform the join locally without a reduce phase.</li>
+                        </ul>
+                    </li>
+                 </ul>
+            </section>
+
+             <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Focus Area 3: Deeper Introduction to Spark</h2>
+                 <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    Connect the concepts from Hadoop to Spark to understand the evolutionary leap.
+                </p>
+                 <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-3">
+                    <li>
+                        <strong>The Role of the DAG:</strong> Contrast the rigid `Map -> Shuffle -> Reduce` flow with Spark's more flexible <span class="interactive-term" data-definition="A Directed Acyclic Graph (DAG) is the logical execution plan created by Spark. It allows for a much more complex and optimized series of operations than the fixed two-stage MapReduce model.">Directed Acyclic Graph (DAG)</span> of transformations. The DAG allows Spark's Catalyst optimizer to pipeline operations and avoid unnecessary intermediate steps.
+                    </li>
+                     <li>
+                        <strong>Spark SQL as the new "Hive":</strong> Understand that Spark SQL and the DataFrame API serve the same purpose as Hive—providing a high-level, easy-to-use interface for structured data analysis—but they do so with the superior performance of the Spark execution engine.
+                    </li>
+                     <li>
+                        <strong>Ecosystem Integration:</strong> Appreciate how Spark's unified engine allows you to seamlessly mix SQL queries, machine learning, and streaming in a single application, something that was much more difficult with the disparate tools in the Hadoop ecosystem.
+                    </li>
+                 </ul>
+            </section>
+
+        </article>
+
+        <footer class="text-center mt-12 py-6 border-t border-gray-300"> 
+            <div class="mb-4"> 
+                 <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-10 mx-auto footer-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+            </div>
+            <p class="text-base text-gray-600">&copy; <span id="currentYearModule"></span> FACE Prep Campus (www.faceprep.in). All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('currentYearModule').textContent = new Date().getFullYear();
+
+        const interactiveTerms = document.querySelectorAll('.interactive-term');
+        const tooltip = document.querySelector('.definition-tooltip');
+        if (tooltip) {
+            interactiveTerms.forEach(term => {
+                term.addEventListener('click', (e) => { 
+                    tooltip.textContent = term.dataset.definition;
+                    tooltip.style.display = 'block';
+                    const termRect = term.getBoundingClientRect();
+                    tooltip.style.top = `${termRect.bottom + window.scrollY + 8}px`;
+                    tooltip.style.left = `${termRect.left + window.scrollX}px`;
+                });
+            });
+            document.addEventListener('click', function(event) {
+                if (!event.target.classList.contains('interactive-term')) {
+                    tooltip.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

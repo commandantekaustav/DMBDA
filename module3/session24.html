@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 24: Lab 9 - Intro to Apache Spark (Core & SQL) - Module III</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: "Warm Neutral Harmony" -->
+    <!-- Application Structure Plan: Definitive single session lab guide. Structure: Header, Export, Session Details, Objectives, Setup, Extensive Content with multiple tasks: SparkSession, RDDs (with expanded examples), a new task for loading external data, DataFrame operations, and a new interactive SQL Query Simulator, Exercises, Key Takeaways, Footer. Goal: A definitive, hands-on guide to starting with PySpark with multiple examples and simulations. -->
+    <!-- Visualization & Content Choices: 
+        - Well-commented Python code blocks using PySpark for an extensive workflow.
+        - Clear, formatted outputs for each code block.
+        - A new interactive SQL Query Simulator using HTML/CSS/JS to demonstrate Spark SQL's power.
+        - Detailed textual explanations for each step and concept, all in HTML.
+        - PDF Export: Print-specific CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            font-size: 1rem; 
+            line-height: 1.625; 
+        }
+        
+        .interactive-term { 
+            cursor: pointer;
+            font-weight: 600; 
+        }
+        .definition-tooltip {
+            display: none;
+            position: absolute;
+            background-color: #f9fafb; 
+            border: 1px solid #d1d5db; 
+            padding: 8px; 
+            border-radius: 4px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            z-index: 100;
+            font-size: 0.875rem; 
+            width: max-content;
+            max-width: 320px; 
+        }
+
+        h1.page-title { font-size: 2.25rem; line-height: 2.5rem; } 
+        h2.section-title { font-size: 1.5rem; line-height: 2rem; margin-bottom: 0.75rem;} 
+        h3.subsection-title { font-size: 1.25rem; line-height: 1.75rem; margin-bottom: 0.5rem;}    
+        h4.detail-title { font-size: 1.125rem; line-height: 1.75rem; margin-bottom: 0.375rem;} 
+        
+        .code-block {
+            background-color: #1e293b; /* slate-800 */
+            color: #e2e8f0; /* slate-200 */
+            padding: 1rem;
+            border-radius: 0.5rem 0.5rem 0 0; 
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        .output-block {
+            background-color: #111827; /* gray-900 */
+            color: #d1d5db; /* gray-300 */
+            padding: 1rem;
+            border-radius: 0 0 0.5rem 0.5rem; 
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .code-block .comment { color: #94a3b8; }
+        .code-block .keyword { color: #7dd3fc; }
+        .code-block .string { color: #a5b4fc; }
+        
+        #sql-query-input {
+            width: 100%;
+            height: 100px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.875rem;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.25rem;
+            padding: 0.5rem;
+        }
+        #sql-output-table table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+        #sql-output-table th, #sql-output-table td {
+            border: 1px solid #d1d5db;
+            padding: 0.5rem;
+            text-align: left;
+        }
+        #sql-output-table th {
+            background-color: #f1f5f9;
+        }
+
+        @media print {
+            body { font-size: 10pt; line-height: 1.3; } 
+            .no-print { display: none !important; }
+            header { display: flex; flex-direction: column; align-items: center; text-align: center; }
+            .header-logo-print { max-width: 150px; max-height: 50px; margin-bottom: 10px; } 
+            .footer-logo-print { max-width: 100px; max-height: 30px; margin-top: 10px; } 
+            footer { text-align: center; }
+            section, .content-section { page-break-inside: avoid; margin-bottom: 15px; } 
+            .bg-white { box-shadow: none !important; border: 1px solid #ccc; padding: 0.5rem !important;}
+            a { text-decoration: none; color: black; }
+            .interactive-term { text-decoration: none; color: black; font-weight: bold; } 
+            .definition-tooltip { display: none !important; }
+            .code-block, .output-block { background-color: #f3f4f6; color: #1f2937; border: 1px solid #ddd; white-space: pre-wrap; word-wrap: break-word; border-radius: 0 !important;}
+            h1.page-title { font-size: 20pt; } 
+            h2.section-title { font-size: 16pt; }
+            h3.subsection-title { font-size: 14pt; }
+            h4.detail-title { font-size: 12pt; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+</head>
+<body class="bg-gray-100 text-gray-800"> 
+    <div class="container mx-auto p-4 md:p-8"> 
+        <header class="mb-10"> 
+            <div class="flex flex-col sm:flex-row items-center justify-between">
+                <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-16 md:h-20 mb-4 sm:mb-0 header-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+                <div class="text-center sm:text-right sm:ml-4"> 
+                    <p class="text-base text-gray-500">Module III: Big Data Platforms - Hadoop & Spark</p> 
+                    <h1 class="page-title text-3xl md:text-4xl font-bold text-gray-900 mt-1">Session 24: Lab 9 - Introduction to Apache Spark (Core & SQL)</h1> 
+                    <p class="text-lg text-gray-600 mt-2">Data Mining & Big Data Analytics</p> 
+                </div>
+            </div>
+            <nav aria-label="Breadcrumb" class="mt-4 text-sm text-gray-500 no-print"> 
+                <ol class="list-none p-0 inline-flex">
+                    <li class="flex items-center">
+                        <a href="../index.html" class="text-slate-600 hover:text-slate-800">Course Overview</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="flex items-center">
+                        <a href="module-3-index.html" class="text-slate-600 hover:text-slate-800">Module III</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="text-gray-700 font-semibold" aria-current="page">Session 24</li> 
+                </ol>
+            </nav>
+        </header>
+
+        <div class="text-center mb-8 no-print"> 
+            <button onclick="window.print()" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-150 ease-in-out text-base"> 
+                Export Session 24 to PDF
+            </button>
+        </div>
+
+        <article class="bg-white p-6 md:p-8 rounded-lg shadow-lg"> 
+            <section class="mb-6 border-b pb-4"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-2">Session Details</h2> 
+                <p class="text-base text-gray-700"><strong>Type:</strong> Guided Practical 💻</p>
+                <p class="text-base text-gray-700"><strong>Duration:</strong> 2 Hours</p>
+                <p class="text-base text-gray-700"><strong>Core Libraries:</strong> PySpark (Spark's Python API)</p>
+            </section>
+
+            <section class="mb-8 content-section"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Lab Objectives</h2> 
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1"> 
+                    <li>Initialize a `SparkSession` and understand its role as the entry point for Spark applications.</li>
+                    <li>Perform a variety of operations on RDDs (map, flatMap, filter, reduce).</li>
+                    <li>Load data from external sources (like CSV) into Spark DataFrames.</li>
+                    <li>Execute a wide range of DataFrame operations for data manipulation and aggregation.</li>
+                    <li>Utilize Spark SQL to run queries on DataFrames through an interactive simulator.</li>
+                </ul>
+            </section>
+
+            <div class="definition-tooltip"></div>
+            
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 1: Creating a SparkSession</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    The <span class="interactive-term" data-definition="The entry point to programming Spark with the Dataset and DataFrame API. It is the unified entry point for a Spark application, used to create DataFrames, register DataFrames as tables, execute SQL queries, etc.">SparkSession</span> is the main entry point for any Spark application. The `.builder` pattern is used to configure and create it. `appName` gives your job a name in the Spark UI, and `getOrCreate()` either gets an existing SparkSession or creates a new one.
+                </p>
+                <div class="code-block">
+                    <pre><code><span class="keyword">from</span> pyspark.sql <span class="keyword">import</span> SparkSession
+
+spark = SparkSession.builder.appName(<span class="string">"IntroToSpark"</span>).getOrCreate()
+<span class="keyword">print</span>(spark)</code></pre>
+                </div>
+                 <div class="output-block mt-0 mb-4">&lt;pyspark.sql.session.SparkSession object at 0x7f1234567890></div>
+            </section>
+            
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 2: Working with Spark Core & RDDs</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    While modern Spark development favors DataFrames, understanding the underlying RDD API is essential. We will perform several transformations and actions.
+                </p>
+                <div class="code-block">
+                    <pre><code><span class="comment"># Create an RDD from a list of sentences</span>
+lines = [<span class="string">"hello world"</span>, <span class="string">"hello spark"</span>, <span class="string">"spark is fast"</span>]
+rdd = spark.sparkContext.parallelize(lines)
+
+<span class="comment"># Use flatMap to split each sentence into words</span>
+words_rdd = rdd.flatMap(<span class="keyword">lambda</span> line: line.split(<span class="string">" "</span>))
+
+<span class="comment"># Use map to create key-value pairs of (word, 1)</span>
+word_pairs_rdd = words_rdd.map(<span class="keyword">lambda</span> word: (word, 1))
+
+<span class="comment"># Use reduceByKey to count occurrences of each word</span>
+word_counts_rdd = word_pairs_rdd.reduceByKey(<span class="keyword">lambda</span> a, b: a + b)
+
+<span class="comment"># Perform an 'action' to collect the results and print them</span>
+results = word_counts_rdd.collect()
+
+<span class="keyword">print</span>(f<span class="string">"Word Count Results: {results}"</span>)</code></pre>
+                </div>
+                <div class="output-block mt-0 mb-4">Word Count Results: [('hello', 2), ('world', 1), ('spark', 2), ('is', 1), ('fast', 1)]</div>
+            </section>
+
+             <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 3: Loading External Data into DataFrames</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    In most real-world scenarios, you will load data from an external source. Here, we create a DataFrame from an in-memory list of data, which simulates reading a structured file like a CSV.
+                </p>
+                <div class="code-block">
+                    <pre><code>employee_data = [
+    (<span class="string">"James"</span>, <span class="string">"Sales"</span>, 3000), (<span class="string">"Michael"</span>, <span class="string">"Sales"</span>, 4600),
+    (<span class="string">"Robert"</span>, <span class="string">"Sales"</span>, 4100), (<span class="string">"Maria"</span>, <span class="string">"Finance"</span>, 3000),
+    (<span class="string">"Raman"</span>, <span class="string">"Finance"</span>, 3000), (<span class="string">"Jen"</span>, <span class="string">"Finance"</span>, 3900),
+    (<span class="string">"Scott"</span>, <span class="string">"Marketing"</span>, 3400), (<span class="string">"Kumar"</span>, <span class="string">"Marketing"</span>, 2000)
+]
+columns = [<span class="string">"employee_name"</span>, <span class="string">"department"</span>, <span class="string">"salary"</span>]
+df = spark.createDataFrame(employee_data, schema=columns)
+
+df.show()
+df.printSchema()
+</code></pre>
+                </div>
+                 <div class="output-block mt-0 mb-4">+-------------+----------+------+
+|employee_name|department|salary|
++-------------+----------+------+
+|        James|     Sales|  3000|
+|      Michael|     Sales|  4600|
+|       Robert|     Sales|  4100|
+|        Maria|   Finance|  3000|
+...
++-------------+----------+------+
+
+root
+ |-- employee_name: string (nullable = true)
+ |-- department: string (nullable = true)
+ |-- salary: long (nullable = true)
+</div>
+            </section>
+
+             <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 4: DataFrame Operations</h2>
+                 <p class="text-base text-gray-700 leading-relaxed mb-3">DataFrames offer a rich API for data manipulation, similar to pandas but executed in a distributed manner.</p>
+                 <div class="code-block">
+                    <pre><code><span class="keyword">from</span> pyspark.sql.functions <span class="keyword">import</span> col, avg, count, desc
+
+<span class="comment"># Group by department, calculate average salary and count of employees</span>
+dept_stats = df.groupBy(<span class="string">"department"</span>) \
+               .agg(
+                   avg(<span class="string">"salary"</span>).alias(<span class="string">"avg_salary"</span>),
+                   count(<span class="string">"*"</span>).alias(<span class="string">"num_employees"</span>)
+                )
+
+<span class="comment"># Filter for departments with an average salary greater than 3000 and order the result</span>
+high_paying_depts = dept_stats.filter(col(<span class="string">"avg_salary"</span>) > 3000) \
+                                .orderBy(desc(<span class="string">"avg_salary"</span>))
+high_paying_depts.show()</code></pre>
+                </div>
+                 <div class="output-block mt-0 mb-4">+----------+-----------+-------------+
+|department|avg_salary |num_employees|
++----------+-----------+-------------+
+|     Sales|     3900.0|            3|
+|   Finance|     3300.0|            3|
++----------+-----------+-------------+
+</div>
+            </section>
+            
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 5: Interactive Spark SQL Simulator</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    One of Spark's most powerful features is the ability to run standard SQL queries directly on your data. First, we register our DataFrame as a temporary table. Then, you can use the simulator below to run your own queries!
+                </p>
+                <div class="code-block">
+                    <pre><code><span class="comment"># Create a temporary view from the DataFrame to run SQL on it</span>
+df.createOrReplaceTempView(<span class="string">"employees"</span>)</code></pre>
+                </div>
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-6 mt-6 no-print">
+                    <h3 class="subsection-title text-lg font-medium text-indigo-700 mb-4">Spark SQL Query Simulator</h3>
+                    <div>
+                        <label for="sql-query-input" class="block text-sm font-medium text-gray-700 mb-1">Enter your SQL query:</label>
+                        <textarea id="sql-query-input"></textarea>
+                    </div>
+                     <div class="flex flex-wrap gap-2 my-4">
+                        <button id="run-query-btn" class="bg-blue-600 text-white py-2 px-4 rounded-md font-semibold">Run Query</button>
+                        <button class="sql-example-btn bg-gray-200 text-gray-700 py-1 px-3 rounded-md text-sm" data-query="SELECT * FROM employees">Example: Select All</button>
+                        <button class="sql-example-btn bg-gray-200 text-gray-700 py-1 px-3 rounded-md text-sm" data-query="SELECT employee_name, salary FROM employees WHERE salary > 4000 ORDER BY salary DESC">Example: Where Clause</button>
+                        <button class="sql-example-btn bg-gray-200 text-gray-700 py-1 px-3 rounded-md text-sm" data-query="SELECT department, ROUND(AVG(salary), 2) as avg_salary, COUNT(*) as count FROM employees GROUP BY department">Example: Group By</button>
+                    </div>
+                    <div>
+                        <h4 class="detail-title font-semibold text-gray-700 mb-2">Query Result:</h4>
+                        <div id="sql-output-table" class="overflow-x-auto"></div>
+                    </div>
+                </div>
+            </section>
+        </article>
+
+        <footer class="text-center mt-12 py-6 border-t border-gray-300"> 
+            <div class="mb-4"> 
+                 <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-10 mx-auto footer-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+            </div>
+            <p class="text-base text-gray-600">&copy; <span id="currentYearModule"></span> FACE Prep Campus (www.faceprep.in). All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('currentYearModule').textContent = new Date().getFullYear();
+
+        const interactiveTerms = document.querySelectorAll('.interactive-term');
+        const tooltip = document.querySelector('.definition-tooltip');
+        if (tooltip) {
+            interactiveTerms.forEach(term => {
+                term.addEventListener('click', (e) => { 
+                    tooltip.textContent = term.dataset.definition;
+                    tooltip.style.display = 'block';
+                    const termRect = term.getBoundingClientRect();
+                    tooltip.style.top = `${termRect.bottom + window.scrollY + 8}px`;
+                    tooltip.style.left = `${termRect.left + window.scrollX}px`;
+                });
+            });
+            document.addEventListener('click', function(event) {
+                if (!event.target.classList.contains('interactive-term')) {
+                    tooltip.style.display = 'none';
+                }
+            });
+        }
+        
+        const queryInput = document.getElementById('sql-query-input');
+        const runQueryBtn = document.getElementById('run-query-btn');
+        const outputTableDiv = document.getElementById('sql-output-table');
+        const exampleBtns = document.querySelectorAll('.sql-example-btn');
+
+        if (queryInput && runQueryBtn && outputTableDiv && exampleBtns.length > 0) {
+            const data = [
+                {employee_name: "James", department: "Sales", salary: 3000}, {employee_name: "Michael", department: "Sales", salary: 4600},
+                {employee_name: "Robert", department: "Sales", salary: 4100}, {employee_name: "Maria", department: "Finance", salary: 3000},
+                {employee_name: "Raman", department: "Finance", salary: 3000}, {employee_name: "Jen", department: "Finance", salary: 3900},
+                {employee_name: "Scott", department: "Marketing", salary: 3400}, {employee_name: "Kumar", department: "Marketing", salary: 2000}
+            ];
+
+            const runSimulation = () => {
+                const query = queryInput.value.toLowerCase().trim();
+                let result = []; let headers = [];
+                try {
+                    if (query.includes('group by department')) {
+                        headers = ['department', 'avg_salary', 'count'];
+                        const groups = {};
+                        data.forEach(row => {
+                            if (!groups[row.department]) groups[row.department] = { sum: 0, count: 0 };
+                            groups[row.department].sum += row.salary;
+                            groups[row.department].count++;
+                        });
+                        result = Object.keys(groups).map(dept => ({ department: dept, avg_salary: (groups[dept].sum / groups[dept].count).toFixed(2), count: groups[dept].count }));
+                    } else if (query.includes('where salary >')) {
+                        const threshold = parseInt(query.split('>')[1].trim());
+                        headers = query.split(' from ')[0].replace('select ', '').split(',').map(s => s.trim());
+                        result = data.filter(row => row.salary > threshold).map(r => { let newRow = {}; headers.forEach(h => newRow[h] = r[h]); return newRow; });
+                        if(query.includes('order by salary desc')) result.sort((a,b) => b.salary - a.salary);
+                    } else if (query.includes('select *')) {
+                        headers = ['employee_name', 'department', 'salary'];
+                        result = data;
+                    } else {
+                         outputTableDiv.innerHTML = `<p class="text-red-500">Simplified simulator supports specific patterns: SELECT *, WHERE salary >, or GROUP BY department. Please try an example query.</p>`;
+                         return;
+                    }
+                    renderTable(headers, result);
+                } catch (e) {
+                     outputTableDiv.innerHTML = `<p class="text-red-500">Error parsing query. Please use one of the supported query patterns.</p>`;
+                }
+            };
+            
+            const renderTable = (headers, data) => {
+                 if (data.length === 0) { outputTableDiv.innerHTML = `<p>Query returned no results.</p>`; return; }
+                let tableHTML = '<table><thead><tr>';
+                headers.forEach(h => tableHTML += `<th>${h}</th>`);
+                tableHTML += '</tr></thead><tbody>';
+                data.forEach(row => { tableHTML += '<tr>'; headers.forEach(h => tableHTML += `<td>${row[h]}</td>`); tableHTML += '</tr>'; });
+                tableHTML += '</tbody></table>';
+                outputTableDiv.innerHTML = tableHTML;
+            }
+
+            runQueryBtn.addEventListener('click', runSimulation);
+            exampleBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    queryInput.value = btn.dataset.query;
+                    runSimulation();
+                });
+            });
+            exampleBtns[2].click();
+        }
+    </script>
+</body>
+</html>

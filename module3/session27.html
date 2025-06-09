@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 27: Lab 11 - Big Data Case Studies Analysis - Module III</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            font-size: 1rem; 
+            line-height: 1.625; 
+        }
+        
+        h1.page-title { font-size: 2.25rem; line-height: 2.5rem; } 
+        h2.section-title { font-size: 1.5rem; line-height: 2rem; margin-bottom: 0.75rem;} 
+        h3.subsection-title { font-size: 1.25rem; line-height: 1.75rem; margin-bottom: 0.5rem;}    
+        h4.detail-title { font-size: 1.125rem; line-height: 1.75rem; margin-bottom: 0.375rem;} 
+        
+        .case-study-tab {
+            transition: all 0.2s ease-in-out;
+        }
+        .case-study-tab.active {
+            transform: translateY(-2px);
+            background-color: #1d4ed8; /* blue-700 */
+            color: white;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .case-study-content {
+            display: none;
+        }
+        .case-study-content.active {
+            display: block;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 350px;
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Quiz Styles */
+        .quiz-option {
+            cursor: pointer;
+            border: 2px solid #e5e7eb;
+            transition: all 0.2s;
+        }
+        .quiz-option:hover {
+            border-color: #3b82f6;
+        }
+        .quiz-option.selected {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+        }
+        .quiz-feedback {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+        }
+        .feedback-correct { background-color: #dcfce7; color: #15803d; }
+        .feedback-incorrect { background-color: #fee2e2; color: #b91c1c; }
+
+        @media print {
+            body { font-size: 10pt; line-height: 1.3; } 
+            .no-print { display: none !important; }
+            header { display: flex; flex-direction: column; align-items: center; text-align: center; }
+            .header-logo-print { max-width: 150px; max-height: 50px; margin-bottom: 10px; } 
+            .footer-logo-print { max-width: 100px; max-height: 30px; margin-top: 10px; } 
+            footer { text-align: center; }
+            section, .content-section { page-break-inside: avoid; margin-bottom: 15px; } 
+            .bg-white { box-shadow: none !important; border: 1px solid #ccc; padding: 0.5rem !important;}
+            a { text-decoration: none; color: black; }
+            .case-study-selector { display: none; }
+            .case-study-content { display: block !important; border-top: 1px solid #ccc; padding-top: 1rem; margin-top: 1rem; }
+            .chart-container { display: none; }
+            h1.page-title { font-size: 20pt; } 
+            h2.section-title { font-size: 16pt; }
+            h3.subsection-title { font-size: 14pt; }
+            h4.detail-title { font-size: 12pt; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+</head>
+<body class="bg-gray-100 text-gray-800"> 
+    <div class="container mx-auto p-4 md:p-8"> 
+        <header class="mb-10"> 
+            <div class="flex flex-col sm:flex-row items-center justify-between">
+                <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-16 md:h-20 mb-4 sm:mb-0 header-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+                <div class="text-center sm:text-right sm:ml-4"> 
+                    <p class="text-base text-gray-500">Module III: Big Data Platforms - Hadoop & Spark</p> 
+                    <h1 class="page-title text-3xl md:text-4xl font-bold text-gray-900 mt-1">Session 27: Lab 11 - Big Data Case Studies Analysis</h1> 
+                    <p class="text-lg text-gray-600 mt-2">Data Mining & Big Data Analytics</p> 
+                </div>
+            </div>
+            <nav aria-label="Breadcrumb" class="mt-4 text-sm text-gray-500 no-print"> 
+                <ol class="list-none p-0 inline-flex">
+                    <li class="flex items-center">
+                        <a href="../index.html" class="text-slate-600 hover:text-slate-800">Course Overview</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="flex items-center">
+                        <a href="module-3-index.html" class="text-slate-600 hover:text-slate-800">Module III</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="text-gray-700 font-semibold" aria-current="page">Session 27</li> 
+                </ol>
+            </nav>
+        </header>
+
+        <div class="text-center mb-8 no-print"> 
+            <button onclick="window.print()" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-150 ease-in-out text-base"> 
+                Export Session 27 to PDF
+            </button>
+        </div>
+
+        <article class="bg-white p-6 md:p-8 rounded-lg shadow-lg"> 
+            <section class="mb-6 border-b pb-4"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-2">Session Details</h2> 
+                <p class="text-base text-gray-700"><strong>Type:</strong> Guided Practical 💻</p>
+                <p class="text-base text-gray-700"><strong>Duration:</strong> 2 Hours</p>
+                <p class="text-base text-gray-700"><strong>Textbook References:</strong> Zikopoulos & Eaton: Ch. 9, 10, 11 (Case Studies)</p>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 1: Case Study Analysis</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-4">
+                    Select a case study from the tabs below. Read it carefully and analyze it using the framework provided in Task 2.
+                </p>
+                <div class="case-study-selector no-print">
+                    <div class="flex flex-wrap border-b border-gray-300">
+                        <button class="case-study-tab py-2 px-4 text-sm font-medium text-gray-600 hover:bg-gray-200 rounded-t-md" data-case="retail">Retail: Dynamic Pricing</button>
+                        <button class="case-study-tab py-2 px-4 text-sm font-medium text-gray-600 hover:bg-gray-200 rounded-t-md" data-case="finance">Finance: Fraud Detection</button>
+                        <button class="case-study-tab py-2 px-4 text-sm font-medium text-gray-600 hover:bg-gray-200 rounded-t-md" data-case="healthcare">Healthcare: Patient Readmission</button>
+                    </div>
+                </div>
+                
+                <div id="case-study-container" class="mt-4">
+                    </div>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 2: "What-If" Scenario Simulator (Retail Case Study)</h2>
+                 <p class="text-base text-gray-700 leading-relaxed mb-4 no-print">
+                    For the Retail Dynamic Pricing case, pricing models are not static. They must react to changing market conditions. Use the simulator below to see how different factors might influence a product's recommended price.
+                </p>
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-6 mt-6 no-print">
+                    <h3 class="subsection-title text-lg font-medium text-indigo-700 text-center mb-4">Dynamic Pricing Simulator</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                        <div class="space-y-4">
+                            <div>
+                                <label for="base-price" class="block text-sm font-medium text-gray-700">Base Price ($)</label>
+                                <input type="number" id="base-price" value="100" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                            </div>
+                            <div>
+                                <label for="competitor-price" class="block text-sm font-medium text-gray-700">Competitor Price Drop (%)</label>
+                                <input type="range" id="competitor-price" min="0" max="20" value="5" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                                <div class="text-xs text-center text-gray-500 mt-1">Drop: <span id="competitor-price-label">5</span>%</div>
+                            </div>
+                            <div>
+                                <label for="inventory-level" class="block text-sm font-medium text-gray-700">Inventory Level (%)</label>
+                                <input type="range" id="inventory-level" min="10" max="100" value="80" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                                <div class="text-xs text-center text-gray-500 mt-1">Level: <span id="inventory-level-label">80</span>%</div>
+                            </div>
+                        </div>
+                        <div class="text-center p-6 bg-white rounded-lg shadow-inner">
+                            <p class="text-lg text-gray-600">Recommended Price:</p>
+                            <p id="recommended-price" class="text-4xl font-bold text-blue-600 mt-2">$96.00</p>
+                            <p id="price-explanation" class="text-sm text-gray-500 mt-2">Price adjusted down due to competitor drop.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+             <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Task 3: Knowledge Check Quiz</h2>
+                 <p class="text-base text-gray-700 leading-relaxed mb-4 no-print">
+                    Based on the case studies, answer the following questions to test your understanding.
+                </p>
+                <div id="quiz-container" class="space-y-6 no-print">
+                    </div>
+            </section>
+        </article>
+
+        <footer class="text-center mt-12 py-6 border-t border-gray-300"> 
+            <div class="mb-4"> 
+                 <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-10 mx-auto footer-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+            </div>
+            <p class="text-base text-gray-600">&copy; <span id="currentYearModule"></span> FACE Prep Campus (www.faceprep.in). All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('currentYearModule').textContent = new Date().getFullYear();
+        
+        // Case Study Logic
+        const caseStudyContainer = document.getElementById('case-study-container');
+        const caseStudyTabs = document.querySelectorAll('.case-study-tab');
+        let currentChart = null;
+
+        const caseStudies = {
+            retail: {
+                title: "Retail: Real-Time Dynamic Pricing Engine",
+                content: `
+                    <div class="prose max-w-none text-gray-700">
+                        <p><strong>Business Problem:</strong> A major online retailer was using a static pricing model, updating prices weekly. They were losing sales to agile competitors who adjusted prices frequently and were unable to capitalize on short-term demand spikes (e.g., a trending product). The primary objective was to increase profit margins by 5% and sales volume by 10% within six months.</p>
+                        <p><strong>Data Sources & Characteristics:</strong> The project required integrating several high-velocity and high-volume data streams: 1) Real-time web scraper data from competitor websites (Variety: semi-structured JSON/HTML). 2) Live clickstream data from their own website tracking user views, adds-to-cart, and purchases (Velocity: high-volume stream). 3) Internal product catalog and inventory databases (Volume: large, structured). 4) Historical sales transaction data.</p>
+                        <p><strong>Technological Approach:</strong> They implemented a solution using Apache Spark. A Spark Streaming application ingests live clickstream and competitor price data. This streaming data is processed in micro-batches, where it is joined with product inventory data from a database. A pre-trained regression model (built in Spark MLlib) uses these combined features to predict the optimal price point for that moment. The new price is then pushed to the website's product database, making the change live in near real-time.</p>
+                        <div class="chart-container"><canvas id="case-chart"></canvas></div>
+                        <h4 class="detail-title font-semibold text-gray-700 mt-4">Business Insights & Analysis</h4>
+                        <p>The implementation led to a 7% increase in profit margins and a 12% increase in sales volume. The key insight was that pricing elasticity was highly dependent on competitor actions and current on-site user behavior, not just historical sales. The system allowed them to automatically lower prices to stay competitive on key items but also increase prices during high-demand windows when inventory was low, maximizing profit. The project demonstrated the value of combining real-time streaming data with historical machine learning models to make automated, intelligent business decisions.</p>
+                    </div>`,
+                chart: {
+                    type: 'bar',
+                    data: {
+                        labels: ['Old System (Weekly Pricing)', 'New System (Dynamic Pricing)'],
+                        datasets: [
+                            { label: 'Profit Margin (%)', data: [15, 16.05], backgroundColor: 'rgba(59, 130, 246, 0.7)', yAxisID: 'y' },
+                            { label: 'Sales Volume (Units)', data: [100000, 112000], backgroundColor: 'rgba(22, 163, 74, 0.7)', yAxisID: 'y1' }
+                        ]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { title: {display: true, text: 'Impact of Dynamic Pricing'}, legend: {position: 'bottom'} }, scales: { y: {type: 'linear', display: true, position: 'left', title: {display: true, text: 'Profit Margin (%)'}}, y1: {type: 'linear', display: true, position: 'right', grid: {drawOnChartArea: false}, title: {display: true, text: 'Sales Volume'}} } }
+                }
+            },
+            finance: {
+                title: "Finance: Real-Time Transaction Fraud Detection",
+                content: `
+                     <div class="prose max-w-none text-gray-700">
+                        <p><strong>Business Problem:</strong> A credit card company was struggling with its batch-based fraud detection system, which only identified fraudulent transactions hours after they occurred. This delay resulted in significant financial losses and poor customer experience. The goal was to build a system to score transactions for fraud in under 100 milliseconds, aiming to reduce fraud losses by 25% without increasing the rate of falsely declined legitimate transactions.</p>
+                        <p><strong>Data Sources & Characteristics:</strong> The core of the system is a high-velocity stream of credit card transaction authorization requests from payment gateways. This stream was enriched in real-time with historical data, including: 1) The customer's average transaction amount and frequency. 2) The geographical distance between the current and previous transaction. 3) Whether the merchant category was unusual for that customer.</p>
+                        <p><strong>Technological Approach:</strong> The company built a streaming pipeline using Apache Kafka to ingest live transactions. A Spark Streaming application consumes this data. For each incoming transaction, the application performs a rapid lookup against a key-value store (like Redis) to fetch the customer's historical profile. It then calculates new features (like the distance from the last transaction). These features are fed into a pre-trained classification model (e.g., a Random Forest model trained in Spark MLlib). If the model's fraud probability score exceeds a threshold, an alert is triggered, and the transaction is automatically declined.</p>
+                        <div class="chart-container"><canvas id="case-chart"></canvas></div>
+                        <h4 class="detail-title font-semibold text-gray-700 mt-4">Business Insights & Analysis</h4>
+                        <p>The new system successfully reduced fraud losses by 30% in the first year. A key insight was that the *velocity* of transactions (e.g., two transactions thousands of miles apart within minutes) was a more powerful predictor of fraud than the transaction amount alone. The real-time nature of Spark Streaming was critical; a batch system like MapReduce would have been completely ineffective. The project showcased the power of combining streaming data with historical context to make instantaneous, high-stakes decisions.</p>
+                    </div>`,
+                chart: {
+                    type: 'line',
+                    data: {
+                        labels: ['Q1 (Old System)', 'Q2 (Old System)', 'Q3 (New System)', 'Q4 (New System)'],
+                        datasets: [{ label: 'Fraud Losses ($M)', data: [10.5, 11.2, 8.1, 7.8], borderColor: 'rgba(239, 68, 68, 1)', backgroundColor: 'rgba(239, 68, 68, 0.2)', fill: true, tension: 0.1 }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { title: {display: true, text: 'Fraud Losses Per Quarter'}, legend: {position: 'bottom'} }, scales: { y: { beginAtZero: false, title: {display: true, text: 'Losses in Millions ($)'} } } }
+                }
+            },
+            healthcare: {
+                title: "Healthcare: Predicting Patient Readmission Risk",
+                content: `
+                     <div class="prose max-w-none text-gray-700">
+                        <p><strong>Business Problem:</strong> A large hospital network was being penalized under healthcare regulations for having a high rate of patient readmission within 30 days of discharge. The clinical staff had no reliable way to identify which patients were most at risk before they were sent home. The goal was to build a predictive model to identify high-risk patients, allowing care coordinators to provide targeted interventions and reduce the overall readmission rate by 20%.</p>
+                        <p><strong>Data Sources & Characteristics:</strong> The project required analyzing years of historical Electronic Health Records (EHRs). This data was high in Volume and Variety, containing: 1) Structured data like patient demographics, diagnoses (ICD-10 codes), procedures, and lab results. 2) Unstructured data like doctors' notes, nurses' comments, and discharge summaries, which contained rich but difficult-to-access information.</p>
+                        <p><strong>Technological Approach:</strong> The hospital leveraged a Hadoop-based data lake using HDFS to cost-effectively store the massive volume of historical EHR data. Apache Spark was the primary processing engine. A large-scale batch job written in PySpark was used for the extensive ETL and feature engineering phase. This involved using NLP techniques to parse the unstructured clinical notes and extract features (e.g., mentions of specific symptoms or social conditions). A classification model (Gradient-Boosted Tree) was then trained on the fully prepared dataset using Spark's MLlib. The final model is now run on each patient's record at the time of discharge to generate a readmission risk score.</p>
+                        <div class="chart-container"><canvas id="case-chart"></canvas></div>
+                        <h4 class="detail-title font-semibold text-gray-700 mt-4">Business Insights & Analysis</h4>
+                        <p>The model helped reduce the 30-day readmission rate by 22%. The most powerful insight was that unstructured data from nurses' notes (e.g., mentioning "patient lives alone" or "seems confused") were among the strongest predictors of readmission, a factor previously missed by analyses that only used structured data. This project highlighted that some of the most valuable information is often "hidden" in unstructured text and that platforms like Spark are essential for unlocking it at scale.</p>
+                    </div>`,
+                chart: {
+                    type: 'bar',
+                    data: {
+                        labels: ['Before Model', 'After Model'],
+                        datasets: [{ label: '30-Day Readmission Rate (%)', data: [18.2, 14.2], backgroundColor: ['rgba(239, 68, 68, 0.7)', 'rgba(22, 163, 74, 0.7)'] }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { title: {display: true, text: 'Impact on Patient Readmission Rate'}, legend: {display: false} }, scales: { y: { beginAtZero: false, title: {display: true, text: 'Readmission Rate (%)'} } } }
+                }
+            }
+        };
+
+        if (caseStudyContainer && caseStudyTabs.length > 0) {
+            const showCaseStudy = (caseKey) => {
+                caseStudyTabs.forEach(tab => {
+                    if (tab.dataset.case === caseKey) tab.classList.add('active');
+                    else tab.classList.remove('active');
+                });
+                caseStudyContainer.innerHTML = caseStudies[caseKey].content;
+                const chartConfig = caseStudies[caseKey].chart;
+                const canvas = document.getElementById('case-chart');
+                if (currentChart) currentChart.destroy();
+                currentChart = new Chart(canvas.getContext('2d'), chartConfig);
+            };
+            caseStudyTabs.forEach(tab => {
+                tab.addEventListener('click', () => showCaseStudy(tab.dataset.case));
+            });
+            caseStudyTabs[0].click();
+        }
+        
+        // Pricing Simulator Logic
+        const basePriceInput = document.getElementById('base-price');
+        const competitorPriceInput = document.getElementById('competitor-price');
+        const inventoryLevelInput = document.getElementById('inventory-level');
+        const recPriceEl = document.getElementById('recommended-price');
+        const priceExplainEl = document.getElementById('price-explanation');
+        const competitorLabel = document.getElementById('competitor-price-label');
+        const inventoryLabel = document.getElementById('inventory-level-label');
+
+        if(basePriceInput && recPriceEl) {
+            const updateRecommendedPrice = () => {
+                const base = parseFloat(basePriceInput.value) || 100;
+                const compDrop = parseFloat(competitorPriceInput.value);
+                const inventory = parseFloat(inventoryLevelInput.value);
+
+                competitorLabel.textContent = compDrop;
+                inventoryLabel.textContent = inventory;
+
+                // Simple pricing model simulation
+                let price = base;
+                let explanation = "Price is stable.";
+
+                // Competitor effect
+                if (compDrop > 0) {
+                    price = price * (1 - (compDrop / 100) * 0.8); // Drop price, but not 1-to-1
+                    explanation = "Price adjusted down due to competitor drop.";
+                }
+
+                // Inventory effect
+                if (inventory < 50) {
+                    price = price * (1 + (50 - inventory) / 100); // Increase price as inventory gets low
+                    explanation = "Inventory is low, price increased to manage demand.";
+                }
+                
+                recPriceEl.textContent = `$${price.toFixed(2)}`;
+                priceExplainEl.textContent = explanation;
+            };
+            [basePriceInput, competitorPriceInput, inventoryLevelInput].forEach(el => el.addEventListener('input', updateRecommendedPrice));
+            updateRecommendedPrice();
+        }
+
+        // Quiz Logic
+        const quizContainer = document.getElementById('quiz-container');
+        if(quizContainer) {
+            const quizQuestions = [
+                { q: "In the Retail case study, what was the primary driver for using Spark over MapReduce?", a: ["Its lower cost", "Its ability to handle near real-time data streams", "Its better integration with HDFS", "Its security features"], correct: 1 },
+                { q: "What was a key insight from the Healthcare case study?", a: ["Patient age is the only important factor", "Structured data is more valuable than unstructured data", "Information in unstructured doctors' notes was highly predictive", "Reducing readmissions is impossible"], correct: 2},
+                { q: "In the Finance case study, why was a streaming architecture essential?", a: ["To create hourly reports", "To process historical data once a day", "To analyze and flag transactions in milliseconds", "To store customer profiles"], correct: 2 }
+            ];
+
+            quizContainer.innerHTML = quizQuestions.map((item, index) => `
+                <div class="p-4 border rounded-lg bg-gray-50">
+                    <p class="font-semibold mb-2">${index+1}. ${item.q}</p>
+                    <div class="space-y-2" id="quiz-options-${index}">
+                        ${item.a.map((option, i) => `<div class="quiz-option p-2 rounded-md" data-q="${index}" data-a="${i}">${option}</div>`).join('')}
+                    </div>
+                    <div id="quiz-feedback-${index}" class="quiz-feedback" style="display:none;"></div>
+                </div>
+            `).join('');
+
+            quizContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('quiz-option')) {
+                    const qIndex = e.target.dataset.q;
+                    const aIndex = parseInt(e.target.dataset.a);
+                    const question = quizQuestions[qIndex];
+                    const feedbackDiv = document.getElementById(`quiz-feedback-${qIndex}`);
+                    
+                    document.querySelectorAll(`div[data-q="${qIndex}"]`).forEach(opt => opt.classList.remove('selected'));
+                    e.target.classList.add('selected');
+
+                    if (aIndex === question.correct) {
+                        feedbackDiv.textContent = 'Correct!';
+                        feedbackDiv.className = 'quiz-feedback feedback-correct';
+                    } else {
+                        feedbackDiv.textContent = 'Not quite. Try again!';
+                        feedbackDiv.className = 'quiz-feedback feedback-incorrect';
+                    }
+                    feedbackDiv.style.display = 'block';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

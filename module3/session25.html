@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 25: Real-time Data Processing with Spark Streaming - Module III</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: "Warm Neutral Harmony" -->
+    <!-- Application Structure Plan: Definitive single session detail page. Structure: Header, Export, Session Details, Objectives, Extensive Content for every section (Why Streaming?, DStreams, Micro-batching architecture diagram, Transformations, new detailed sections on Windowed Operations with an interactive visualization, Stateful vs. Stateless processing, Sources/Sinks), Key Takeaways, Footer. Goal: The definitive theoretical introduction to Spark Streaming with all text and demos. -->
+    <!-- Visualization & Content Choices: 
+        - Detailed textual explanations for all concepts, converted to standard HTML.
+        - Conceptual diagrams for micro-batching.
+        - An interactive visualization to demonstrate Windowed Operations, allowing users to control window length and slide interval.
+        - Interactive tooltips for technical terms.
+        - PDF Export: Print-specific CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            font-size: 1rem; 
+            line-height: 1.625; 
+        }
+        
+        .interactive-term { 
+            cursor: pointer;
+            font-weight: 600; 
+        }
+        .definition-tooltip {
+            display: none;
+            position: absolute;
+            background-color: #f9fafb; 
+            border: 1px solid #d1d5db; 
+            padding: 8px; 
+            border-radius: 4px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            z-index: 100;
+            font-size: 0.875rem; 
+            width: max-content;
+            max-width: 320px; 
+        }
+
+        h1.page-title { font-size: 2.25rem; line-height: 2.5rem; } 
+        h2.section-title { font-size: 1.5rem; line-height: 2rem; margin-bottom: 0.75rem;} 
+        h3.subsection-title { font-size: 1.25rem; line-height: 1.75rem; margin-bottom: 0.5rem;}    
+        h4.detail-title { font-size: 1.125rem; line-height: 1.75rem; margin-bottom: 0.375rem;} 
+        
+        .info-card {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-left-width: 4px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 0.5rem;
+        }
+        
+        /* Streaming Viz Styles */
+        .timeline {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.25rem;
+            height: 60px;
+            position: relative;
+        }
+        .batch-box {
+            width: 50px;
+            height: 50px;
+            border: 1px solid #9ca3af;
+            background-color: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-family: monospace;
+            flex-shrink: 0;
+        }
+        .sliding-window {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            background-color: rgba(59, 130, 246, 0.2);
+            border: 2px dashed #2563eb;
+            transition: left 0.5s ease-in-out;
+        }
+        .selector-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .selector-btn.active {
+            transform: scale(1.1);
+            background-color: #1d4ed8; /* blue-700 */
+            color: white;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        
+        .flow-diagram {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .flow-box {
+            background-color: #f3f4f6;
+            border: 1px solid #d1d5db;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            text-align: center;
+            font-size: 0.875rem;
+        }
+        .flow-arrow {
+            font-size: 1.5rem;
+            color: #9ca3af;
+        }
+
+        @media print {
+            body { font-size: 10pt; line-height: 1.3; } 
+            .no-print { display: none !important; }
+            header { display: flex; flex-direction: column; align-items: center; text-align: center; }
+            .header-logo-print { max-width: 150px; max-height: 50px; margin-bottom: 10px; } 
+            .footer-logo-print { max-width: 100px; max-height: 30px; margin-top: 10px; } 
+            footer { text-align: center; }
+            section, .content-section, .info-card { page-break-inside: avoid; margin-bottom: 15px; } 
+            .bg-white { box-shadow: none !important; border: 1px solid #ccc; padding: 0.5rem !important;}
+            a { text-decoration: none; color: black; }
+            .interactive-term { text-decoration: none; color: black; font-weight: bold; } 
+            .definition-tooltip { display: none !important; }
+            .flow-diagram { display: none; }
+            h1.page-title { font-size: 20pt; } 
+            h2.section-title { font-size: 16pt; }
+            h3.subsection-title { font-size: 14pt; }
+            h4.detail-title { font-size: 12pt; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+</head>
+<body class="bg-gray-100 text-gray-800"> 
+    <div class="container mx-auto p-4 md:p-8"> 
+        <header class="mb-10"> 
+            <div class="flex flex-col sm:flex-row items-center justify-between">
+                <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-16 md:h-20 mb-4 sm:mb-0 header-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+                <div class="text-center sm:text-right sm:ml-4"> 
+                    <p class="text-base text-gray-500">Module III: Big Data Platforms - Hadoop & Spark</p> 
+                    <h1 class="page-title text-3xl md:text-4xl font-bold text-gray-900 mt-1">Session 25: Real-time Data Processing with Spark Streaming</h1> 
+                    <p class="text-lg text-gray-600 mt-2">Data Mining & Big Data Analytics</p> 
+                </div>
+            </div>
+            <nav aria-label="Breadcrumb" class="mt-4 text-sm text-gray-500 no-print"> 
+                <ol class="list-none p-0 inline-flex">
+                    <li class="flex items-center">
+                        <a href="../index.html" class="text-slate-600 hover:text-slate-800">Course Overview</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="flex items-center">
+                        <a href="module-3-index.html" class="text-slate-600 hover:text-slate-800">Module III</a>
+                        <span class="mx-2">/</span> 
+                    </li>
+                    <li class="text-gray-700 font-semibold" aria-current="page">Session 25</li> 
+                </ol>
+            </nav>
+        </header>
+
+        <div class="text-center mb-8 no-print"> 
+            <button onclick="window.print()" class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-150 ease-in-out text-base"> 
+                Export Session 25 to PDF
+            </button>
+        </div>
+
+        <article class="bg-white p-6 md:p-8 rounded-lg shadow-lg"> 
+            <section class="mb-6 border-b pb-4"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-2">Session Details</h2> 
+                <p class="text-base text-gray-700"><strong>Type:</strong> Theory 📖</p>
+                <p class="text-base text-gray-700"><strong>Duration:</strong> 1 Hour</p>
+                <p class="text-base text-gray-700"><strong>Textbook References:</strong> Zikopoulos & Eaton: Ch. 7</p>
+            </section>
+
+            <section class="mb-8 content-section"> 
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Learning Objectives</h2> 
+                <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-1"> 
+                    <li>Differentiate between batch processing and stream processing.</li>
+                    <li>Explain the core concept of Spark Streaming: Discretized Streams (DStreams).</li>
+                    <li>Describe the micro-batching architecture and how it enables fault tolerance.</li>
+                    <li>Identify common transformations and output operations for DStreams.</li>
+                    <li>Understand and visualize the concept of windowed operations for processing data over sliding time intervals.</li>
+                    <li>Distinguish between stateless and stateful stream processing.</li>
+                </ul>
+            </section>
+
+            <div class="definition-tooltip"></div>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">From Batch to Real-Time: The Need for Stream Processing</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    So far, we've discussed processing large datasets that are stored at rest—this is known as <strong>batch processing</strong>. Hadoop MapReduce and even standard Spark jobs are examples of this. You take a large, finite dataset, process it, and generate a result.
+                </p>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    However, many modern data sources generate data continuously and unboundedly. Think of sensor data from IoT devices, user activity logs from a popular website, financial market data, or social media feeds. For these use cases, waiting for data to be collected and then processing it in large batches is too slow. We need to process the data as it arrives, in near real-time. This is <strong>stream processing</strong>.
+                </p>
+                <p class="text-base text-gray-700 leading-relaxed">
+                    <strong>Apache Spark Streaming</strong> is an extension of the core Spark API that enables scalable, high-throughput, fault-tolerant stream processing of live data streams.
+                </p>
+            </section>
+
+            <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Core Concept: Discretized Streams (DStreams)</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    Instead of processing data one record at a time, Spark Streaming uses a clever abstraction called a <span class="interactive-term" data-definition="A Discretized Stream or DStream is the basic abstraction in Spark Streaming. It is a continuous sequence of RDDs, where each RDD contains data from a certain time interval.">Discretized Stream (DStream)</span>. This approach is also known as <strong>micro-batching</strong>.
+                </p>
+                <h3 class="subsection-title text-lg font-medium text-gray-700 mt-4 mb-2">The Micro-Batching Architecture</h3>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    Here's how it works:
+                </p>
+                <ol class="list-decimal list-inside text-base text-gray-700 ml-5 space-y-2 mb-4">
+                    <li>A live data stream (e.g., from Kafka, Flume, Twitter) is received by Spark Streaming.</li>
+                    <li>Spark divides the stream into small batches of data based on a fixed time interval (e.g., every 1 second).</li>
+                    <li>Each batch of data becomes a regular Spark RDD.</li>
+                    <li>A DStream is simply a continuous sequence of these RDDs.</li>
+                    <li>Any operation applied to a DStream is applied to each RDD in that sequence. The results are returned as another DStream.</li>
+                </ol>
+                <div class="flow-diagram no-print border border-gray-200 p-4 rounded-lg">
+                    <div class="flow-box bg-red-100 border-red-300">Live Data Stream</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box bg-blue-100 border-blue-300">Spark Streaming</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flex gap-1">
+                        <div class="flow-box">RDD @ t1</div>
+                        <div class="flow-box">RDD @ t2</div>
+                        <div class="flow-box">RDD @ t3</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box bg-green-100 border-green-300">Processed Results</div>
+                </div>
+                <p class="text-base text-gray-700 leading-relaxed mt-4">
+                    This architecture is powerful because it allows you to use the same Spark Core API (with transformations like `map`, `filter`, `reduceByKey`) on streaming data that you use on batch data. It also provides excellent fault tolerance, as Spark can recompute any lost RDDs (micro-batches) using its lineage graph.
+                </p>
+            </section>
+
+             <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Windowed Operations</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    Often, you need to perform calculations over a longer period of time than a single micro-batch interval. Spark Streaming provides <strong>windowed operations</strong> for this. You can define a "window" that spans multiple micro-batches and slides over time. This requires two parameters:
+                </p>
+                 <ul class="list-disc list-inside text-base text-gray-700 ml-5 space-y-2">
+                    <li><strong>Window Length:</strong> The total duration of the window (e.g., 40 seconds). This determines how much data is included in each calculation.</li>
+                    <li><strong>Sliding Interval:</strong> How often the window operation is computed (e.g., every 20 seconds). This determines the frequency of the output.</li>
+                </ul>
+
+                 <div class="bg-slate-50 border border-slate-200 rounded-lg p-6 mt-6 no-print">
+                    <h3 class="subsection-title text-lg font-medium text-indigo-700 text-center mb-4">Interactive Demo: Sliding Window Operations</h3>
+                    <p class="text-center text-sm text-gray-600 mb-4">A new batch of data arrives every 10 seconds. Use the buttons to configure the window and see how it slides across the data stream.</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <p class="text-sm font-semibold text-center mb-2">Window Length</p>
+                            <div id="window-length-selector" class="flex justify-center items-center space-x-2">
+                                <button class="selector-btn bg-gray-200 text-gray-700 py-1 px-3 rounded-md" data-value="20">20s</button>
+                                <button class="selector-btn bg-gray-200 text-gray-700 py-1 px-3 rounded-md" data-value="40">40s</button>
+                                <button class="selector-btn bg-gray-200 text-gray-700 py-1 px-3 rounded-md" data-value="60">60s</button>
+                            </div>
+                        </div>
+                         <div>
+                            <p class="text-sm font-semibold text-center mb-2">Slide Interval</p>
+                             <div id="slide-interval-selector" class="flex justify-center items-center space-x-2">
+                                <button class="selector-btn bg-gray-200 text-gray-700 py-1 px-3 rounded-md" data-value="10">10s</button>
+                                <button class="selector-btn bg-gray-200 text-gray-700 py-1 px-3 rounded-md" data-value="20">20s</button>
+                                <button class="selector-btn bg-gray-200 text-gray-700 py-1 px-3 rounded-md" data-value="30">30s</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline border border-gray-200 p-2 rounded-lg bg-white overflow-x-auto">
+                        <div class="flex items-center" style="width: fit-content;">
+                            <div id="batch-container" class="flex items-center gap-1 relative">
+                                <div class="sliding-window"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center items-center mt-4">
+                         <button id="animate-window-btn" class="bg-green-600 text-white font-semibold py-2 px-6 rounded-lg shadow">Animate Slide</button>
+                    </div>
+
+                    <div id="window-explanation" class="text-center text-gray-700 mt-4 p-3 bg-gray-100 rounded-md text-sm leading-relaxed min-h-[50px]">
+                        Select a Window Length and Slide Interval.
+                    </div>
+                </div>
+            </section>
+
+             <section class="mb-8 content-section">
+                <h2 class="section-title text-xl font-semibold text-slate-800 mb-3">Stateless vs. Stateful Transformations</h2>
+                <p class="text-base text-gray-700 leading-relaxed mb-3">
+                    Transformations on DStreams can be categorized into two types:
+                </p>
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                    <div class="info-card border-l-cyan-500">
+                        <h4 class="detail-title font-semibold text-cyan-700">Stateless Transformations</h4>
+                        <p class="text-sm text-gray-600 leading-relaxed">
+                            The processing of each micro-batch does not depend on the data of previous batches. Operations like `map`, `filter`, and `flatMap` are stateless. For example, filtering a stream of logs for the word "ERROR" only requires looking at the data within the current batch.
+                        </p>
+                    </div>
+                     <div class="info-card border-l-rose-500">
+                        <h4 class="detail-title font-semibold text-rose-700">Stateful Transformations</h4>
+                        <p class="text-sm text-gray-600 leading-relaxed">
+                            The processing of each micro-batch requires using data or intermediate results ("state") from previous batches. Windowed operations are a form of stateful transformation. Another key stateful operation is `updateStateByKey`, which allows you to maintain a running state for each key across all batches (e.g., maintaining a running count of words seen so far in the entire stream). Stateful operations require <span class="interactive-term" data-definition="Checkpointing is the process of periodically saving the generated DStreams and their metadata to a reliable storage system (like HDFS). This is crucial for recovering from driver failures in stateful applications.">checkpointing</span> for fault tolerance.
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </article>
+
+        <footer class="text-center mt-12 py-6 border-t border-gray-300"> 
+            <div class="mb-4"> 
+                 <img src="../faceprep-logo-multicolor.png" alt="FACE Prep Logo" class="h-10 mx-auto footer-logo-print" onerror="this.style.display='none'; this.onerror=null;"> 
+            </div>
+            <p class="text-base text-gray-600">&copy; <span id="currentYearModule"></span> FACE Prep Campus (www.faceprep.in). All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('currentYearModule').textContent = new Date().getFullYear();
+
+        const interactiveTerms = document.querySelectorAll('.interactive-term');
+        const tooltip = document.querySelector('.definition-tooltip');
+        if (tooltip) {
+            interactiveTerms.forEach(term => {
+                term.addEventListener('click', (e) => { 
+                    tooltip.textContent = term.dataset.definition;
+                    tooltip.style.display = 'block';
+                    const termRect = term.getBoundingClientRect();
+                    tooltip.style.top = `${termRect.bottom + window.scrollY + 8}px`;
+                    tooltip.style.left = `${termRect.left + window.scrollX}px`;
+                });
+            });
+            document.addEventListener('click', function(event) {
+                if (!event.target.classList.contains('interactive-term')) {
+                    tooltip.style.display = 'none';
+                }
+            });
+        }
+
+        const batchContainer = document.getElementById('batch-container');
+        const windowLengthSelector = document.getElementById('window-length-selector');
+        const slideIntervalSelector = document.getElementById('slide-interval-selector');
+        const animateBtn = document.getElementById('animate-window-btn');
+        const windowExplanation = document.getElementById('window-explanation');
+
+        if (batchContainer && windowLengthSelector && slideIntervalSelector && animateBtn && windowExplanation) {
+            let config = { windowLength: 40, slideInterval: 20, batchInterval: 10 };
+            let animationTimeout;
+            let slidingWindow;
+
+            const createBatches = () => {
+                batchContainer.innerHTML = ''; 
+                for(let i=0; i < 10; i++) {
+                    const batch = document.createElement('div');
+                    batch.className = 'batch-box';
+                    batch.textContent = `T${i*10}-${(i+1)*10}`;
+                    batchContainer.appendChild(batch);
+                }
+                const windowDiv = document.createElement('div');
+                windowDiv.className = 'sliding-window';
+                batchContainer.appendChild(windowDiv);
+                slidingWindow = windowDiv;
+            };
+            
+            const updateConfig = (key, value, selector) => {
+                config[key] = value;
+                Array.from(selector.children).forEach(btn => {
+                    btn.classList.remove('active');
+                    if (parseInt(btn.dataset.value) === value) {
+                        btn.classList.add('active');
+                    }
+                });
+                updateVisualization();
+            };
+
+            const updateVisualization = () => {
+                clearTimeout(animationTimeout);
+                const boxWidth = 50 + 4; // 50px width + 4px gap approx
+                const windowWidthBatches = config.windowLength / config.batchInterval;
+                if (windowWidthBatches > 10) {
+                    windowExplanation.innerHTML = `<span class="text-red-600">Error: Window Length cannot be greater than the timeline.</span>`;
+                    return;
+                }
+                const windowWidth = windowWidthBatches * boxWidth - 4; // Adjust for last gap
+                slidingWindow.style.width = `${windowWidth}px`;
+                slidingWindow.style.left = `0px`;
+                windowExplanation.innerHTML = `Window configured with <strong>${config.windowLength}s length</strong> and <strong>${config.slideInterval}s slide interval</strong>. Press Animate to start.`;
+            };
+
+            const animateSlide = () => {
+                clearTimeout(animationTimeout);
+                let currentLeft = 0;
+                const boxWidth = 50 + 4;
+                const windowWidthBatches = config.windowLength / config.batchInterval;
+                const maxLeft = (10 - windowWidthBatches) * boxWidth;
+                const slidePixels = (config.slideInterval / config.batchInterval) * boxWidth;
+
+                if(slidePixels === 0) return;
+
+                const slide = () => {
+                    slidingWindow.style.left = `${currentLeft}px`;
+                    
+                    const startBatch = currentLeft / boxWidth;
+                    const endBatch = startBatch + windowWidthBatches;
+                    windowExplanation.innerHTML = `Calculating over batches from T${startBatch*config.batchInterval} to T${endBatch*config.batchInterval}...`;
+
+                    currentLeft += slidePixels;
+                    if (currentLeft <= maxLeft) {
+                        animationTimeout = setTimeout(slide, 1500);
+                    } else {
+                        windowExplanation.innerHTML += `<br><strong>Animation complete!</strong>`;
+                    }
+                }
+                slide();
+            };
+            
+            windowLengthSelector.addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') updateConfig('windowLength', parseInt(e.target.dataset.value), windowLengthSelector);
+            });
+            slideIntervalSelector.addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') updateConfig('slideInterval', parseInt(e.target.dataset.value), slideIntervalSelector);
+            });
+            animateBtn.addEventListener('click', animateSlide);
+            
+            createBatches();
+            updateConfig('windowLength', 40, windowLengthSelector);
+            updateConfig('slideInterval', 20, slideIntervalSelector);
+        }
+    </script>
+</body>
+</html>
